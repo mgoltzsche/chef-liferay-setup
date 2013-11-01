@@ -20,7 +20,7 @@ user node['liferay']['user'] do
 end
 
 # --- Set host name ---
-hostname = 'dev.algorythm.de'
+hostname = node['liferay']['hostname']
 
 file '/etc/hostname' do
   content "#{hostname}\n"
