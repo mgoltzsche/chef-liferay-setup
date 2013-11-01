@@ -1,9 +1,9 @@
 # --- Install prerequisites ---
 package 'imagemagick'
+package 'unzip'
 package 'openjdk-7-jre-headless'
 
 # --- Import recipes ---
-include_recipe 'unzip'
 include_recipe 'postgresql'
 include_recipe 'nginx'
 
