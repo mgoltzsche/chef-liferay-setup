@@ -17,7 +17,7 @@ package 'nginx'
 # --- Set host name ---
 # Note how this is plain Ruby code, so we can define variables to
 # DRY up our code:
-hostname = 'algorythm.de'
+hostname = 'dev.algorythm.de'
 
 file '/etc/hostname' do
   content "#{hostname}\n"
