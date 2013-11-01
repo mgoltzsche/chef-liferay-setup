@@ -1,22 +1,9 @@
-# --- Install packages we need ---
-#package 'ntp'
-#package 'sysstat'
-package 'openjdk-7-jre-headless'
-package 'nginx'
-
-# --- Add the data partition ---
-#directory '/mnt/data_joliss'
-
-#mount '/mnt/data_joliss' do
-#  action [:mount, :enable]  # mount and add to fstab
-#  device 'data_joliss'
-#  device_type :label
-#  options 'noatime,errors=remount-ro'
-#end
+# --- Import recipes ---
+include_recipe 'prerequisites'
+include_recipe 'postgresql'
+include_recipe 'nginx'
 
 # --- Set host name ---
-# Note how this is plain Ruby code, so we can define variables to
-# DRY up our code:
 hostname = 'dev.algorythm.de'
 
 file '/etc/hostname' do
@@ -40,8 +27,3 @@ end
 # This will copy cookbooks/op/files/default/apache2.conf (which
 # you'll have to create yourself) into place. Whenever you edit
 # that file, simply run "./deploy.sh" to copy it to the server.
-
-service 'nginx' do
-  action :restart
-end
-
