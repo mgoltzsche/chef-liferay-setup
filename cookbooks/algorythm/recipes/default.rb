@@ -3,10 +3,6 @@ package 'imagemagick'
 package 'openjdk-7-jre-headless'
 
 # --- Import recipes ---
-case node['platform_family']
-when 'debian'
-  include_recipe 'apt'
-end
 include_recipe 'unzip'
 include_recipe 'postgresql'
 include_recipe 'nginx'
