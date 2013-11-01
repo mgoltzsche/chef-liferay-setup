@@ -12,8 +12,14 @@ if ! test -f "$chef_binary"; then
     apt-get -o Dpkg::Options::="--force-confnew" \
         --force-yes -fuy dist-upgrade &&
     # Install Ruby and Chef
-    apt-get install -y rvm &&
-    rvm install 2.0.0 &&
+    apt-get install -y ruby-rvm &&
+    apt-get install -y libyaml-dev &&
+    rvm get stable &&
+    rvm pkg install openssl &&
+    rvm install 2.0.0 \
+	--with-openssl-dir=$HOME/.rvm/usr \
+	--verify-downloads 1 &&
+    rvm use 2.0.0 &&
     gem install --no-rdoc --no-ri chef
 fi &&
 
