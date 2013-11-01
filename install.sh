@@ -2,8 +2,8 @@
 
 # This runs as root on the server
 
-RUBY_VERSION=2.0.0
-CHEF_BINARY=chef-solo
+RUBY_VERSION=2.0.0-p247
+CHEF_BINARY="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin/chef-solo"
 
 # Are we on a vanilla system?
 if ! test -f "$CHEF_BINARY"; then
