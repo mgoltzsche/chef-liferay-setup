@@ -1,7 +1,7 @@
 package 'nginx'
 
 directory '/usr/share/nginx/www' do
-  recursive false
+  recursive true
   action :delete
 end
 
