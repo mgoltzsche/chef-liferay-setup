@@ -47,6 +47,6 @@ node['liferay']['postgresql']['database'].each do |db, name|
   execute "Create database #{name}" do
     user 'postgres'
     command "createdb #{name} -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0"
-    not_if "psql -U postgres -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';\" | grep #{name}"
+    not_if("psql -U postgres -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';\" | grep #{name}", :user => 'postgres')
   end
 end
