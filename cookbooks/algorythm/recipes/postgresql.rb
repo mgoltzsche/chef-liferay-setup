@@ -34,7 +34,7 @@ end
 execute "Create liferay postgres user" do
   user 'postgres'
   command "psql -U postgres -c \"CREATE USER #{node['liferay']['postgresql']['user']};\""
-  not_if "sfs fpsql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';\" | grep #{node['liferay']['postgresql']['user']}"
+  not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';\" | grep #{node['liferay']['postgresql']['user']}", :user => 'postgres')
 end
 
 execute "Set liferay postgres user password" do
