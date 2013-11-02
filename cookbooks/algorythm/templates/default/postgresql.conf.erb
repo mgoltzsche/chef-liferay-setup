@@ -6,11 +6,7 @@ port = <%=node['liferay']['postgresql']['port']%>
 max_connections = 100
 unix_socket_directory = '/var/run/postgresql'
 ssl = false
-shared_buffers = 32MB
+shared_buffers = 24MB
 log_line_prefix = '%t '
 datestyle = 'iso, dmy'
-lc_messages = 'de_DE.UTF-8'
-lc_monetary = 'de_DE.UTF-8'
-lc_numeric = 'de_DE.UTF-8'
-lc_time = 'de_DE.UTF-8'
-default_text_search_config = 'pg_catalog.german'
+default_text_search_config = 'pg_catalog.english'
