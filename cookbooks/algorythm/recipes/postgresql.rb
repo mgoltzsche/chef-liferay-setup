@@ -11,11 +11,6 @@ end
 
 package 'postgresql'
 
-# restart postgresql
-service 'postgresql' do
-  action :restart
-end
-
 # Write config files
 template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
   source "postgresql.conf.erb"
@@ -25,12 +20,9 @@ template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
 #  notifies :reload, 'service[postgresql]', :immediately
 end
 
-template "#{node['liferay']['postgresql']['dir']}/pg_hba.conf" do
-  source "pg_hba.conf.erb"
-  owner "postgres"
-  group "postgres"
-  mode 00600
-#  notifies :reload, 'service[postgresql]', :immediately
+# restart postgresql
+service 'postgresql' do
+  action :restart
 end
 
 # Configure users
