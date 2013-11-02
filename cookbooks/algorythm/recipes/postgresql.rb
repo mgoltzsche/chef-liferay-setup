@@ -9,30 +9,38 @@ unless ENV['LANGUAGE'] == "en_US.UTF-8" && ENV['LANG'] == "en_US.UTF-8" && ENV['
   ENV['LANGUAGE'] = ENV['LANG'] = ENV['LC_ALL'] = "en_US.UTF-8"
 end
 
-include_recipe "postgresql::server"
-include_recipe "database::postgresql"
+package 'postgresql'
 
-postgresql_connection_info = {:host => "127.0.0.1",
-                              :port => node['postgresql']['config']['port'],
-                              :username => 'postgres',
-                              :password => node['postgresql']['password']['postgres']}
+execute "Set postgres user password" do
+  user 'postgres'
+  code <<-EOH
+echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';" | psql
+  EOH
+end
 
-# create the liferay postgresql user but grant no privileges
-postgresql_database_user node['liferay']['postgresql']['user'] do
-  connection postgresql_connection_info
-  password node['liferay']['postgresql']['user_password']
-  action :create
+execute "Create liferay postgres user" do
+  user 'postgres'
+  exists <<-EOH
+echo "SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';" | psql | grep #{node['liferay']['postgresql']['user']}
+  EOH
+  command <<-EOH
+echo "CREATE USER #{node['liferay']['postgresql']['user']};" | psql
+  EOH
+  not_if exists
+end
+
+execute "Set liferay postgres user password" do
+  user 'postgres'
+  command <<-EOH
+echo "ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';" | psql
+  EOH
 end
 
 # create databases
 node['liferay']['postgresql']['database'].each do |db, name|
-        postgresql_database name do
-         connection postgresql_connection_info
-    template 'template0'
-    encoding 'UTF8'
-    tablespace 'DEFAULT'
-    connection_limit '-1'
-    owner node['liferay']['postgresql']['user']
-    action :create
-        end
+#    template 'template0'
+#    encoding 'UTF8'
+#    tablespace 'DEFAULT'
+#    connection_limit '-1'
+#    owner node['liferay']['postgresql']['user']
 end
