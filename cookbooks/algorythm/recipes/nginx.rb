@@ -1,18 +1,6 @@
 package 'nginx'
 
-directory '/usr/share/nginx/www' do
-  recursive true
-  action :delete
-end
-
-directory '/var/www/http' do
-  owner 'root'
-  group 'root'
-  mode 00644
-  action :create
-end
-
-directory '/var/www/cache' do
+directory '/usr/share/nginx/cache' do
   owner 'root'
   group 'root'
   mode 00644
