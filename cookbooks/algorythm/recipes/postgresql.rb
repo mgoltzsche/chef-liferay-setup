@@ -56,7 +56,7 @@ node['liferay']['postgresql']['database'].each do |db, name|
   execute "Create database #{name}" do
     user 'postgres'
     exists = <<-EOH
-echo "SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';" | psql
+echo "SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';" | psql | grep #{name}
     EOH
     command <<-EOH
 createdb #{name} -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0
