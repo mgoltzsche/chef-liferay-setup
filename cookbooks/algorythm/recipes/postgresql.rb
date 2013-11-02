@@ -20,7 +20,7 @@ end
 
 execute "Create liferay postgres user" do
   user 'postgres'
-  exists <<-EOH
+  exists = <<-EOH
 echo "SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';" | psql | grep #{node['liferay']['postgresql']['user']}
   EOH
   command <<-EOH
