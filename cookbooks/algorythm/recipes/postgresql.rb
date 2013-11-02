@@ -11,6 +11,11 @@ end
 
 package 'postgresql'
 
+# restart postgresql
+service 'postgresql' do
+  action :restart
+end
+
 # Write config files
 template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
   source "postgresql.conf.erb"
@@ -66,9 +71,4 @@ createdb #{db} -D DEFAULT -E UTF8 -O #{node['liferay']['postgresql']['user']} -T
     EOH
     not_if exists
   end
-end
-
-# restart postgresql
-service 'postgresql' do
-  action :restart
 end
