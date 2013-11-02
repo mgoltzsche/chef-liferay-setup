@@ -1,0 +1,16 @@
+data_directory = "/var/lib/postgresql/#{node['liferay']['postgresql']['version']}/main"
+hba_file = "/etc/postgresql/#{node['liferay']['postgresql']['version']}/main/pg_hba.conf"
+ident_file = "/etc/postgresql/#{node['liferay']['postgresql']['version']}/main/pg_ident.conf"
+external_pid_file = "/var/run/postgresql/#{node['liferay']['postgresql']['version']}-main.pid"
+port = #{node['liferay']['postgresql']['port']}
+max_connections = 100
+unix_socket_directory = '/var/run/postgresql'
+ssl = false
+shared_buffers = 32MB
+log_line_prefix = '%t '
+datestyle = 'iso, dmy'
+lc_messages = 'de_DE.UTF-8'
+lc_monetary = 'de_DE.UTF-8'
+lc_numeric = 'de_DE.UTF-8'
+lc_time = 'de_DE.UTF-8'
+default_text_search_config = 'pg_catalog.german'

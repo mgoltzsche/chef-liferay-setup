@@ -11,6 +11,24 @@ end
 
 package 'postgresql'
 
+# Write config files
+template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
+  source "postgresql.conf.erb"
+  owner "postgres"
+  group "postgres"
+  mode 0600
+  notifies :reload, 'service[postgresql]', :immediately
+end
+
+template "#{node['liferay']['postgresql']['dir']}/pg_hba.conf" do
+  source "pg_hba.conf.erb"
+  owner "postgres"
+  group "postgres"
+  mode 00600
+  notifies :reload, 'service[postgresql]', :immediately
+end
+
+# Configure users
 execute "Set postgres user password" do
   user 'postgres'
   command <<-EOH
@@ -38,9 +56,14 @@ end
 
 # create databases
 node['liferay']['postgresql']['database'].each do |db, name|
-#    template 'template0'
-#    encoding 'UTF8'
-#    tablespace 'DEFAULT'
-#    connection_limit '-1'
-#    owner node['liferay']['postgresql']['user']
+  execute "Create database #{db}" do
+    user 'postgres'
+    exists = <<-EOH
+psql -l | grep #{db} | wc -l
+    EOH
+    command <<-EOH
+createdb #{db} -D DEFAULT -E UTF8 -O #{node['liferay']['postgresql']['user']} -T template0
+    EOH
+    not_if exists
+  end
 end
