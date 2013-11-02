@@ -3,10 +3,6 @@ package 'imagemagick'
 package 'unzip'
 package 'openjdk-7-jre-headless'
 
-# --- Import recipes ---
-include_recipe 'postgresql'
-include_recipe 'nginx'
-
 # --- Set user ---
 user node['liferay']['user'] do
   comment 'Liferay User'
