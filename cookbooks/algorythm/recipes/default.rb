@@ -3,14 +3,6 @@ package 'imagemagick'
 package 'unzip'
 package 'openjdk-7-jre-headless'
 
-# --- Create liferay system user ---
-user node['liferay']['user'] do
-  comment 'Liferay User'
-  home "/home/#{node['liferay']['user']}"
-  shell '/bin/bash'
-  supports :manage_home=>true
-end
-
 # --- Set host name ---
 hostname = node['liferay']['hostname']
 

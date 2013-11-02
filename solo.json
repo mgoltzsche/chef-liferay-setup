@@ -1,7 +1,8 @@
 {
 	"run_list": [
-		"recipe[algorythm::postgresql]",
 		"recipe[algorythm::default]",
-		"recipe[algorythm::nginx]"
+		"recipe[algorythm::postgresql]",
+		"recipe[algorythm::nginx]",
+		"recipe[algorythm::liferay]"
 	]
 }
