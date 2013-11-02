@@ -20,8 +20,8 @@ directory '/var/www/cache' do
 end
 
 cookbook_file '/etc/nginx/sites-available/default'
-cookbook_file '/var/www/http/index.html'
-cookbook_file '/var/www/http/50x.html'
+cookbook_file '/usr/share/nginx/www/index.html'
+cookbook_file '/usr/share/nginx/www/50x.html'
 
 service 'nginx' do
   action :restart
