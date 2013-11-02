@@ -28,39 +28,25 @@ end
 # Configure users
 execute "Set postgres user password" do
   user 'postgres'
-  command <<-EOH
-psql -U postgres -c "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';"
-  EOH
+  command "psql -U postgres -c \"ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';\""
 end
 
 execute "Create liferay postgres user" do
   user 'postgres'
-  exists = <<-EOH
-psql -U postgres -c "SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';" | grep #{node['liferay']['postgresql']['user']}
-  EOH
-  command <<-EOH
-psql -U postgres -c "CREATE USER #{node['liferay']['postgresql']['user']};"
-  EOH
-  not_if !exists
+  command "psql -U postgres -c \"CREATE USER #{node['liferay']['postgresql']['user']};\""
+  not_if "psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';\" | grep #{node['liferay']['postgresql']['user']}"
 end
 
 execute "Set liferay postgres user password" do
   user 'postgres'
-  command <<-EOH
-psql -U postgres -c "ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';"
-  EOH
+  command "psql -U postgres -c \"ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';\""
 end
 
 # create databases
 node['liferay']['postgresql']['database'].each do |db, name|
   execute "Create database #{name}" do
     user 'postgres'
-    exists = <<-EOH
-psql -U postgres -c "SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';" | grep #{name}
-    EOH
-    command <<-EOH
-createdb #{name} -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0
-    EOH
-    not_if exists
+    command "createdb #{name} -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0"
+    not_if "psql -U postgres -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{name}';\" | grep #{name}"
   end
 end
