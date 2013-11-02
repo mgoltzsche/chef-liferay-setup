@@ -13,7 +13,7 @@ package 'postgresql'
 
 execute "Set postgres user password" do
   user 'postgres'
-  code <<-EOH
+  command <<-EOH
 echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';" | psql
   EOH
 end
