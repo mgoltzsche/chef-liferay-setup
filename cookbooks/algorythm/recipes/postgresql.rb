@@ -41,7 +41,7 @@ psql -U postgres -c "SELECT * FROM pg_user WHERE usename='#{node['liferay']['pos
   command <<-EOH
 psql -U postgres -c "CREATE USER #{node['liferay']['postgresql']['user']};"
   EOH
-  not_if exists
+  not_if !exists
 end
 
 execute "Set liferay postgres user password" do
