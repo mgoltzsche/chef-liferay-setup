@@ -17,7 +17,7 @@ template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
   owner "postgres"
   group "postgres"
   mode 0600
-  notifies :reload, 'service[postgresql]', :immediately
+#  notifies :reload, 'service[postgresql]', :immediately
 end
 
 template "#{node['liferay']['postgresql']['dir']}/pg_hba.conf" do
@@ -25,7 +25,7 @@ template "#{node['liferay']['postgresql']['dir']}/pg_hba.conf" do
   owner "postgres"
   group "postgres"
   mode 00600
-  notifies :reload, 'service[postgresql]', :immediately
+#  notifies :reload, 'service[postgresql]', :immediately
 end
 
 # Configure users
@@ -66,4 +66,9 @@ createdb #{db} -D DEFAULT -E UTF8 -O #{node['liferay']['postgresql']['user']} -T
     EOH
     not_if exists
   end
+end
+
+# restart postgresql
+service 'postgresql' do
+  action :restart
 end
