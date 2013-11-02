@@ -2,9 +2,9 @@ package 'nginx'
 
 # Create cache directory
 directory '/usr/share/nginx/cache' do
-  owner 'root'
-  group 'root'
-  mode 00644
+  owner 'www-data'
+  group 'www-data'
+  mode 00744
   action :create
 end
 
