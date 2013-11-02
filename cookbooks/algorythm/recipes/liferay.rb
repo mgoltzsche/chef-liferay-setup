@@ -9,10 +9,11 @@ user node['liferay']['user'] do
 end
 
 # --- Download and install Liferay ---
+downloadDir = "/home/#{node['liferay']['user']}"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 
-remote_file "/home/#{node['liferay']['user']}/#{liferayZipFile}" do
+remote_file "#{downloadDir}/#{liferayZipFile}" do
   owner node['liferay']['user']
   group node['liferay']['group']
   source node['liferay']['download_url']
@@ -20,13 +21,11 @@ remote_file "/home/#{node['liferay']['user']}/#{liferayZipFile}" do
   notifies :run, "bash[Extract Liferay]", :immediately
 end
 
-downloadDir = "/home/#{node['liferay']['user']}"
-
 bash "Extract Liferay" do
   cwd downloadDir
   user node['liferay']['user']
   group node['liferay']['group']
-  code "unzip #{liferayZipFile}"
+  code "unzip -q #{liferayZipFile}"
   action :nothing
   notifies :run, "bash[Move Liferay]", :immediately
 end
