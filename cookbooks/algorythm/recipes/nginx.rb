@@ -8,6 +8,11 @@ directory '/usr/share/nginx/cache' do
   action :create
 end
 
+# Declare nginx service
+service 'nginx' do
+  action :nothing
+end
+
 # Set default vhost and pages
 cookbook_file '/usr/share/nginx/www/index.html'
 cookbook_file '/usr/share/nginx/www/50x.html'
