@@ -1,6 +1,6 @@
 require 'uri'
 
-# --- Create Liferay system user ---
+# --- Create Liferay system user (not required) ---
 user node['liferay']['user'] do
   comment 'Liferay User'
   home "/home/#{node['liferay']['user']}"
@@ -9,14 +9,14 @@ user node['liferay']['user'] do
 end
 
 # --- Download and install Liferay ---
-downloadDir = "/home/#{node['liferay']['user']}"
+downloadDir = "/tmp/liferay_downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
-  owner node['liferay']['user']
-  group node['liferay']['group']
+  owner 'root'
+  group 'root'
   source node['liferay']['download_url']
   action :create_if_missing
 end
