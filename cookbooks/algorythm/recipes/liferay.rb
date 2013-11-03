@@ -51,9 +51,10 @@ end
 
 # --- Clean up Liferay installation ---
 execute "Delete *.bat files" do
+  cwd "#{liferayHome}/tomcat/bin/"
   user 'root'
   group 'root'
-  command "ls #{liferayHome}/tomcat/bin/ | grep '\\.bat$' | xargs rm"
+  command "ls | grep '\\.bat$' | xargs rm"
   action :nothing
 end
 
