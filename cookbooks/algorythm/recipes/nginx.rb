@@ -14,7 +14,7 @@ cookbook_file '/usr/share/nginx/www/index.html'
 cookbook_file '/usr/share/nginx/www/50x.html'
 
 template "/etc/nginx/sites-available/default" do
-  source "default.erb"
+  source "nginx.default.vhost.erb"
   mode 00700
   variables({
     :port => node['liferay']['port']
