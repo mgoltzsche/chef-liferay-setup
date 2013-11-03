@@ -46,6 +46,7 @@ ln -s #{liferayHome} #{node['liferay']['install_directory']}/liferay &&
 ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat
   EOH
   action :nothing
+  notifies :run, "execute[Delete *.bat files]", :immediately
 end
 
 # --- Clean up Liferay installation ---
