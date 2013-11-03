@@ -97,6 +97,31 @@ template "#{liferayHome}/tomcat/conf/server.xml" do
   })
 end
 
+template "#{liferayHome}/tomcat/conf/server.xml" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  source "server.xml.erb"
+  mode 00700
+  variables({
+    :port => node['liferay']['port']
+  })
+end
+
+template "#{liferayHome}/portal-ext.properties" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  source "portal-ext.properties.erb"
+  mode 00700
+  variables({
+    :liferay_home => liferayHome,
+    :postgres_port => node['liferay']['postgresql']['port'],
+    :company_name => node['liferay']['company_default_name'],
+    :hostname => node['liferay']['hostname'],
+    :admin_name => node['liferay']['admin']['name'],
+    :admin_email => node['liferay']['admin']['email']
+  })
+end
+
 # --- Register Liferay as service ---
 service "liferay" do
   supports :restart => true
@@ -106,7 +131,7 @@ template "/etc/init.d/liferay" do
   source "init.d.liferay.erb"
   mode 00755
   variables({
-    :liferay_home => "#{liferayHome}",
+    :liferay_home => liferayHome,
     :user => node['liferay']['user'],
     :group => node['liferay']['group']
   })
