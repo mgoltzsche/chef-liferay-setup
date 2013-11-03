@@ -27,18 +27,18 @@ execute "Extract Liferay" do
   group 'root'
   command "unzip -qd #{node['liferay']['install_directory']} #{liferayZipFile}"
   not_if {File.exist?(liferayHome)}
+  notifies :run, "execute[Create symlinks]", :immediately
 end
 
-link "#{node['liferay']['install_directory']}/liferay" do
+execute "Create symlinks" do
   owner node['liferay']['user']
   group node['liferay']['group']
-  to "#{node['liferay']['install_directory']}/#{liferayExtractionDir}"
-end
-
-link "#{node['liferay']['install_directory']}/liferay/tomcat" do
-  owner node['liferay']['user']
-  group node['liferay']['group']
-  to "#{liferayHome}/$(ls #{liferayHome} | grep tomcat))"
+  command <<-EOH
+rm -rf #{node['liferay']['install_directory']}/liferay &&
+ln -s #{liferayHome} #{node['liferay']['install_directory']}/liferay &&
+ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat
+  EOH
+  action :nothing
 end
 
 # --- Clean up Liferay installation ---
