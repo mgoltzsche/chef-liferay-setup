@@ -49,7 +49,7 @@ ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat
 end
 
 # --- Clean up Liferay installation ---
-execute "Create symlinks" do
+execute "Delete *.bat files" do
   user 'root'
   group 'root'
   command "ls #{liferayHome}/tomcat/bin/ | grep '\\.bat$' | xargs rm"
