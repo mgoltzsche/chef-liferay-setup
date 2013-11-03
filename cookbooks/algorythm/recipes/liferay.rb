@@ -12,13 +12,13 @@ end
 downloadDir = "/home/#{node['liferay']['user']}"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
+liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
   owner node['liferay']['user']
   group node['liferay']['group']
   source node['liferay']['download_url']
   action :create_if_missing
-  notifies :run, "bash[Extract Liferay]", :immediately
 end
 
 bash "Extract Liferay" do
@@ -26,7 +26,7 @@ bash "Extract Liferay" do
   user node['liferay']['user']
   group node['liferay']['group']
   code "unzip -q #{liferayZipFile}"
-  action :run
+  not_if {File.exist?(liferayHome)}
   notifies :run, "bash[Move Liferay]", :immediately
 end
 
@@ -42,8 +42,6 @@ link "#{node['liferay']['install_directory']}/liferay" do
   group node['liferay']['group']
   to "#{node['liferay']['install_directory']}/#{liferayExtractionDir}"
 end
-
-liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 
 link "#{node['liferay']['install_directory']}/liferay/tomcat" do
   owner node['liferay']['user']
