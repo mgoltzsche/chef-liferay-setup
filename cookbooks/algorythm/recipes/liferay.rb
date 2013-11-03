@@ -1,6 +1,6 @@
 require 'uri'
 
-# --- Create Liferay system user (not required) ---
+# --- Create Liferay system user ---
 user node['liferay']['user'] do
   comment 'Liferay User'
   home "/home/#{node['liferay']['user']}"
@@ -49,18 +49,19 @@ ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat
 end
 
 # --- Clean up Liferay installation ---
-Dir.glob("#{node['liferay']['install_directory']}/liferay/tomcat/bin/*.bat").each do |bat_file|
-  file bat_file do
-    action :delete
-  end
+execute "Create symlinks" do
+  user 'root'
+  group 'root'
+  command "ls #{liferayHome}/tomcat/bin/ | grep '\\.bat$' | xargs rm"
+  action :nothing
 end
 
-directory "#{node['liferay']['install_directory']}/liferay/tomcat/webapps/welcome-theme" do
+directory "#{liferayHome}/tomcat/webapps/welcome-theme" do
   recursive true
   action :delete
 end
 
-directory "#{node['liferay']['install_directory']}/liferay/tomcat/webapps/resources-importer-web" do
+directory "#{liferayHome}/tomcat/webapps/resources-importer-web" do
   recursive true
   action :delete
 end
