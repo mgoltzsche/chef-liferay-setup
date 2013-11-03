@@ -1,6 +1,7 @@
+# --- Install nginx
 package 'nginx'
 
-# Create cache directory
+# --- Create cache directory ---
 directory '/usr/share/nginx/cache' do
   owner 'www-data'
   group 'www-data'
@@ -8,7 +9,7 @@ directory '/usr/share/nginx/cache' do
   action :create
 end
 
-# Set default vhost and pages
+# --- Set default vhost and pages ---
 cookbook_file '/usr/share/nginx/www/index.html'
 cookbook_file '/usr/share/nginx/www/50x.html'
 
@@ -20,7 +21,7 @@ template "/etc/nginx/sites-available/default" do
   })
 end
 
-# Restart nginx
+# --- (Re)start nginx ---
 service 'nginx' do
   action :restart
 end

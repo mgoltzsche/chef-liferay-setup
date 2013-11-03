@@ -123,10 +123,6 @@ template "#{liferayHome}/portal-ext.properties" do
 end
 
 # --- Register Liferay as service ---
-service "liferay" do
-  supports :restart => true
-end
-
 template "/etc/init.d/liferay" do
   source "init.d.liferay.erb"
   mode 00755
@@ -135,8 +131,6 @@ template "/etc/init.d/liferay" do
     :user => node['liferay']['user'],
     :group => node['liferay']['group']
   })
-  notifies :enable, "service[liferay]", :delayed
-  notifies :start, "service[liferay]", :delayed
 end
 
 template "/etc/logrotate.d/liferay" do
@@ -145,4 +139,9 @@ template "/etc/logrotate.d/liferay" do
   variables({
     :liferay_log_home => "#{liferayHome}/tomcat/logs"
   })
+end
+
+# --- (Re)start Liferay ---
+service "liferay" do
+  action :restart
 end

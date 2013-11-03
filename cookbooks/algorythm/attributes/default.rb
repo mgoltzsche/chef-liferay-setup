@@ -5,7 +5,7 @@ default['liferay']['hostname'] = 'dev.algorythm.de'
 default['liferay']['user'] = "liferay"
 default['liferay']['group'] = "liferay"
 
-# Database: Postgres
+# DB: Postgres
 default['liferay']['postgresql']['version'] = "9.1"
 default['liferay']['postgresql']['dir'] = "/etc/postgresql/#{default['liferay']['postgresql']['version']}/main"
 default['liferay']['postgresql']['port'] = 5432

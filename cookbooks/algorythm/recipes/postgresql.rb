@@ -1,3 +1,4 @@
+# --- Configure locale: en_US.UTF-8 ---
 unless ENV['LANGUAGE'] == "en_US.UTF-8" && ENV['LANG'] == "en_US.UTF-8" && ENV['LC_ALL'] == "en_US.UTF-8"
   execute "setup-locale" do
     command "locale-gen en_US.UTF-8 && dpkg-reconfigure locales"
@@ -9,9 +10,10 @@ unless ENV['LANGUAGE'] == "en_US.UTF-8" && ENV['LANG'] == "en_US.UTF-8" && ENV['
   ENV['LANGUAGE'] = ENV['LANG'] = ENV['LC_ALL'] = "en_US.UTF-8"
 end
 
+# --- Install postgresql ---
 package 'postgresql'
 
-# Write config
+# --- Write config ---
 template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
   source "postgresql.conf.erb"
   owner "postgres"
@@ -19,12 +21,12 @@ template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
   mode 0600
 end
 
-# Restart postgresql
+# --- (Re)start postgresql ---
 service 'postgresql' do
   action :restart
 end
 
-# Configure users
+# --- Configure users ---
 execute "Set postgres admin password" do
   user 'postgres'
   command "psql -U postgres -c \"ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['admin_password']}';\""
@@ -41,7 +43,7 @@ execute "Set postgres user password of '#{node['liferay']['postgresql']['user']}
   command "psql -U postgres -c \"ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['user_password']}';\""
 end
 
-# Create databases
+# --- Create databases ---
 node['liferay']['postgresql']['database'].each do |db, name|
   execute "Create database '#{name}'" do
     user 'postgres'
