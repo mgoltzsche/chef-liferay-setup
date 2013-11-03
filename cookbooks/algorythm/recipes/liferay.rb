@@ -31,8 +31,8 @@ execute "Extract Liferay" do
 end
 
 execute "Create symlinks" do
-  owner node['liferay']['user']
-  group node['liferay']['group']
+  user 'root'
+  group 'root'
   command <<-EOH
 rm -rf #{node['liferay']['install_directory']}/liferay &&
 ln -s #{liferayHome} #{node['liferay']['install_directory']}/liferay &&
