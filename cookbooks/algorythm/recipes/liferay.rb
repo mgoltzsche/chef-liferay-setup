@@ -14,6 +14,13 @@ liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 
+directory downloadDir do
+  owner 'root'
+  group 'root'
+  mode 00744
+  action :create
+end
+
 remote_file "#{downloadDir}/#{liferayZipFile}" do
   owner 'root'
   group 'root'
