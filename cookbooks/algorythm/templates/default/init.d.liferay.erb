@@ -119,10 +119,8 @@ function stop {
         log_end_msg $status
     <% end %>
 
-        if [ "$status" = "0" ];then
-            rm -f "$CATALINA_PID"
-        fi
-        exit $status
+        rm -f "$CATALINA_PID"
+        exit 0
 }
 
 #restarts the daemon service
