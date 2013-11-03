@@ -67,3 +67,54 @@ directory "#{liferayHome}/tomcat/webapps/resources-importer-web" do
   recursive true
   action :delete
 end
+
+# --- Configure Liferay installation ---
+template "#{liferayHome}/tomcat/bin/setenv.sh" do
+  source "setenv.sh.erb"
+  mode 01755
+  variables({
+    :java_opts => node['liferay']['java_opts']
+  })
+end
+
+service "liferay" do
+  supports :restart => true
+end
+
+template "/etc/init.d/liferay" do
+  source "init.d.liferay.erb"
+  mode 00755
+  variables({
+    :liferay_home => "#{liferayHome}",
+    :user => node['liferay']['user'],
+    :group => node['liferay']['group']
+  })
+  notifies :enable, "service[liferay]", :delayed
+  notifies :start, "service[liferay]", :delayed
+end
+
+template "/etc/logrotate.d/liferay" do
+  source "logrotate.d.liferay.erb"
+  mode 00755
+  variables({
+    :liferay_log_home => "#{liferayHome}/tomcat/logs"
+  })
+end
+
+directory "#{liferayHome}/deploy" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  mode 01755
+  action :create
+  recursive true
+end
+
+template "#{liferayHome}/tomcat/conf/server.xml" do
+  source "server.xml.erb"
+  mode 00740
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  variables({
+    :port => node['liferay']['port']
+  })
+end

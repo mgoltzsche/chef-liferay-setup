@@ -9,11 +9,16 @@ directory '/usr/share/nginx/cache' do
 end
 
 # Set default vhost and pages
-cookbook_file '/etc/nginx/sites-available/default'
 cookbook_file '/usr/share/nginx/www/index.html'
 cookbook_file '/usr/share/nginx/www/50x.html'
 
-# Restart nginx
-service 'nginx' do
-  action :restart
+template "/etc/nginx/sites-available/default" do
+  source "default.erb"
+  mode 00700
+  owner 'root'
+  group 'root'
+  variables({
+    :port => node['liferay']['port']
+  })
+  notifies :reload, 'service[nginx]', :immediately
 end

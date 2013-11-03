@@ -17,4 +17,6 @@ default['liferay']['postgresql']['database']['default'] = "liferay"
 # Liferay
 default['liferay']['download_url'] = "http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr"
 default['liferay']['install_directory'] = "/opt"
+default['liferay']['java_opts'] = "-Xms128m -Xmx1024m -XX:MaxPermSize=256m"
+default['liferay']['port'] = 8087
 
