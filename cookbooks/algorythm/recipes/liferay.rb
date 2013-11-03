@@ -9,21 +9,21 @@ user node['liferay']['user'] do
 end
 
 # --- Download and install Liferay ---
-downloadDir = "/tmp/liferay_downloads"
+downloadDir = "/home/#{node['liferay']['user']}/liferay_downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 
 directory downloadDir do
-  owner 'root'
-  group 'root'
+  owner node['liferay']['user']
+  group node['liferay']['group']
   mode 00744
   action :create
 end
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
-  owner 'root'
-  group 'root'
+  owner node['liferay']['user']
+  group node['liferay']['group']
   source node['liferay']['download_url']
   action :create_if_missing
 end
