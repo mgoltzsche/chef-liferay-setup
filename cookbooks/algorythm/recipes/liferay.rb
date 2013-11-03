@@ -1,6 +1,6 @@
 require 'uri'
 
-# --- Create liferay system user ---
+# --- Create Liferay system user ---
 user node['liferay']['user'] do
   comment 'Liferay User'
   home "/home/#{node['liferay']['user']}"
@@ -26,7 +26,7 @@ bash "Extract Liferay" do
   user node['liferay']['user']
   group node['liferay']['group']
   code "unzip -q #{liferayZipFile}"
-  action :nothing
+  action :run
   notifies :run, "bash[Move Liferay]", :immediately
 end
 
@@ -35,6 +35,20 @@ bash "Move Liferay" do
   user "root"
   code "mv #{liferayExtractionDir} #{node['liferay']['install_directory']}"
   action :nothing
+end
+
+link "#{node['liferay']['install_directory']}/liferay" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  to "#{node['liferay']['install_directory']}/#{liferayExtractionDir}"
+end
+
+liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
+
+link "#{node['liferay']['install_directory']}/liferay/tomcat" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  to "#{liferayHome}/$(ls #{liferayHome} | grep tomcat))"
 end
 
 # --- Clean up Liferay installation ---
