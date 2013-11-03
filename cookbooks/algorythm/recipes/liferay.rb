@@ -21,20 +21,12 @@ remote_file "#{downloadDir}/#{liferayZipFile}" do
   action :create_if_missing
 end
 
-bash "Extract Liferay" do
+execute "Extract Liferay" do
   cwd downloadDir
-  user node['liferay']['user']
-  group node['liferay']['group']
-  code "unzip -q #{liferayZipFile}"
+  user 'root'
+  group 'root'
+  command "unzip -qd #{node['liferay']['install_directory']} #{liferayZipFile}"
   not_if {File.exist?(liferayHome)}
-  notifies :run, "bash[Move Liferay]", :immediately
-end
-
-bash "Move Liferay" do
-  cwd downloadDir
-  user "root"
-  code "mv #{liferayExtractionDir} #{node['liferay']['install_directory']}"
-  action :nothing
 end
 
 link "#{node['liferay']['install_directory']}/liferay" do
