@@ -70,13 +70,34 @@ end
 
 # --- Configure Liferay installation ---
 template "#{liferayHome}/tomcat/bin/setenv.sh" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
   source "setenv.sh.erb"
-  mode 01755
+  mode 01700
   variables({
     :java_opts => node['liferay']['java_opts']
   })
 end
 
+directory "#{liferayHome}/deploy" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  mode 01750
+  action :create
+  recursive true
+end
+
+template "#{liferayHome}/tomcat/conf/server.xml" do
+  owner node['liferay']['user']
+  group node['liferay']['group']
+  source "server.xml.erb"
+  mode 00700
+  variables({
+    :port => node['liferay']['port']
+  })
+end
+
+# --- Register Liferay as service ---
 service "liferay" do
   supports :restart => true
 end
@@ -98,23 +119,5 @@ template "/etc/logrotate.d/liferay" do
   mode 00755
   variables({
     :liferay_log_home => "#{liferayHome}/tomcat/logs"
-  })
-end
-
-directory "#{liferayHome}/deploy" do
-  owner node['liferay']['user']
-  group node['liferay']['group']
-  mode 01755
-  action :create
-  recursive true
-end
-
-template "#{liferayHome}/tomcat/conf/server.xml" do
-  source "server.xml.erb"
-  mode 00740
-  owner node['liferay']['user']
-  group node['liferay']['group']
-  variables({
-    :port => node['liferay']['port']
   })
 end
