@@ -29,24 +29,26 @@ imagemagick.enabled=true
 # Login
 login.email.from.name=<%=@hostname%>
 login.email.from.address=no-reply@<%=@hostname%>
+#passwords.default.policy.lockout=false
+#passwords.default.policy.lockout.duration=15
 
 # Webserver config
 web.server.http.port=80
 web.server.https.port=443
 web.server.host=<%=@hostname%>
 
-# Auth: LDAP
+# Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(mail=@email_address@)
 ldap.auth.password.encryption.algorithm=SHA-256
 
 ldap.base.provider.url=ldap://localhost:389
-ldap.base.dn=dc=dev,dc=algorythm,dc=de
+ldap.base.dn=dc=algorythm,dc=de
 ldap.security.principal=cn=manager
 ldap.security.credentials=maximum!
-ldap.users.dn=ou=People,dc=dev,dc=algorythm,dc=de
-ldap.groups.dn=ou=Groups,dc=dev,dc=algorythm,dc=de
+ldap.users.dn=ou=People,dc=algorythm,dc=de
+ldap.groups.dn=ou=Groups,dc=algorythm,dc=de
 
 ldap.user.impl=com.liferay.portal.security.ldap.LDAPUser
 ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title\ngroup=groupMembership
