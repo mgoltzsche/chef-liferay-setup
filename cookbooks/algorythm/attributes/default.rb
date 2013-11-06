@@ -1,9 +1,8 @@
 # Hostname
 default['liferay']['hostname'] = 'dev.algorythm.de'
 
-# User
+# Executing system user
 default['liferay']['user'] = "liferay"
-default['liferay']['group'] = "liferay"
 
 # DB: Postgres
 default['liferay']['postgresql']['version'] = "9.1"
