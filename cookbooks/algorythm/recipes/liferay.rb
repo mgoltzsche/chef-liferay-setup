@@ -31,8 +31,8 @@ end
 
 execute "Extract Liferay" do
   cwd downloadDir
-  user 'root'
-  group 'root'
+  user node['liferay']['user']
+  group node['liferay']['group']
   command "unzip -qd #{node['liferay']['install_directory']} #{liferayZipFile}"
   not_if {File.exist?(liferayHome)}
   notifies :run, "execute[Create symlinks]", :immediately
