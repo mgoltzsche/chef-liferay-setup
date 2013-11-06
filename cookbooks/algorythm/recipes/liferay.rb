@@ -10,7 +10,7 @@ end
 
 # --- Download and install Liferay ---
 usr = node['liferay']['user']
-downloadDir = "/home/#{usr}/liferay_downloads"
+downloadDir = "/home/#{usr}/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
@@ -46,7 +46,7 @@ execute "Create symlinks and change owner" do
 rm -rf #{node['liferay']['install_directory']}/liferay &&
 ln -s #{liferayHome} #{liferayHomeLink} &&
 ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
-chown -R usr:usr $#{liferayHome}
+chown -R #{usr}:#{usr} $#{liferayHome}
   EOH
   action :nothing
   notifies :run, "execute[Delete *.bat files]", :immediately
