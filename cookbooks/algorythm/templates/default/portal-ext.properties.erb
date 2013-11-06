@@ -39,30 +39,29 @@ web.server.host=<%=@hostname%>
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(mail=@email_address@)
-#ldap.auth.password.encryption.algorithm=SSHA
-#ldap.auth.password.encryption.algorithm.types=SHA,SSHA
+ldap.auth.password.encryption.algorithm=SHA-256
 
-ldap.base.provider.url=ldap://127.0.0.1:389
+ldap.base.provider.url=ldap://localhost:389
 ldap.base.dn=dc=dev,dc=algorythm,dc=de
 ldap.security.principal=cn=manager
 ldap.security.credentials=maximum!
-
 ldap.users.dn=ou=People,dc=dev,dc=algorythm,dc=de
 ldap.groups.dn=ou=Groups,dc=dev,dc=algorythm,dc=de
 
-ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title\ngroup=groupMembership
 ldap.user.impl=com.liferay.portal.security.ldap.LDAPUser
-
+ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title\ngroup=groupMembership
 ldap.group.mappings=groupName=cn\ndescription=description\nuser=uniqueMember
 
 ldap.import.enabled=true
 ldap.import.on.startup=true
 ldap.import.interval=10 # Minutes
 ldap.import.method=user
-ldap.import.method=group
+#ldap.import.method=group
 ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)
-ldap.export.enabled=true
+ldap.export.enabled=false
+ldap.export.group.enabled=true
+
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
