@@ -36,7 +36,7 @@ execute "Extract Liferay" do
   group 'root'
   command "unzip -qd #{node['liferay']['install_directory']} #{liferayZipFile}"
   not_if {File.exist?(liferayHome)}
-  notifies :run, "execute[Create symlinks]", :immediately
+  notifies :run, "execute[Create symlinks and change owner]", :immediately
 end
 
 execute "Create symlinks and change owner" do
