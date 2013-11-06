@@ -1,5 +1,12 @@
 require 'uri'
 
+usr = node['liferay']['user']
+downloadDir = "/home/#{usr}/Downloads"
+liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
+liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
+liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
+liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
+
 # --- Create Liferay system user ---
 user usr do
   comment 'Liferay User'
@@ -9,13 +16,6 @@ user usr do
 end
 
 # --- Download and install Liferay ---
-usr = node['liferay']['user']
-downloadDir = "/home/#{usr}/Downloads"
-liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
-liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
-liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
-liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
-
 directory downloadDir do
   owner usr
   group usr
