@@ -1,5 +1,13 @@
-admin.email.from.name=<%=@admin_name%>
-admin.email.from.address=<%=@admin_email%>
+default.regular.theme.id=classic
+liferay.home=<%=@liferay_home%>
+imagemagick.enabled=true
+
+### Webserver aware
+web.server.http.port=80
+web.server.https.port=443
+web.server.host=<%=@hostname%>
+
+### Persistence
 setup.wizard.enabled=false # usr: test@<%=@hostname%>, pwd: test
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
 jdbc.default.url=jdbc:hsqldb:${liferay.home}/data/hsql/lportal
@@ -9,39 +17,65 @@ jdbc.default.password=
 #jdbc.default.url=jdbc:postgresql://localhost:<%=@postgres_port%>/lportal
 #jdbc.default.username=sa
 #jdbc.default.password=
+
+### Locale & timezone
 locales=en_US,de_DE
 locale.default.request=true
-prepend.friendly.url.style = 1
-default.regular.theme.id=classic
+locale.prepend.friendly.url.style=2
+time.zones=Europe/Berlin
+
+### Admin
+admin.email.from.name=<%=@admin_name%>
+admin.email.from.address=<%=@admin_email%>
+default.admin.screen.name=Max Goltzsche
+default.admin.password=maximum!
+default.admin.email.address.prefix=admin
+default.admin.first.name=Max
+default.admin.middle.name=
+default.admin.last.name=Goltzsche
+admin.default.group.names=Admin
+
+### Company
 company.default.name=<%=@company_name%>
 company.default.web.id=<%=@hostname%>
 company.default.home.url=/web/guest
 company.default.locale=en_US
+company.default.time.zone=Europe/Berlin
+company.settings.form.authentication=general,ldap,open-id
 company.settings.form.miscellaneous=display-settings,analytics
 #image.default.company.logo=com/liferay/portal/dependencies/company_logo.png
 #company.encryption.algorithm=HmacSHA256
 #company.encryption.key.size=256
 #company.security.auth.requires.https=true
-company.security.strangers=false
-liferay.home=<%=@liferay_home%>
-imagemagick.enabled=true
+company.security.strangers=false # do not allow user registration
+#company.security.strangers.verify=false # verify strangers email address
+organizations.types=regular-organization
+user.timezone=Europe/Berlin
+user.country=US
+user.language=en
 
-# Login
+### Users
+users.update.last.login=true
+users.reminder.queries.enabled=true
+users.reminder.queries.custom.question.enabled=false
+
+### Groups
+system.groups=algorythm
+system.site.roles=Developer,Manager,Redakteur
+terms.of.use.required=false
+
+### Login
 login.email.from.name=<%=@hostname%>
 login.email.from.address=no-reply@<%=@hostname%>
 #passwords.default.policy.lockout=false
 #passwords.default.policy.lockout.duration=15
 
-# Webserver config
-web.server.http.port=80
-web.server.https.port=443
-web.server.host=<%=@hostname%>
-
-# Auth: LDAP (assuming Fedora DS)
+### Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(mail=@email_address@)
-ldap.auth.password.encryption.algorithm=SHA-256
+ldap.auth.method=password-compare
+ldap.auth.password.encryption.algorithm=SSHA
 
 ldap.base.provider.url=ldap://localhost:389
 ldap.base.dn=dc=algorythm,dc=de
@@ -57,8 +91,7 @@ ldap.group.mappings=groupName=cn\ndescription=description\nuser=uniqueMember
 ldap.import.enabled=true
 ldap.import.on.startup=true
 ldap.import.interval=10 # Minutes
-ldap.import.method=user
-#ldap.import.method=group
+ldap.import.method=group
 ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)

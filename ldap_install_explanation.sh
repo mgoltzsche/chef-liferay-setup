@@ -1,26 +1,27 @@
 #!/bin/bash
 # run as root
 
-# Install RedHat's/Fedora's 389 directory server
+# Install RedHat's/Fedora's 389 directory server (also referred as "Fedora DS")
 apt-get install 389-ds-base
 # Install LDAP utils (for ldapmodify)
 apt-get install ldap-utils
 
 
-# Decrease tcp timeout
+# Decrease tcp timeout (if is default: 120 Minutes)
 echo "net.ipv4.tcp_keepalive_time = 600" >> /etc/sysctl.conf
 sysctl -p # apply sysctl.conf changes immediately
 
-# Increase open file limit
+# Increase open file limit (if is default: 1024)
 echo "*		 soft	 nofile		 4096" >> /etc/security/limits.conf
 echo "*		 hard	 nofile		 4096" >> /etc/security/limits.conf
 # restart required to apply changes
 
 
-# Create new 389 directory server instance
+# Setup new 389 directory server instance
 setup-ds
 
-# Let server listen on IPv4
+
+# If you want to let server listen on IPv4 instead of v6:
 echo "dn: cn=config" > nsslapd-listenhost.ldif
 echo "changetype: modify" >> nsslapd-listenhost.ldif
 echo "replace: nsslapd-listenhost" >> nsslapd-listenhost.ldif
@@ -30,17 +31,24 @@ rm nsslapd-listenhost.ldif
 service dirsrv restart
 
 
-# Add system user e.g. with the following LDIF (using Apache Directory Studio):
+# Fedora DS' initial sample db may be sufficient for simple evironments
+# since it already contains the organizationalUnits ou=People and ou=Groups
+# which you can easily map/import in systems like liferay
+# (see http://www.liferay.com/de/community/wiki/-/wiki/Main/LDAP)
+# Add e.g. liferay user with the following LDIF (using Apache Directory Studio):
 dn: cn=devilopa,ou=People,dc=algorythm,dc=de
-objectClass: simpleSecurityObject
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
+objectClass: simpleSecurityObject
 cn: devilopa
 sn: Goltzsche
 userPassword:: e3NzaGEyNTZ9WjFESCtZcG9aRE5SUTNlR1NqVWRVM2JJM3k1Q1FyVDQvUURiS
  URxZmFBVWVsRlg5aC9FMmtRPT0=
 mail: max.goltzsche@gmail.com
-
-# ... encrypt password with SHA-256
+# ... encrypt password with SSHA-256
+# ... or simply right click on ou=People->New->New Entry...
+# and configure it in the UI at least with the objectClass inetOrgPerson
+# (its super classes are added implicitly; simpleSecurityObject is optional
+# and requires password to be not empty)
