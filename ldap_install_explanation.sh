@@ -21,11 +21,11 @@ echo "*		 hard	 nofile		 4096" >> /etc/security/limits.conf
 setup-ds
 
 
-# If you want to let server listen on IPv4 instead of v6:
+# If you want to let server listen on IPv4 localhost:
 echo "dn: cn=config" > nsslapd-listenhost.ldif
 echo "changetype: modify" >> nsslapd-listenhost.ldif
 echo "replace: nsslapd-listenhost" >> nsslapd-listenhost.ldif
-echo "nsslapd-listenhost: 0.0.0.0" >> nsslapd-listenhost.ldif
+echo "nsslapd-listenhost: 127.0.0.1" >> nsslapd-listenhost.ldif
 ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="manager" -w maximum! -f nsslapd-listenhost.ldif
 rm nsslapd-listenhost.ldif
 service dirsrv restart
