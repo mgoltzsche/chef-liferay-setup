@@ -1,4 +1,4 @@
-setup.wizard.enabled=false # usr: test@<%=@hostname%>
+setup.wizard.enabled=false
 browser.launcher.url= # disable browser launcher
 default.regular.theme.id=classic
 liferay.home=<%=@liferay_home%>
@@ -71,8 +71,8 @@ login.email.from.address=no-reply@<%=@hostname%>
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(mail=@email_address@)
-ldap.auth.method=password-compare
-ldap.auth.password.encryption.algorithm=SSHA
+#ldap.auth.method=password-compare
+#ldap.auth.password.encryption.algorithm=SSHA
 
 ldap.base.provider.url=ldap://localhost:389
 ldap.base.dn=dc=algorythm,dc=de
