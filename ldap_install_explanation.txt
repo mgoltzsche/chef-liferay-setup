@@ -17,7 +17,7 @@ echo "*		 hard	 nofile		 4096" >> /etc/security/limits.conf
 # restart required to apply changes
 
 
-# Setup new 389 directory server instance
+# Setup new 389 directory server instance (wizard)
 setup-ds
 
 
