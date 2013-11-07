@@ -64,6 +64,7 @@ system.site.roles=Developer,Manager,Redakteur
 ### Login
 login.email.from.name=<%=@hostname%>
 login.email.from.address=no-reply@<%=@hostname%>
+passwords.encryption.algorithm=SSHA
 #passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
 
@@ -71,8 +72,8 @@ login.email.from.address=no-reply@<%=@hostname%>
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(mail=@email_address@)
-#ldap.auth.method=password-compare
-#ldap.auth.password.encryption.algorithm=SSHA
+ldap.auth.method=password-compare
+ldap.auth.password.encryption.algorithm=SSHA
 
 ldap.base.provider.url=ldap://localhost:389
 ldap.base.dn=dc=algorythm,dc=de
@@ -92,8 +93,8 @@ ldap.import.method=group
 ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)
-ldap.export.enabled=false
-ldap.export.group.enabled=true
 
+ldap.export.enabled=true
+ldap.export.group.enabled=false
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
