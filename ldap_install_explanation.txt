@@ -2,9 +2,8 @@
 # run as root
 
 # Install RedHat's/Fedora's 389 directory server (also referred as "Fedora DS")
-apt-get install 389-ds-base
-# Install LDAP utils (for ldapmodify)
-apt-get install ldap-utils
+# + LDAP utils (for ldapmodify)
+apt-get install 389-ds-base ldap-utils
 
 
 # Decrease tcp timeout (if is default: 120 Minutes)
