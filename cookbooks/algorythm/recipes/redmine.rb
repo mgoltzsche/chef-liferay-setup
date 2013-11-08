@@ -6,7 +6,7 @@ redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
 redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
 dbname = node['redmine']['postgresql']['database']
 
-# --- Create Liferay system user ---
+# --- Create Redmine system user ---
 user usr do
   comment 'Redmine User'
   home "/home/#{usr}"
@@ -35,7 +35,7 @@ execute "Extract Redmine" do
   user 'root'
   group 'root'
   command "unzip -qd #{node['redmine']['install_directory']} #{redmineZipFile}"
-  not_if {File.exist?(liferayHome)}
+  not_if {File.exist?(redmineHome)}
   notifies :run, "execute[Create symlink and change owner]", :immediately
 end
 
