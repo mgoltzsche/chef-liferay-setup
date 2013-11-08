@@ -61,7 +61,7 @@ template "#{redmineHome}/config/database.yml" do
   source "redmine.database.config"
   mode 01700
   variables({
-    :database => node['redmine']['postgresql']['database'],
+    :database => dbname,
     :user => node['redmine']['postgresql']['user'],
     :password => node['redmine']['postgresql']['password']
   })
@@ -89,6 +89,17 @@ execute "Generate session store secret" do
   user usr
   group usr
   command "rake generate_secret_token"
+end
+
+execute "Create redmine postgres user '#{node['redmine']['postgresql']['user']}'" do
+  user 'postgres'
+  command "psql -U postgres -c \"CREATE USER #{node['redmine']['postgresql']['user']};\""
+  not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['redmine']['postgresql']['user']}';\" | grep #{node['redmine']['postgresql']['user']}", :user => 'postgres')
+end
+
+execute "Set postgres user password of '#{node['redmine']['postgresql']['user']}'" do
+  user 'postgres'
+  command "psql -U postgres -c \"ALTER ROLE #{node['redmine']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['redmine']['postgresql']['password']}';\""
 end
 
 execute "Create database '#{dbname}'" do
