@@ -91,7 +91,7 @@ end
 
 execute "Create database '#{dbname}'" do
   user 'postgres'
-  command "createdb '#{dbname}' -O #{default['liferay']['postgresql']['user']} -E UTF8 -T template0"
+  command "createdb '#{dbname}' -O #{node['redmine']['postgresql']['user']} -E UTF8 -T template0"
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
   notifies :run, "execute[Insert default database conf]", :immediately
 end
