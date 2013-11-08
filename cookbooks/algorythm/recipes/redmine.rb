@@ -77,8 +77,6 @@ end
 
 execute "Install gems" do
   cwd redmineHome
-  user usr
-  group usr
   command "bundle install --without development test"
 end
 
@@ -106,7 +104,7 @@ execute "Insert default database data" do
   cwd redmineHome
   user usr
   group usr
-  command "RAILS_ENV=production REDMINE_LANG=fr rake redmine:load_default_data"
+  command "RAILS_ENV=production REDMINE_LANG=en rake redmine:load_default_data"
 end
 
 execute "Configure file system permissions" do
