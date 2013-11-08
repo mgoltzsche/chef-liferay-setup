@@ -8,6 +8,7 @@ dbname = node['redmine']['postgresql']['database']
 
 package 'libpq-dev'
 package 'libmagick-dev'
+package 'libmagickwand-dev'
 
 # --- Create Redmine system user ---
 user usr do
