@@ -6,6 +6,9 @@ redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
 redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
 dbname = node['redmine']['postgresql']['database']
 
+package 'libpq-dev'
+package 'libmagick-dev'
+
 # --- Create Redmine system user ---
 user usr do
   comment 'Redmine User'
