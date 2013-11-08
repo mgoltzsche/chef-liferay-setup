@@ -6,6 +6,7 @@ liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
+dbname = node['liferay']['postgresql']['database']
 
 # --- Create Liferay system user ---
 user usr do
@@ -71,6 +72,24 @@ directory "#{liferayHomeLink}/tomcat/webapps/resources-importer-web" do
   action :delete
 end
 
+# --- Create Liferay postgres user and database
+execute "Create liferay postgres user '#{node['liferay']['postgresql']['user']}'" do
+  user 'postgres'
+  command "psql -U postgres -c \"CREATE USER #{node['liferay']['postgresql']['user']};\""
+  not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';\" | grep #{node['liferay']['postgresql']['user']}", :user => 'postgres')
+end
+
+execute "Set postgres user password of '#{node['liferay']['postgresql']['user']}'" do
+  user 'postgres'
+  command "psql -U postgres -c \"ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['password']}';\""
+end
+
+execute "Create database '#{dbname}'" do
+  user 'postgres'
+  command "createdb '#{dbname}' -O #{default['liferay']['postgresql']['user']} -E UTF8 -T template0"
+  not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
+end
+
 # --- Configure Liferay installation ---
 template "#{liferayHome}/tomcat/bin/setenv.sh" do
   owner usr
@@ -118,6 +137,9 @@ template "#{liferayHome}/portal-ext.properties" do
   variables({
     :liferay_home => liferayHome,
     :postgres_port => node['liferay']['postgresql']['port'],
+    :postgres_database => node['liferay']['postgresql']['database'],
+    :postgres_user => node['liferay']['postgresql']['user'],
+    :postgres_password => node['liferay']['postgresql']['password'],
     :company_name => node['liferay']['company_default_name'],
     :hostname => node['liferay']['hostname'],
     :admin_name => node['liferay']['admin']['name'],
