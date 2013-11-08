@@ -94,7 +94,7 @@ ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)
 
-ldap.export.enabled=true
+ldap.export.enabled=false # true doesn't work due to Nullpointerexception
 ldap.export.group.enabled=false
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
