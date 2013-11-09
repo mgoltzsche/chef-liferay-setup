@@ -1,0 +1,32 @@
+#!/bin/sh
+
+RVM_BINARY=/usr/local/rvm/bin/rvm
+
+# Exit if RVM is not installed
+[ -x "$RVM_BINARY" ] || exit 0
+
+THIN_BINARY=$($RVM_BINARY gemdir)/bin/thin
+
+# Exit if the package is not installed
+[ -x "$THIN_BINARY" ] || exit 0
+
+run_action() {
+	/usr/local/rvm/bin/ruby $THIN_BINARY $1 --all /etc/thin
+}
+
+case "$1" in
+  start)
+        run_action start
+        ;;
+  stop)
+        run_action stop
+        ;;
+  restart|force-reload|reload)
+        run_action restart
+        ;;
+  *)
+        echo "Usage: service thin {start|stop|restart}" >&2
+        exit 3
+        ;;
+esac
+

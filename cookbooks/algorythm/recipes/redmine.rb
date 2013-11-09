@@ -48,8 +48,7 @@ execute "Create symlink and change owner" do
   group 'root'
   command <<-EOH
 rm -rf #{node['redmine']['install_directory']}/redmine &&
-ln -s #{redmineHome} #{redmineHomeLink} &&
-chown -R #{usr}:#{usr} #{redmineHome}
+ln -s #{redmineHome} #{redmineHomeLink}
   EOH
   action :nothing
 end
@@ -58,7 +57,7 @@ end
 template "#{redmineHome}/config/database.yml" do
   owner usr
   group usr
-  source "redmine.database.config"
+  source "redmine.database.config.erb"
   mode 01700
   variables({
     :database => dbname,
@@ -124,8 +123,24 @@ end
 
 execute "Configure file system permissions" do
   cwd redmineHome
-  command "chmod -R 755 files log tmp public/plugin_assets"
+  command "chmod -R 755 files log tmp"
 end
 
 # --- Configure thin application server ---
+template "/etc/init.d/thin" do
+  source "init.d.thin.erb"
+  mode 00755
+  variables({
+    :user => usr
+  })
+end
 
+directory "/etc/thin" do
+  mode 01755
+  action :create
+end
+
+template "/etc/thin/redmine" do
+  source "redmine.thin.config.erb"
+  mode 00750
+end
