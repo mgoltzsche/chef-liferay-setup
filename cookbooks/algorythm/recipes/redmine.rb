@@ -173,3 +173,7 @@ end
 link "/etc/nginx/sites-enabled/#{hostname}" do
   to "/etc/nginx/sites-available/#{hostname}"
 end
+
+service "thin" do
+  action :restart
+end
