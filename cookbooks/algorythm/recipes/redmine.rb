@@ -132,7 +132,7 @@ end
 # --- Configure thin application server ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
-  mode 00755
+  mode 00750
   variables({
     :user => usr
   })
@@ -145,7 +145,9 @@ end
 
 template "/etc/thin/redmine" do
   source "redmine.thin.config.erb"
-  mode 00750
+  user 'root'
+  group usr
+  mode 00740
   variables({
     :home => redmineHomeLink
   })
