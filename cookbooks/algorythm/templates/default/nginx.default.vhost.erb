@@ -5,8 +5,11 @@ proxy_temp_path /usr/share/nginx/cache/tmp;
 # local.algorythm.de HTTP proxy
 server {
 	listen 80;
-	server_name dev.algorythm.de;
+	server_name <%=hostname%>;
 	root /usr/share/nginx/www;
+
+	access_log  /var/log/nginx/liferay-proxy-access;
+	error_log   /var/log/nginx/liferay-proxy-error;
 
 	location / {
 		proxy_pass http://127.0.0.1:<%=@port%>/;

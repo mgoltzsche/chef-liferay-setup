@@ -51,6 +51,7 @@ rm -rf #{node['redmine']['install_directory']}/redmine &&
 ln -s #{redmineHome} #{redmineHomeLink}
   EOH
   action :nothing
+  notifies :run, "execute[Register thin gem for installation]", :immediately
 end
 
 # --- Configure redmine database ---
@@ -73,9 +74,8 @@ end
 
 execute "Register thin gem for installation" do
   cwd redmineHome
-  user usr
-  group usr
   command 'echo "gem \'thin\'" >> Gemfile'
+  action :nothing
 end
 
 execute "Install gems" do
@@ -129,7 +129,14 @@ chmod -R 755 files log tmp
   EOH
 end
 
-# --- Configure thin application server ---
+directory "#{redmineHome}/public/plugin_assets" do
+  owner usr
+  group usr
+  mode 00755
+  action :create
+end
+
+# --- Configure thin application server behind nginx ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
   mode 00750
@@ -152,3 +159,16 @@ template "/etc/thin/redmine" do
     :home => redmineHomeLink
   })
 end
+
+template "/etc/nginx/sites-available/#{hostname}" do
+  source "nginx.redmine.vhost.erb"
+  mode 00700
+  variables({
+    :home => redmineHome,
+    :hostname => hostname
+  })
+end
+
+link "/etc/nginx/sites-available/#{hostname}" do {
+  to "/etc/nginx/sites-enabled/#{hostname}"
+}
