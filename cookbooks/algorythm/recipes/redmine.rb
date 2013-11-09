@@ -75,7 +75,7 @@ execute "Register thin gem for installation" do
   cwd redmineHome
   user usr
   group usr
-  command 'echo "gem \'thin\'" > Gemfile.local'
+  command 'echo "gem \'thin\'" >> Gemfile'
 end
 
 execute "Install gems" do
