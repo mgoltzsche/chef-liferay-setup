@@ -169,6 +169,6 @@ template "/etc/nginx/sites-available/#{hostname}" do
   })
 end
 
-link "/etc/nginx/sites-available/#{hostname}" do {
+link "/etc/nginx/sites-available/#{hostname}" do
   to "/etc/nginx/sites-enabled/#{hostname}"
-}
+end
