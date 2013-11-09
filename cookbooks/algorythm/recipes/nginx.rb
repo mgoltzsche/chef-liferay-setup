@@ -17,7 +17,7 @@ template "/etc/nginx/sites-available/default" do
   source "nginx.default.vhost.erb"
   mode 00700
   variables({
-    :hostname => node['liferay']['hostname']
+    :hostname => node['liferay']['hostname'],
     :port => node['liferay']['port']
   })
 end
