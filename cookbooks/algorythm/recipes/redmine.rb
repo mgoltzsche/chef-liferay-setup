@@ -123,16 +123,16 @@ end
 
 execute "Configure file system permissions" do
   cwd redmineHome
-  command "chmod -R 755 files log tmp"
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome}
+chmod -R 755 files log tmp
+  EOH
 end
 
 # --- Configure thin application server ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
   mode 00755
-  variables({
-    :user => usr
-  })
 end
 
 directory "/etc/thin" do
@@ -143,4 +143,7 @@ end
 template "/etc/thin/redmine" do
   source "redmine.thin.config.erb"
   mode 00750
+  variables({
+    :home => redmineHomeLink
+  })
 end
