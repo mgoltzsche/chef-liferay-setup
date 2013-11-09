@@ -177,3 +177,21 @@ end
 service "thin" do
   action :restart
 end
+
+service "nginx" do
+  action :restart
+end
+
+
+# Example LDAP config:
+# Name: LDAP (local)
+# Host: localhost
+# Port: 389
+# Account: cn=manager
+# Password: ***
+# Base DN: dc=algorythm,dc=de
+# On-the-fly-Userimport: yes
+# Member name attribute: cn
+# first name attribute: givenName
+# name attribute: sn
+# email attribute: mail
