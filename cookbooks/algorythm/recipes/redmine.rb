@@ -133,6 +133,9 @@ end
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
   mode 00755
+  variables({
+    :user => usr
+  })
 end
 
 directory "/etc/thin" do
