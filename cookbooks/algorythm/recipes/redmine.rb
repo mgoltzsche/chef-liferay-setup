@@ -4,6 +4,7 @@ redmineZipFile = File.basename(URI.parse(node['redmine']['download_url']).path)
 redmineExtractionDir = redmineZipFile.gsub(/(.*)\.zip/, '\1')
 redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
 redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
+hostname = node['redmine']['hostname']
 dbname = node['redmine']['postgresql']['database']
 
 package 'libpq-dev'

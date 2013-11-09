@@ -30,6 +30,7 @@ default['redmine']['user'] = "redmine"
 default['redmine']['install_directory'] = "/opt"
 
 # Redmine configuration
+default['liferay']['hostname'] = 'redmine.dev.algorythm.de'
 default['redmine']['postgresql']['database'] = "redmine"
 default['redmine']['postgresql']['user'] = "redmine_user"
 default['redmine']['postgresql']['password'] = "redmine"
