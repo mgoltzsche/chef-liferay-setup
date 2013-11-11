@@ -121,7 +121,7 @@ execute "Create redmine postgres user '#{node['redmine']['postgresql']['user']}'
   not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['redmine']['postgresql']['user']}';\" | grep #{node['redmine']['postgresql']['user']}", :user => 'postgres')
 end
 
-execute "Set postgres user password of '#{node['redmine']['postgresql']['user']}'" do
+execute "Set redmine postgres user password" do
   user 'postgres'
   command "psql -U postgres -c \"ALTER ROLE #{node['redmine']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['redmine']['postgresql']['password']}';\""
 end
