@@ -85,7 +85,15 @@ execute "Create database '#{dbname}'" do
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
 end
 
-# --- Configure Liferay installation ---
+# --- Configure Liferay tomcat ---
+directory "#{liferayHome}/deploy" do
+  owner usr
+  group usr
+  mode 01750
+  action :create
+  recursive true
+end
+
 template "#{liferayHome}/tomcat/bin/setenv.sh" do
   owner usr
   group usr
@@ -94,14 +102,6 @@ template "#{liferayHome}/tomcat/bin/setenv.sh" do
   variables({
     :java_opts => node['liferay']['java_opts']
   })
-end
-
-directory "#{liferayHome}/deploy" do
-  owner usr
-  group usr
-  mode 01750
-  action :create
-  recursive true
 end
 
 template "#{liferayHome}/tomcat/conf/server.xml" do
@@ -114,16 +114,7 @@ template "#{liferayHome}/tomcat/conf/server.xml" do
   })
 end
 
-template "#{liferayHome}/tomcat/conf/server.xml" do
-  owner usr
-  group usr
-  source "server.xml.erb"
-  mode 00700
-  variables({
-    :port => node['liferay']['port']
-  })
-end
-
+# --- Configure Liferay ---
 template "#{liferayHome}/portal-ext.properties" do
   owner usr
   group usr
