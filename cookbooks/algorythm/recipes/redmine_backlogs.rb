@@ -224,7 +224,7 @@ service "nginx" do
 end
 
 
-# Example LDAP config:
+## Example LDAP config:
 # Name: LDAP (local)
 # Host: localhost
 # Port: 389
@@ -236,3 +236,13 @@ end
 # first name attribute: givenName
 # name attribute: sn
 # email attribute: mail
+
+## Backup like this (files + sql):
+# cp -R $REDMINE_HOME/files $BACKUP/files
+# su postgres -c "pg_dump -U redmine -h localhost -Fp --file=$BACKUP/redmine.sqlc
+
+## Import backup like this (files + sql):
+# rm -rf $REDMINE_HOME/files;
+# cp -R $BACKUP/files $REDMINE_HOME/files &&
+# chown -R redmine:redmine $REDMINE_HOME/files &&
+# su postgres -c "psql redmine < $BACKUP/redmine.sqlc"
