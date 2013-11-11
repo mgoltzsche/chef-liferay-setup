@@ -3,6 +3,7 @@
 		"recipe[algorythm::default]",
 		"recipe[algorythm::postgresql]",
 		"recipe[algorythm::nginx]",
+		"recipe[algorythm::liferay]",
 		"recipe[algorythm::redmine_backlogs]"
 	]
 }
