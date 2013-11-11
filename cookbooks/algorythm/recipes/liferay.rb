@@ -67,11 +67,6 @@ directory "#{liferayHomeLink}/tomcat/webapps/welcome-theme" do
   action :delete
 end
 
-directory "#{liferayHomeLink}/tomcat/webapps/resources-importer-web" do
-  recursive true
-  action :delete
-end
-
 # --- Create Liferay postgres user and database
 execute "Create liferay postgres user '#{node['liferay']['postgresql']['user']}'" do
   user 'postgres'
@@ -94,7 +89,7 @@ end
 template "#{liferayHome}/tomcat/bin/setenv.sh" do
   owner usr
   group usr
-  source "setenv.sh.erb"
+  source "liferay.tomcat.setenv.sh.erb"
   mode 01700
   variables({
     :java_opts => node['liferay']['java_opts']
@@ -112,7 +107,7 @@ end
 template "#{liferayHome}/tomcat/conf/server.xml" do
   owner usr
   group usr
-  source "server.xml.erb"
+  source "liferay.tomcat.server.xml.erb"
   mode 00700
   variables({
     :port => node['liferay']['port']
