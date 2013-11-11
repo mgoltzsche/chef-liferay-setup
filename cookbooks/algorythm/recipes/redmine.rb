@@ -11,6 +11,7 @@ backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
 package 'libpq-dev'
 package 'libmagick-dev'
 package 'libmagickwand-dev'
+package 'git'
 
 # --- Create Redmine system user ---
 user usr do
@@ -170,8 +171,6 @@ link "/etc/nginx/sites-enabled/#{hostname}" do
 end
 
 # Install Redmine backlogs plugin
-package 'git'
-
 execute "Download Redmine Backlogs plugin" do
   user usr
   group usr
@@ -204,7 +203,7 @@ execute "Install Redmine Backlogs plugin" do
   group usr
   cwd backlogsHome
   command <<-EOH
-export RAILS_ENV=production &&
+export RAILS_ENV=production;
 rake db:migrate &&
 rake tmp:cache:clear &&
 rake tmp:sessions:clear
