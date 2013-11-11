@@ -150,7 +150,7 @@ execute "Create/Migrate database structure" do
   cwd redmineHome
   user usr
   group usr
-  command "RAILS_ENV=production rake db:migrate"
+  command "export RAILS_ENV=production; rake db:migrate"
 end
 
 execute "Insert default data" do
@@ -167,7 +167,6 @@ execute "Install Redmine Backlogs plugin" do
   cwd redmineHome
   command <<-EOH
 export RAILS_ENV=production;
-rake db:migrate &&
 rake tmp:cache:clear &&
 rake tmp:sessions:clear &&
 rake redmine:backlogs:install \
