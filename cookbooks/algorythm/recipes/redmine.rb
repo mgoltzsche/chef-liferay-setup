@@ -182,7 +182,7 @@ package 'git'
 
 execute "Download Redmine backlogs plugin" do
   user usr
-  group grp
+  group usr
   cwd "#{downloadDir}"
   command "git clone git://github.com/backlogs/redmine_backlogs.git"
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
