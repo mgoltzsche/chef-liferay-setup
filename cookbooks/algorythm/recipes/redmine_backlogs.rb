@@ -169,7 +169,7 @@ execute "Install Redmine Backlogs plugin" do
 export RAILS_ENV=production;
 rake db:migrate &&
 rake tmp:cache:clear &&
-rake tmp:sessions:clear
+rake tmp:sessions:clear &&
 rake redmine:backlogs:install \
 	story_trackers=feature \
 	task_tracker=task \
