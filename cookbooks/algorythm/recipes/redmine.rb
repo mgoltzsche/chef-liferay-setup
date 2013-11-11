@@ -6,6 +6,7 @@ redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
 redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
 hostname = node['redmine']['hostname']
 dbname = node['redmine']['postgresql']['database']
+backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -88,16 +89,7 @@ execute "Register thin gem for installation" do
   notifies :run, "execute[Configure file system permissions]", :immediately
 end
 
-execute "Configure file system permissions" do
-  cwd redmineHome
-  command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome}
-chmod -R 755 files log tmp
-  EOH
-  action :nothing
-end
-
-execute "Install gems" do
+execute "Install required gems" do
   cwd redmineHome
   command "bundle install --without development test"
 end
@@ -180,7 +172,7 @@ end
 # Install Redmine backlogs plugin
 package 'git'
 
-execute "Download Redmine backlogs plugin" do
+execute "Download Redmine Backlogs plugin" do
   user usr
   group usr
   cwd "#{downloadDir}"
@@ -188,22 +180,46 @@ execute "Download Redmine backlogs plugin" do
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
 end
 
-execute "Install redmine backlogs plugin" do
+execute "Copy Redmine Backlogs plugin into Redmine installation" do
   user usr
   group usr
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
 git checkout #{node['redmine']['backlogs_version']} &&
-cp -R . #{redmineHome}/plugins/redmine_backlogs &&
-cd #{redmineHome}/plugins/redmine_backlogs &&
+cp -R . #{backlogsHome}
+  EOH
+  not_if {File.exist?(backlogsHome)}
+  notifies :run, "execute[Install required Backlog gems]", :immediately
+end
+
+execute "Install required Backlog gems" do
+  cwd backlogsHome
+  command "bundle install --without development test"
+  action :nothing
+  notifies :run, "execute[Install Redmine Backlogs plugin]", :immediately
+end
+
+execute "Install Redmine Backlogs plugin" do
+  user usr
+  group usr
+  cwd backlogsHome
+  command <<-EOH
 export RAILS_ENV=production &&
 rake db:migrate &&
 rake tmp:cache:clear &&
 rake tmp:sessions:clear
 # bundle exec rake redmine:backlogs:install param1=...
   EOH
-  not_if {File.exist?("#{redmineHome}/plugins/redmine_backlogs")}
+  action :nothing
   notifies :run, "execute[Configure file system permissions]", :immediately
+end
+
+execute "Configure file system permissions" do
+  cwd redmineHome
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome}
+chmod -R 755 files log tmp
+  EOH
 end
 
 # Restart thin & nginx
