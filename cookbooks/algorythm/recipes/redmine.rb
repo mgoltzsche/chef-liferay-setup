@@ -21,7 +21,7 @@ user usr do
   supports :manage_home=>true
 end
 
-# --- Download Redmine
+# --- Download Redmine & Backlogs plugin
 directory downloadDir do
   owner usr
   group usr
@@ -36,8 +36,16 @@ remote_file "#{downloadDir}/#{redmineZipFile}" do
   action :create_if_missing
 end
 
-# --- Extract and link Redmine ---
-execute "Extract Redmine" do
+execute "Download Redmine Backlogs plugin repository" do
+  user usr
+  group usr
+  cwd "#{downloadDir}"
+  command "git clone git://github.com/backlogs/redmine_backlogs.git"
+  not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
+end
+
+# --- Copy and link Redmine installation ---
+execute "Put Redmine in place" do
   cwd downloadDir
   user 'root'
   group 'root'
@@ -54,18 +62,29 @@ directory "#{redmineHome}/public/plugin_assets" do
   notifies :run, "execute[Create symlink and change owner]", :immediately
 end
 
+execute "Put Redmine Backlogs plugin in place" do
+  user usr
+  group usr
+  cwd "#{downloadDir}/redmine_backlogs"
+  command <<-EOH
+git checkout #{node['redmine']['backlogs_version']} &&
+cp -R . #{backlogsHome}
+  EOH
+  not_if {File.exist?(backlogsHome)}
+end
+
 execute "Create symlink and change owner" do
   user 'root'
   group 'root'
   command <<-EOH
 rm -rf #{node['redmine']['install_directory']}/redmine &&
-ln -s #{redmineHome} #{redmineHomeLink}
+ln -s #{redmineHome} #{redmineHomeLink} &&
   EOH
   action :nothing
-  notifies :run, "execute[Register thin gem for installation]", :immediately
+  notifies :run, "execute[Configure file system permissions]", :immediately
 end
 
-# --- Configure redmine database ---
+# --- Configure Redmine database connection ---
 template "#{redmineHome}/config/database.yml" do
   owner usr
   group usr
@@ -83,15 +102,13 @@ execute "Install bundler" do
   command "gem install bundler"
 end
 
-execute "Register thin gem for installation" do
-  cwd redmineHome
-  command 'echo "gem \'thin\'" >> Gemfile'
-  action :nothing
-  notifies :run, "execute[Configure file system permissions]", :immediately
-end
-
 execute "Install required gems" do
   cwd redmineHome
+  command "bundle install --without development test"
+end
+
+execute "Install required Backlog plugin gems" do
+  cwd backlogsHome
   command "bundle install --without development test"
 end
 
@@ -99,9 +116,11 @@ execute "Generate session store secret" do
   cwd redmineHome
   user usr
   group usr
-  command "rake generate_secret_token"
+  command "rake generate_secret_token && touch .secretTokenWritten"
+  not_if {File.exist?("#{redmineHome}/.secretTokenWritten")}
 end
 
+# --- Create postgresql database + user ---
 execute "Create redmine postgres user '#{node['redmine']['postgresql']['user']}'" do
   user 'postgres'
   command "psql -U postgres -c \"CREATE USER #{node['redmine']['postgresql']['user']};\""
@@ -119,21 +138,44 @@ execute "Create database '#{dbname}'" do
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
 end
 
-execute "Create database structure" do
+# --- Create/Migrate database structures ---
+execute "Create/Migrate database structure" do
   cwd redmineHome
   user usr
   group usr
   command "RAILS_ENV=production rake db:migrate"
 end
 
-execute "Insert default database data" do
+execute "Insert default data" do
   cwd redmineHome
   user usr
   group usr
   command "RAILS_ENV=production REDMINE_LANG=en rake redmine:load_default_data"
 end
 
-# --- Configure thin application server behind nginx ---
+# Install Redmine backlogs plugin
+execute "Install Redmine Backlogs plugin" do
+  user usr
+  group usr
+  cwd redmineHome
+  command <<-EOH
+export RAILS_ENV=production;
+rake db:migrate &&
+rake tmp:cache:clear &&
+rake tmp:sessions:clear
+# rake redmine:backlogs:install param1=...
+  EOH
+end
+
+execute "Configure file system permissions" do
+  cwd redmineHome
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome}
+chmod -R 755 files log tmp
+  EOH
+end
+
+# --- Configure thin application server to run Redmine behind nginx ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
   mode 00750
@@ -168,57 +210,6 @@ end
 
 link "/etc/nginx/sites-enabled/#{hostname}" do
   to "/etc/nginx/sites-available/#{hostname}"
-end
-
-# Install Redmine backlogs plugin
-execute "Download Redmine Backlogs plugin" do
-  user usr
-  group usr
-  cwd "#{downloadDir}"
-  command "git clone git://github.com/backlogs/redmine_backlogs.git"
-  not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
-end
-
-execute "Copy Redmine Backlogs plugin into Redmine installation" do
-  user usr
-  group usr
-  cwd "#{downloadDir}/redmine_backlogs"
-  command <<-EOH
-git checkout #{node['redmine']['backlogs_version']} &&
-cp -R . #{backlogsHome}
-  EOH
-  not_if {File.exist?(backlogsHome)}
-  notifies :run, "execute[Install required Backlog gems]", :immediately
-end
-
-execute "Install required Backlog gems" do
-  cwd backlogsHome
-  command "bundle install --without development test"
-  action :nothing
-  notifies :run, "execute[Install Redmine Backlogs plugin]", :immediately
-end
-
-execute "Install Redmine Backlogs plugin" do
-  user usr
-  group usr
-  cwd backlogsHome
-  command <<-EOH
-export RAILS_ENV=production;
-rake db:migrate &&
-rake tmp:cache:clear &&
-rake tmp:sessions:clear
-# bundle exec rake redmine:backlogs:install param1=...
-  EOH
-  action :nothing
-  notifies :run, "execute[Configure file system permissions]", :immediately
-end
-
-execute "Configure file system permissions" do
-  cwd redmineHome
-  command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome}
-chmod -R 755 files log tmp
-  EOH
 end
 
 # Restart thin & nginx
