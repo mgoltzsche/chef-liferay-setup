@@ -170,13 +170,12 @@ export RAILS_ENV=production;
 rake db:migrate &&
 rake tmp:cache:clear &&
 rake tmp:sessions:clear
-# rake redmine:backlogs:install param1=...
+rake redmine:backlogs:install \
+	story_trackers=feature \
+	task_tracker=task \
+	corruptiontest=true \
+	labels=true
   EOH
-end
-
-execute "Set recursive redmine folder owner" do
-  cwd redmineHome
-  command "chown -R #{usr}:#{usr} #{redmineHome}"
 end
 
 # --- Configure thin application server to run Redmine behind nginx ---
