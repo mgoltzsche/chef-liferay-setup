@@ -157,7 +157,7 @@ execute "Insert default data" do
   cwd redmineHome
   user usr
   group usr
-  command "RAILS_ENV=production REDMINE_LANG=en rake redmine:load_default_data"
+  command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
 end
 
 # Install Redmine backlogs plugin
