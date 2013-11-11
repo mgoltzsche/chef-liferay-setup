@@ -190,7 +190,7 @@ end
 
 execute "Install redmine backlogs plugin" do
   user usr
-  group grp
+  group usr
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
 git checkout #{node['redmine']['backlogs_version']} &&
