@@ -195,6 +195,7 @@ execute "Install redmine backlogs plugin" do
   command <<-EOH
 git checkout #{node['redmine']['backlogs_version']} &&
 cp -R . #{redmineHome}/plugins/redmine_backlogs &&
+cd #{redmineHome}/plugins/redmine_backlogs &&
 export RAILS_ENV=production &&
 rake db:migrate &&
 rake tmp:cache:clear &&
