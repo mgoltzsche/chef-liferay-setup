@@ -59,7 +59,6 @@ directory "#{redmineHome}/public/plugin_assets" do
   group usr
   mode 00755
   action :nothing
-  notifies :run, "execute[Create symlink and change owner]", :immediately
 end
 
 execute "Put Redmine Backlogs plugin in place" do
@@ -73,31 +72,24 @@ cp -R . #{backlogsHome}
   not_if {File.exist?(backlogsHome)}
 end
 
-execute "Create symlink and change owner" do
+execute "Create symlink" do
   user 'root'
   group 'root'
   command <<-EOH
 rm -rf #{node['redmine']['install_directory']}/redmine &&
-ln -s #{redmineHome} #{redmineHomeLink} &&
+ln -s #{redmineHome} #{redmineHomeLink}
   EOH
-  action :nothing
-  notifies :run, "execute[Configure file system permissions]", :immediately
 end
 
-# --- Configure Redmine database connection ---
-template "#{redmineHome}/config/database.yml" do
-  owner usr
-  group usr
-  source "redmine.database.config.erb"
-  mode 01700
-  variables({
-    :database => dbname,
-    :user => node['redmine']['postgresql']['user'],
-    :password => node['redmine']['postgresql']['password']
-  })
+execute "Configure file system permissions" do
+  cwd redmineHome
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome} &&
+chmod -R 755 files log tmp public/plugin_assets
+  EOH
 end
 
-# --- Install Redmine ---
+# --- Install required gems ---
 execute "Install bundler" do
   command "gem install bundler"
 end
@@ -116,8 +108,8 @@ execute "Generate session store secret" do
   cwd redmineHome
   user usr
   group usr
-  command "rake generate_secret_token && touch .secretTokenWritten"
-  not_if {File.exist?("#{redmineHome}/.secretTokenWritten")}
+  command "rake generate_secret_token"
+  not_if {File.exist?("#{redmineHome}/config/database.yml")}
 end
 
 # --- Create postgresql database + user ---
@@ -136,6 +128,19 @@ execute "Create database '#{dbname}'" do
   user 'postgres'
   command "createdb '#{dbname}' -O #{node['redmine']['postgresql']['user']} -E UTF8 -T template0"
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
+end
+
+# --- Configure Redmine database connection ---
+template "#{redmineHome}/config/database.yml" do
+  owner usr
+  group usr
+  source "redmine.database.config.erb"
+  mode 01700
+  variables({
+    :database => dbname,
+    :user => node['redmine']['postgresql']['user'],
+    :password => node['redmine']['postgresql']['password']
+  })
 end
 
 # --- Create/Migrate database structures ---
@@ -167,12 +172,9 @@ rake tmp:sessions:clear
   EOH
 end
 
-execute "Configure file system permissions" do
+execute "Set recursive redmine folder owner" do
   cwd redmineHome
-  command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome}
-chmod -R 755 files log tmp
-  EOH
+  command "chown -R #{usr}:#{usr} #{redmineHome}"
 end
 
 # --- Configure thin application server to run Redmine behind nginx ---
