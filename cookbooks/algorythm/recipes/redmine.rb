@@ -81,14 +81,6 @@ ln -s #{redmineHome} #{redmineHomeLink}
   EOH
 end
 
-execute "Configure file system permissions" do
-  cwd redmineHome
-  command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome} &&
-chmod -R 755 files log tmp public/plugin_assets
-  EOH
-end
-
 # --- Install required gems ---
 execute "Install bundler" do
   command "gem install bundler"
@@ -104,6 +96,16 @@ execute "Install required Backlog plugin gems" do
   command "bundle install --without development test"
 end
 
+# --- Change file system permissions ---
+execute "Configure file system permissions" do
+  cwd redmineHome
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome} &&
+chmod -R 755 files log tmp public/plugin_assets
+  EOH
+end
+
+# --- Initially generate session store secret ---
 execute "Generate session store secret" do
   cwd redmineHome
   user usr
