@@ -41,6 +41,14 @@ execute "Extract Redmine" do
   group 'root'
   command "unzip -qd #{node['redmine']['install_directory']} #{redmineZipFile}"
   not_if {File.exist?(redmineHome)}
+  notifies :create, "directory[#{redmineHome}/public/plugin_assets]", :immediately
+end
+
+directory "#{redmineHome}/public/plugin_assets" do
+  owner usr
+  group usr
+  mode 00755
+  action :nothing
   notifies :run, "execute[Create symlink and change owner]", :immediately
 end
 
@@ -76,6 +84,16 @@ end
 execute "Register thin gem for installation" do
   cwd redmineHome
   command 'echo "gem \'thin\'" >> Gemfile'
+  action :nothing
+  notifies :run, "execute[Configure file system permissions]", :immediately
+end
+
+execute "Configure file system permissions" do
+  cwd redmineHome
+  command <<-EOH
+chown -R #{usr}:#{usr} #{redmineHome}
+chmod -R 755 files log tmp
+  EOH
   action :nothing
 end
 
@@ -122,21 +140,6 @@ execute "Insert default database data" do
   command "RAILS_ENV=production REDMINE_LANG=en rake redmine:load_default_data"
 end
 
-execute "Configure file system permissions" do
-  cwd redmineHome
-  command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome}
-chmod -R 755 files log tmp
-  EOH
-end
-
-directory "#{redmineHome}/public/plugin_assets" do
-  owner usr
-  group usr
-  mode 00755
-  action :create
-end
-
 # --- Configure thin application server behind nginx ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
@@ -174,6 +177,35 @@ link "/etc/nginx/sites-enabled/#{hostname}" do
   to "/etc/nginx/sites-available/#{hostname}"
 end
 
+# Install Redmine backlogs plugin
+package 'git'
+
+execute "Download Redmine backlogs plugin" do
+  user usr
+  group grp
+  cwd "#{downloadDir}"
+  command "git clone git://github.com/backlogs/redmine_backlogs.git"
+  not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
+end
+
+execute "Install redmine backlogs plugin" do
+  user usr
+  group grp
+  cwd "#{downloadDir}/redmine_backlogs"
+  command <<-EOH
+git checkout #{node['redmine']['backlogs_version']} &&
+cp -R . #{redmineHome}/plugins/redmine_backlogs &&
+export RAILS_ENV=production &&
+rake db:migrate &&
+rake tmp:cache:clear &&
+rake tmp:sessions:clear
+# bundle exec rake redmine:backlogs:install param1=...
+  EOH
+  not_if {File.exist?("#{redmineHome}/plugins/redmine_backlogs")}
+  notifies :run, "execute[Configure file system permissions]", :immediately
+end
+
+# Restart thin & nginx
 service "thin" do
   action :restart
 end

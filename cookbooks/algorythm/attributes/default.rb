@@ -34,3 +34,4 @@ default['redmine']['hostname'] = 'redmine.dev.algorythm.de'
 default['redmine']['postgresql']['database'] = "redmine"
 default['redmine']['postgresql']['user'] = "redmine_user"
 default['redmine']['postgresql']['password'] = "redmine"
+default['redmine']['backlogs_version'] = "v1.0.6"
