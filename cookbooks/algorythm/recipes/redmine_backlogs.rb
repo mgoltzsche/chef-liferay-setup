@@ -246,3 +246,5 @@ end
 # cp -R $BACKUP/files $REDMINE_HOME/files &&
 # chown -R redmine:redmine $REDMINE_HOME/files &&
 # su postgres -c "psql redmine < $BACKUP/redmine.sqlc"
+## Execute the following to migrate the database afterwards:
+# su redmine -c "PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate; rake redmine:backlogs:install"
