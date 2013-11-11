@@ -11,6 +11,14 @@ remote_file nexusWebappWar do
   action :create_if_missing
 end
 
+directory nexusWebappDir do
+  owner usr
+  group usr
+  mode 01750
+  action :create
+  recursive true
+end
+
 execute "Deploy Nexus OSS" do
   cwd downloadDir
   user usr
