@@ -154,6 +154,8 @@ end
 
 # --- Configure default nginx vhost ---
 directory '/usr/share/nginx/cache' do
+  owner 'www-data'
+  group 'www-data'
   mode 00744
   action :create
 end
