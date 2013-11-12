@@ -25,6 +25,7 @@ default['liferay']['admin']['email'] = "max.goltzsche@gmail.com"
 
 # Sonatype Nexus
 default['nexus']['version'] = "2.6.4"
+default['nexus']['hostname'] = "nexus.dev.algorythm.de"
 
 # Redmine installation
 default['redmine']['download_url'] = 'http://files.rubyforge.vm.bytemark.co.uk/redmine/redmine-2.3.3.zip'

@@ -1,0 +1,46 @@
+proxy_cache_path /usr/share/nginx/cache levels=1:2 keys_zone=algorythm-cache:8m max_size=1000m inactive=600m;
+proxy_temp_path /usr/share/nginx/cache/tmp;
+
+
+# HTTP proxy
+server {
+	listen 80;
+	server_name <%=@hostname%>;
+	root /usr/share/nginx/www;
+
+	access_log  /var/log/nginx/nexus-proxy-access;
+	error_log   /var/log/nginx/nexus-proxy-error;
+
+	location / {
+		rewrite (.*) /nexus$1 break;
+		proxy_pass http://127.0.0.1:<%=@port%>/;
+		proxy_set_header X-Forwarded-Host $host;
+		proxy_set_header X-Forwarded-Server $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_redirect off;
+		proxy_cache algorythm-cache;
+		proxy_cache_valid 302 60m;
+	}
+}
+
+# HTTPS proxy
+#server {
+#	listen 443;
+#	server_name dev.algorythm.de;
+#	root html;
+#	index index.html index.htm;
+#
+#	ssl on;
+#	ssl_certificate cert.pem;
+#	ssl_certificate_key cert.key;
+#
+#	ssl_session_timeout 5m;
+#
+#	ssl_protocols SSLv3 TLSv1;
+#	ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+#	ssl_prefer_server_ciphers on;
+#
+#	location / {
+#		try_files $uri $uri/ /index.html;
+#	}
+#}
