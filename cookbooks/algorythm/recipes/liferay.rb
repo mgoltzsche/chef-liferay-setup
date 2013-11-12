@@ -50,30 +50,16 @@ ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
 chown -R #{usr}:#{usr} #{liferayHome}
   EOH
   action :nothing
-  notifies :run, "execute[Rename ROOT WAR]", :immediately
-end
-
-execute "Rename ROOT WAR" do
-  user usr
-  group usr
-  cwd "#{liferayHome}/tomcat"
-  command "mv webapps/ROOT webapps/portal && mv conf/Catalina/localhost/ROOT.xml conf/Catalina/localhost/portal.xml"
-  action :nothing
   notifies :run, "execute[Delete *.bat files]", :immediately
 end
 
-#directory "#{liferayHome}/tomcat/webapps/portal/META-INF" do
-#  owner usr
-#  group usr
-#  mode 00755
-#  action :create
-#end
-
-#template "#{liferayHome}/tomcat/webapps/portal/META-INF/context.xml" do
+#execute "Rename ROOT WAR" do
 #  user usr
 #  group usr
-#  source "liferay.context.xml.erb"
-#  mode 00644
+#  cwd "#{liferayHome}/tomcat"
+#  command "mv webapps/ROOT webapps/portal && mv conf/Catalina/localhost/ROOT.xml conf/Catalina/localhost/portal.xml"
+#  action :nothing
+#  notifies :run, "execute[Delete *.bat files]", :immediately
 #end
 
 # --- Clean up Liferay installation ---
