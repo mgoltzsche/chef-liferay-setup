@@ -50,16 +50,23 @@ ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
 chown -R #{usr}:#{usr} #{liferayHome}
   EOH
   action :nothing
-  notifies :run, "execute[Rename ROOT WAR to liferay]", :immediately
+  notifies :run, "execute[Rename ROOT WAR]", :immediately
 end
 
-execute "Rename ROOT WAR to liferay" do
+execute "Rename ROOT WAR" do
   user usr
   group usr
   cwd "#{liferayHome}/tomcat/webapps"
-  command "mv ROOT liferay"
+  command "mv ROOT portal"
   action :nothing
   notifies :run, "execute[Delete *.bat files]", :immediately
+end
+
+directory "#{liferayHome}/tomcat/webapps/liferay/META-INF" do
+  owner usr
+  group usr
+  mode 00755
+  action :create
 end
 
 template "#{liferayHome}/tomcat/webapps/liferay/META-INF/context.xml" do
