@@ -2,7 +2,7 @@ usr = node['liferay']['user']
 downloadDir = "/home/#{usr}/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
-nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus"
+nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/tomcat/nexus"
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
