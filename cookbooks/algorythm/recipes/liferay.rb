@@ -162,11 +162,10 @@ template "/etc/logrotate.d/liferay" do
 end
 
 # --- Configure default nginx vhost ---
-directory '/usr/share/nginx/cache/liferay' do
+directory '/usr/share/nginx/cache' do
   owner 'www-data'
   group 'www-data'
   mode 00744
-  recursive true
   action :create
 end
 

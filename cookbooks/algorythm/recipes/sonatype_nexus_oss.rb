@@ -20,14 +20,6 @@ execute "Deploy Nexus OSS" do
 end
 
 # --- Configure nginx vhost ---
-directory '/usr/share/nginx/cache/nexus' do
-  owner 'www-data'
-  group 'www-data'
-  mode 00744
-  recursive true
-  action :create
-end
-
 template "/etc/nginx/sites-available/#{hostname}" do
   source "nexus.nginx.vhost.erb"
   mode 00700
