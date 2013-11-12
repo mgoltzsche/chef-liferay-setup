@@ -26,3 +26,8 @@ execute "Deploy Nexus OSS" do
   command "unzip -qd #{nexusWebappDir} #{nexusWebappDir}"
   not_if {File.exist?(nexusWebappDir)}
 end
+
+# --- Restart Liferay ---
+service "liferay" do
+  action :restart
+end
