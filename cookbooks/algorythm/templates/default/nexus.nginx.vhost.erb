@@ -1,7 +1,3 @@
-proxy_cache_path /usr/share/nginx/cache/nexus levels=1:2 keys_zone=nexus-cache:8m max_size=1000m inactive=600m;
-proxy_temp_path /usr/share/nginx/cache/nexus/tmp;
-
-
 # HTTP proxy
 server {
 	listen 80;
@@ -18,7 +14,7 @@ server {
 		proxy_set_header X-Forwarded-Server $host;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 		proxy_redirect off;
-		proxy_cache nexus-cache;
+		proxy_cache algorythm-cache;
 		proxy_cache_valid 302 60m;
 	}
 }
