@@ -32,3 +32,8 @@ end
 link "/etc/nginx/sites-enabled/#{hostname}" do
   to "/etc/nginx/sites-available/#{hostname}"
 end
+
+# --- Restart nginx ---
+service "nginx" do
+  action :restart
+end

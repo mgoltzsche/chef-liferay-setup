@@ -12,6 +12,7 @@ server {
 	error_log   /var/log/nginx/liferay-proxy-error;
 
 	location / {
+		rewrite (.*) /liferay$1 break;
 		proxy_pass http://127.0.0.1:<%=@port%>/;
 		proxy_set_header X-Forwarded-Host $host;
 		proxy_set_header X-Forwarded-Server $host;

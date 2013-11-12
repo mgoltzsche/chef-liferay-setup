@@ -21,7 +21,7 @@ user usr do
   supports :manage_home=>true
 end
 
-# --- Download Redmine & Backlogs plugin
+# --- Download Redmine & Backlogs plugin ---
 directory downloadDir do
   owner usr
   group usr
@@ -160,7 +160,7 @@ execute "Insert default data" do
   command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
 end
 
-# Install Redmine backlogs plugin
+# --- Install Redmine backlogs plugin ---
 execute "Install Redmine Backlogs plugin" do
   user usr
   group usr
@@ -214,7 +214,7 @@ link "/etc/nginx/sites-enabled/#{hostname}" do
   to "/etc/nginx/sites-available/#{hostname}"
 end
 
-# Restart thin & nginx
+# --- Restart thin & nginx ---
 service "thin" do
   action :restart
 end

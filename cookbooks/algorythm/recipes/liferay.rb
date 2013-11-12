@@ -50,6 +50,15 @@ ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
 chown -R #{usr}:#{usr} #{liferayHome}
   EOH
   action :nothing
+  notifies :run, "execute[Rename ROOT WAR to liferay]", :immediately
+end
+
+execute "Rename ROOT WAR to liferay" do
+  user usr
+  group usr
+  cwd "#{liferayHome}/tomcat/webapps"
+  command "mv ROOT liferay"
+  action :nothing
   notifies :run, "execute[Delete *.bat files]", :immediately
 end
 
