@@ -62,6 +62,13 @@ execute "Rename ROOT WAR to liferay" do
   notifies :run, "execute[Delete *.bat files]", :immediately
 end
 
+template "#{liferayHome}/tomcat/webapps/liferay/META-INF/context.xml" do
+  user usr
+  group usr
+  source "liferay.context.xml.erb"
+  mode 00644
+end
+
 # --- Clean up Liferay installation ---
 execute "Delete *.bat files" do
   cwd "#{liferayHomeLink}/tomcat/bin/"
