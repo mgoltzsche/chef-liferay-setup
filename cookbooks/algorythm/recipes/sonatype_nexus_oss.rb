@@ -2,7 +2,7 @@ usr = node['liferay']['user']
 downloadDir = "/home/#{usr}/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
-nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/tomcat/nexus"
+nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus"
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
@@ -34,19 +34,13 @@ execute "Deploy Nexus OSS" do
   command "unzip -qd #{nexusDeployDir} #{nexusWarFile}"
 end
 
-# --- Configure Nexus OSS to run under / context ---
-template "#{nexusDeployDir}/META-INF/context.xml" do
-  source "nexus.context.xml.erb"
-  mode 00744
-end
-
 # --- Configure nginx vhost ---
 template "/etc/nginx/sites-available/#{hostname}" do
   source "nexus.nginx.vhost.erb"
   mode 00700
   variables({
     :hostname => hostname,
-    :port => node['liferay']['port']
+    :liferay_hostname => node['liferay']['hostname']
   })
 end
 
