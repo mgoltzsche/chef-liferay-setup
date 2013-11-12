@@ -53,15 +53,6 @@ chown -R #{usr}:#{usr} #{liferayHome}
   notifies :run, "execute[Delete *.bat files]", :immediately
 end
 
-#execute "Rename ROOT WAR" do
-#  user usr
-#  group usr
-#  cwd "#{liferayHome}/tomcat"
-#  command "mv webapps/ROOT webapps/portal && mv conf/Catalina/localhost/ROOT.xml conf/Catalina/localhost/portal.xml"
-#  action :nothing
-#  notifies :run, "execute[Delete *.bat files]", :immediately
-#end
-
 # --- Clean up Liferay installation ---
 execute "Delete *.bat files" do
   cwd "#{liferayHomeLink}/tomcat/bin/"

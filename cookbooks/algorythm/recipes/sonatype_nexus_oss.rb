@@ -12,11 +12,25 @@ remote_file nexusWarFile do
   action :create_if_missing
 end
 
+#execute "Deploy Nexus OSS" do
+#  cwd downloadDir
+#  user usr
+#  group usr
+#  command "cp #{nexusWarFile} #{nexusDeployWarFile}"
+#end
+
+directory "#{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus" do
+  owner usr
+  group usr
+  mode 00755
+  action :create
+end
+
 execute "Deploy Nexus OSS" do
   cwd downloadDir
   user usr
   group usr
-  command "cp #{nexusWarFile} #{nexusDeployWarFile}"
+  command "unzip -qd #{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus #{nexusWarFile}"
 end
 
 # --- Configure nginx vhost ---
