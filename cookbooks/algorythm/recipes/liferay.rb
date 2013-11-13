@@ -1,7 +1,7 @@
 require 'uri'
 
 usr = node['liferay']['user']
-downloadDir = "/home/#{usr}/Downloads"
+downloadDir = "/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 aprSourceArchive = File.basename(URI.parse(node['liferay']['apr_download_url']).path)
@@ -26,15 +26,11 @@ end
 
 # --- Download and install Liferay ---
 directory downloadDir do
-  owner usr
-  group usr
   mode 00755
   action :create
 end
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
-  owner usr
-  group usr
   source node['liferay']['download_url']
   action :create_if_missing
 end
@@ -95,15 +91,11 @@ end
 
 # --- Download & install native APR library ---
 remote_file "#{downloadDir}/#{aprSourceArchive}" do
-  owner usr
-  group usr
   source node['liferay']['apr_download_url']
   action :create_if_missing
 end
 
 remote_file "#{downloadDir}/#{nativeConnectorSourceArchive}" do
-  owner usr
-  group usr
   source node['liferay']['native_connectors_download_url']
   action :create_if_missing
 end

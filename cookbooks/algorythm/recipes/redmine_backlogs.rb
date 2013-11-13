@@ -1,5 +1,5 @@
 usr = node['redmine']['user']
-downloadDir = "/home/#{usr}/Downloads"
+downloadDir = "/Downloads"
 redmineZipFile = File.basename(URI.parse(node['redmine']['download_url']).path)
 redmineExtractionDir = redmineZipFile.gsub(/(.*)\.zip/, '\1')
 redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
@@ -23,22 +23,16 @@ end
 
 # --- Download Redmine & Backlogs plugin ---
 directory downloadDir do
-  owner usr
-  group usr
   mode 00755
   action :create
 end
 
 remote_file "#{downloadDir}/#{redmineZipFile}" do
-  owner usr
-  group usr
   source node['redmine']['download_url']
   action :create_if_missing
 end
 
 execute "Download Redmine Backlogs plugin repository" do
-  user usr
-  group usr
   cwd "#{downloadDir}"
   command "git clone git://github.com/backlogs/redmine_backlogs.git"
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
