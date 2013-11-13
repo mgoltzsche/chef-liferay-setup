@@ -1,7 +1,7 @@
 # --- Install prerequisites ---
 package 'imagemagick'
 package 'unzip'
-package 'openjdk-7-jre-headless'
+package 'openjdk-7-jdk'
 
 # --- Set host name ---
 hostname = node['liferay']['hostname']
