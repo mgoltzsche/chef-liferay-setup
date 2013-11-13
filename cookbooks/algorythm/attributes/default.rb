@@ -13,6 +13,8 @@ default['liferay']['postgresql']['user'] = "liferay_user"
 default['liferay']['postgresql']['password'] = "liferay"
 
 # Liferay installation
+default['liferay']['native_connectors_download_url'] = "http://apache.lehtivihrea.org//tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz"
+default['liferay']['apr_download_url'] = "http://mirror.synyx.de/apache/apr/apr-1.4.8.tar.bz2"
 default['liferay']['download_url'] = "http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr"
 default['liferay']['install_directory'] = "/opt"
 default['liferay']['java_opts'] = "-Xms128m -Xmx1024m -XX:MaxPermSize=512m"

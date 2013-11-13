@@ -4,9 +4,17 @@ usr = node['liferay']['user']
 downloadDir = "/home/#{usr}/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
 liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
+aprSourceArchive = File.basename(URI.parse(node['liferay']['apr_download_url']).path)
+aprSourceFolder = aprSourceArchive.gsub(/(.*?)\..*/, '\1')
+aprSourcePath = "#{downloadDir}/#{aprSourceFolder}"
+nativeConnectorSourceArchive = File.basename(URI.parse(node['liferay']['native_connectors_download_url']).path)
+nativeConnectorSourceFolder = nativeConnectorSourceArchive.gsub(/(.*?)\..*/, '\1')
+nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
 dbname = node['liferay']['postgresql']['database']
+
+package 'libssl-dev'
 
 # --- Create Liferay system user ---
 user usr do
@@ -83,6 +91,51 @@ execute "Create database '#{dbname}'" do
   user 'postgres'
   command "createdb '#{dbname}' -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0"
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
+end
+
+# --- Install native APR library ---
+remote_file "#{downloadDir}/#{aprSourceArchive}" do
+  owner usr
+  group usr
+  source node['liferay']['apr_download_url']
+  action :create_if_missing
+end
+
+remote_file "#{downloadDir}/#{nativeConnectorSourceArchive}" do
+  owner usr
+  group usr
+  source node['liferay']['native_connectors_download_url']
+  action :create_if_missing
+end
+
+execute "Extract APR source" do
+  cwd downloadDir
+  user 'root'
+  group 'root'
+  command "tar xvjf #{downloadDir}/#{aprSourceArchive}"
+  not_if {File.exist?(aprSourcePath)}
+end
+
+execute "Extract native connectors source" do
+  cwd downloadDir
+  user 'root'
+  group 'root'
+  command "tar xvzf #{downloadDir}/#{nativeConnectorSourceArchive}"
+  not_if {File.exist?(nativeConnectorSourcePath)}
+end
+
+execute "Compile APR source" do
+  cwd aprSourcePath
+  user 'root'
+  group 'root'
+  command "./configure && make && make install"
+end
+
+execute "Compile native connectors source" do
+  cwd "#{nativeConnectorSourcePath}/jni/native"
+  user 'root'
+  group 'root'
+  command "./configure --with-apr=/usr/local/apr && make && make install"
 end
 
 # --- Configure Liferay tomcat ---
