@@ -93,7 +93,7 @@ execute "Create database '#{dbname}'" do
   not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
 end
 
-# --- Install native APR library ---
+# --- Download & install native APR library ---
 remote_file "#{downloadDir}/#{aprSourceArchive}" do
   owner usr
   group usr
@@ -128,14 +128,22 @@ execute "Compile APR source" do
   cwd aprSourcePath
   user 'root'
   group 'root'
-  command "./configure && make && make install"
+  command <<-EOH
+./configure
+make
+make install
+  EOH
 end
 
 execute "Compile native connectors source" do
   cwd "#{nativeConnectorSourcePath}/jni/native"
   user 'root'
   group 'root'
-  command "./configure --with-apr=/usr/local/apr && make && make install"
+  command <<-EOH
+./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64
+make
+make install
+  EOH
 end
 
 # --- Configure Liferay tomcat ---
