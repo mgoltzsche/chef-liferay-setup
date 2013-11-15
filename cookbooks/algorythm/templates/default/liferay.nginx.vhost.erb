@@ -1,10 +1,22 @@
 server {
 	listen 80;
+	server_name <%=@hostname%>;
+	root /usr/share/nginx/www;
+
+	access_log /var/log/nginx/liferay-proxy-access;
+	error_log  /var/log/nginx/liferay-proxy-error;
+
+	include proxy_params;
+
+	location / {
+		proxy_pass http://127.0.0.1:<%=@http_port%>/;
+	}
+}
+
+server {
 	listen 443 ssl;
 	server_name <%=@hostname%>;
 	root /usr/share/nginx/www;
-	keepalive_requests 10;
-	keepalive_timeout 60 60;
 
 	access_log /var/log/nginx/liferay-proxy-access;
 	error_log  /var/log/nginx/liferay-proxy-error;
@@ -15,6 +27,6 @@ server {
 	include proxy_params;
 
 	location / {
-		proxy_pass $scheme://127.0.0.1:<%=@port%>/;
+		proxy_pass http://127.0.0.1:<%=@https_port%>/;
 	}
 }

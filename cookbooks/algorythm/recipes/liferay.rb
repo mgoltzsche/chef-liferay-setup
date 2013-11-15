@@ -163,7 +163,8 @@ template "#{liferayHome}/tomcat/conf/server.xml" do
   source "liferay.tomcat.server.xml.erb"
   mode 00700
   variables({
-    :port => node['liferay']['port']
+    :http_port => node['liferay']['http_port'],
+    :https_port => node['liferay']['https_port']
   })
 end
 
@@ -221,7 +222,8 @@ template "/etc/nginx/sites-available/default" do
   mode 00700
   variables({
     :hostname => node['liferay']['hostname'],
-    :port => node['liferay']['port']
+    :http_port => node['liferay']['http_port'],
+    :https_port => node['liferay']['https_port']
   })
 end
 

@@ -18,7 +18,8 @@ default['liferay']['native_connectors_download_url'] = "http://apache.lehtivihre
 default['liferay']['apr_download_url'] = "http://mirror.synyx.de/apache/apr/apr-1.4.8.tar.bz2"
 default['liferay']['install_directory'] = "/opt"
 default['liferay']['java_opts'] = "-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m"
-default['liferay']['port'] = 8087
+default['liferay']['http_port'] = 8087
+default['liferay']['https_port'] = 8089
 
 # Portal configuration
 default['liferay']['company_default_name'] = "algorythm"
