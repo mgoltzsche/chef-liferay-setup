@@ -8,6 +8,7 @@ imagemagick.enabled=true
 web.server.http.port=80
 web.server.https.port=443
 web.server.host=<%=@hostname%>
+web.server.protocol=https
 
 ### Persistence
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
@@ -38,9 +39,11 @@ default.admin.last.name=Goltzsche
 ### Company
 company.default.name=<%=@company_name%>
 company.default.web.id=<%=@hostname%>
-company.default.home.url=/web/guest
+company.default.home.url=/web/guest/home
+default.landing.page.path=/web/guest/home
 company.default.locale=en_US
 company.default.time.zone=Europe/Berlin
+company.login.prepopulate.domain=false
 company.settings.form.authentication=general,ldap,open-id
 company.settings.form.miscellaneous=display-settings,analytics
 #image.default.company.logo=com/liferay/portal/dependencies/company_logo.png

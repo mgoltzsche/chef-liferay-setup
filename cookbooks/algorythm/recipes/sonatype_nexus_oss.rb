@@ -15,6 +15,7 @@ execute "Deploy Nexus OSS" do
   user usr
   group usr
   command "cp #{nexusWarFile} #{nexusDeployWarFile}"
+  not_if {File.exist?("#{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus")}
 end
 
 link "/etc/nginx/sites-enabled/#{hostname}" do
