@@ -5,6 +5,6 @@
 		"recipe[algorythm::nginx]",
 		"recipe[algorythm::liferay]",
 		"recipe[algorythm::sonatype_nexus_oss]",
-		"recipe[algorythm::redmine]"
+		"recipe[algorythm::redmine_backlogs]"
 	]
 }
