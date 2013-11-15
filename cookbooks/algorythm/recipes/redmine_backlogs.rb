@@ -1,12 +1,12 @@
+hostname = default['redmine']['hostname']
 usr = node['redmine']['user']
 downloadDir = "/Downloads"
-redmineZipFile = File.basename(URI.parse(node['redmine']['download_url']).path)
-redmineExtractionDir = redmineZipFile.gsub(/(.*)\.zip/, '\1')
-redmineHome = "#{node['redmine']['install_directory']}/#{redmineExtractionDir}";
+redmineHome = "#{node['redmine']['install_directory']}/redmine-#{node['redmine']['version']}";
 redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
-hostname = node['redmine']['hostname']
+redmineVersion = node['redmine']['version']
 dbname = node['redmine']['postgresql']['database']
 backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
+backlogsVersion = node['redmine']['backlogs_version']
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -27,9 +27,10 @@ directory downloadDir do
   action :create
 end
 
-remote_file "#{downloadDir}/#{redmineZipFile}" do
-  source node['redmine']['download_url']
-  action :create_if_missing
+execute "Download Redmine Backlogs plugin repository" do
+  cwd "#{downloadDir}"
+  command "git clone git://github.com/redmine/redmine.git"
+  not_if {File.exist?("#{downloadDir}/redmine")}
 end
 
 execute "Download Redmine Backlogs plugin repository" do
@@ -38,40 +39,47 @@ execute "Download Redmine Backlogs plugin repository" do
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
 end
 
-# --- Copy and link Redmine installation ---
-execute "Put Redmine in place" do
-  cwd downloadDir
-  user 'root'
-  group 'root'
-  command "unzip -qd #{node['redmine']['install_directory']} #{redmineZipFile}"
+# --- Download, copy and link Redmine installation ---
+execute "Checkout Redmine version #{redmineVersion}" do
+  cwd "#{downloadDir}/redmine"
+  command <<-EOH
+git fetch --tags origin &&
+git checkout #{redmineVersion}
+  EOH
   not_if {File.exist?(redmineHome)}
-  notifies :create, "directory[#{redmineHome}/public/plugin_assets]", :immediately
 end
 
 directory "#{redmineHome}/public/plugin_assets" do
   owner usr
   group usr
   mode 00755
-  action :nothing
+  action :create
 end
 
-execute "Checkout Redmine Backlogs version #{node['redmine']['backlogs_version']}" do
+execute "Checkout Redmine Backlogs version #{backlogsVersion}" do
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
 git fetch --tags origin &&
-git checkout #{node['redmine']['backlogs_version']}
+git checkout #{backlogsVersion}
   EOH
   not_if {File.exist?(backlogsHome)}
 end
 
-execute "Put Redmine Backlogs plugin in place" do
+execute "Copy Redmine to installation directory" do
+  user usr
+  group usr
+  command "cp -R #{downloadDir}/redmine #{redmineHome}"
+  not_if {File.exist?(backlogsHome)}
+end
+
+execute "Copy Redmine Backlogs plugin to Redmine's plugins directory" do
   user usr
   group usr
   command "cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}"
   not_if {File.exist?(backlogsHome)}
 end
 
-execute "Create symlink" do
+execute "Create redmine symlink" do
   command <<-EOH
 rm -rf #{node['redmine']['install_directory']}/redmine &&
 ln -s #{redmineHome} #{redmineHomeLink}
