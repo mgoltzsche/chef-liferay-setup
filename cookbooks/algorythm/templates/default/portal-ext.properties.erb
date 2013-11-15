@@ -8,7 +8,6 @@ imagemagick.enabled=true
 web.server.http.port=80
 web.server.https.port=443
 web.server.host=<%=@hostname%>
-#web.server.protocol=https
 
 ### Persistence
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
@@ -48,7 +47,7 @@ company.settings.form.miscellaneous=display-settings,analytics
 #image.default.company.logo=com/liferay/portal/dependencies/company_logo.png
 #company.encryption.algorithm=HmacSHA256
 #company.encryption.key.size=256
-company.security.auth.requires.https=false
+company.security.auth.requires.https=true
 company.security.strangers=false # do not allow user registration
 company.security.strangers.verify=true # verify strangers email address
 organizations.types=regular-organization
