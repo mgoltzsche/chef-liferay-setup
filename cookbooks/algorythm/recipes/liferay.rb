@@ -121,8 +121,8 @@ execute "Compile APR source" do
   user 'root'
   group 'root'
   command <<-EOH
-./configure
-make
+./configure &&
+make &&
 make install
   EOH
 end
@@ -132,8 +132,8 @@ execute "Compile native connectors source" do
   user 'root'
   group 'root'
   command <<-EOH
-./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64
-make
+./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64 &&
+make &&
 make install
   EOH
 end
