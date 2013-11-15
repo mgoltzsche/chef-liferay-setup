@@ -1,4 +1,4 @@
-hostname = default['redmine']['hostname']
+hostname = node['redmine']['hostname']
 usr = node['redmine']['user']
 downloadDir = "/Downloads"
 redmineHome = "#{node['redmine']['install_directory']}/redmine-#{node['redmine']['version']}";
