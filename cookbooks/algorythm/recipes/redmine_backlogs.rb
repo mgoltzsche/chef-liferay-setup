@@ -61,16 +61,15 @@ cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}
 end
 
 directory "#{redmineHome}/public/plugin_assets" do
-  owner usr
-  group usr
   mode 00755
   action :create
 end
 
-execute "Create/Update symlink" do
+execute "Create/Update symlink and change owner" do
   command <<-EOH
 rm -rf #{redmineHomeLink} &&
-ln -s #{redmineHome} #{redmineHomeLink}
+ln -s #{redmineHome} #{redmineHomeLink} &&
+chown -R #{usr}:#{usr} #{redmineHome}
   EOH
 end
 
