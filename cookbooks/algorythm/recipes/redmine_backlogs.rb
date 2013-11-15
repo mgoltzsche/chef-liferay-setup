@@ -27,13 +27,13 @@ directory downloadDir do
   action :create
 end
 
-execute "Download Redmine Backlogs plugin repository" do
+execute "Clone Redmine git repository" do
   cwd "#{downloadDir}"
   command "git clone git://github.com/redmine/redmine.git"
   not_if {File.exist?("#{downloadDir}/redmine")}
 end
 
-execute "Download Redmine Backlogs plugin repository" do
+execute "Clone Redmine Backlogs plugin git repository" do
   cwd "#{downloadDir}"
   command "git clone git://github.com/backlogs/redmine_backlogs.git"
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
