@@ -39,36 +39,24 @@ execute "Download Redmine Backlogs plugin repository" do
   not_if {File.exist?("#{downloadDir}/redmine_backlogs")}
 end
 
-# --- Download, copy and link Redmine installation ---
-execute "Checkout Redmine version #{redmineVersion}" do
+# --- Checkout, copy and link Redmine installation ---
+execute "Checkout and copy Redmine to installation directory" do
   cwd "#{downloadDir}/redmine"
   command <<-EOH
 git fetch --tags origin &&
-git checkout #{redmineVersion}
+git checkout #{redmineVersion} &&
+cp -R #{downloadDir}/redmine #{redmineHome}
   EOH
   not_if {File.exist?(redmineHome)}
 end
 
-execute "Checkout Redmine Backlogs version #{backlogsVersion}" do
+execute "Checkout and copy Redmine Backlogs to plugins directory" do
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
 git fetch --tags origin &&
-git checkout #{backlogsVersion}
+git checkout #{backlogsVersion} &&
+cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}
   EOH
-  not_if {File.exist?(backlogsHome)}
-end
-
-execute "Copy Redmine to installation directory" do
-  user usr
-  group usr
-  command "cp -R #{downloadDir}/redmine #{redmineHome}"
-  not_if {File.exist?(backlogsHome)}
-end
-
-execute "Copy Redmine Backlogs plugin to Redmine's plugins directory" do
-  user usr
-  group usr
-  command "cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}"
   not_if {File.exist?(backlogsHome)}
 end
 
@@ -79,7 +67,7 @@ directory "#{redmineHome}/public/plugin_assets" do
   action :create
 end
 
-execute "Create redmine symlink" do
+execute "Create/Update symlink" do
   command <<-EOH
 rm -rf #{redmineHomeLink} &&
 ln -s #{redmineHome} #{redmineHomeLink}

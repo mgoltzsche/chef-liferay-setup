@@ -44,7 +44,7 @@ execute "Extract Liferay" do
   notifies :run, "execute[Create symlinks and change owner]", :immediately
 end
 
-execute "Create symlinks and change owner" do
+execute "Create/Update symlinks and change owner" do
   user 'root'
   group 'root'
   command <<-EOH
