@@ -1,46 +1,31 @@
-# Upstream Ruby process cluster for load balancing
-upstream thin_cluster {
-    server unix:/tmp/thin.0.sock;
-    server unix:/tmp/thin.1.sock;
-    server unix:/tmp/thin.2.sock;
-    server unix:/tmp/thin.3.sock;
+upstream thin_cluster { # simple load balancing
+	server unix:/tmp/thin.0.sock;
+	server unix:/tmp/thin.1.sock;
+	server unix:/tmp/thin.2.sock;
+	server unix:/tmp/thin.3.sock;
 }
 
 server {
-    listen 80;
-    server_name <%=@hostname%>;
-    root <%=@home%>/public;
+	listen 80;
+	listen 443 ssl;
+	server_name <%=@hostname%>;
+	root <%=@home%>/public;
 
-    access_log  /var/log/nginx/redmine-proxy-access;
-    error_log   /var/log/nginx/redmine-proxy-error;
-    proxy_redirect off;
+	access_log /var/log/nginx/redmine-proxy-access;
+	error_log  /var/log/nginx/redmine-proxy-error;
 
-    # default proxy settings
-    proxy_set_header   Host $http_host;                                                                                                                     
-    proxy_set_header   X-Real-IP $remote_addr;                                                                                                                   
-    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header   X-Forwarded-Proto $scheme;
+	ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
+	ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
 
-    client_max_body_size       10m;
-    client_body_buffer_size    128k;
+	include proxy_params;
 
-    proxy_connect_timeout      90;
-    proxy_send_timeout         90;
-    proxy_read_timeout         90;
+	rewrite ^/login(.*)|^/my/account(.*)|^/my/password(.*)|^/admin(.*) https://$server_name$request_uri permanent;
 
-    proxy_buffer_size          4k;
-    proxy_buffers              4 32k;
-    proxy_busy_buffers_size    64k;
-    proxy_temp_file_write_size 64k;
+	location / {
+		try_files $uri/index.html $uri.html $uri @cluster;
+	}
 
-    # Send sensitive stuff via https
-    # rewrite ^/login(.*)|^/my/account(.*)|^/my/password(.*)|^/admin(.*) https://$server_name$request_uri permanent;
-
-    location / {
-        try_files $uri/index.html $uri.html $uri @cluster;
-    }
-
-    location @cluster {
-        proxy_pass http://thin_cluster;
-    }
+	location @cluster {
+		proxy_pass http://thin_cluster;
+	}
 }
