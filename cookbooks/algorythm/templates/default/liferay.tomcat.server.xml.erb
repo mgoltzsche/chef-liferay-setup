@@ -67,12 +67,15 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
+    <!-- Proxied HTTP Connector -->
     <Connector address="127.0.0.1" port="<%=@http_port%>" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="443" URIEncoding="UTF-8"
+               redirectPort="443"
+               URIEncoding="UTF-8"
                proxyName="<%=@hostname%>"
                proxyPort="80"
                />
+    <!-- Proxied HTTPS Connector -->
     <Connector address="127.0.0.1" port="<%=@https_port%>" protocol="HTTP/1.1"
                connectionTimeout="20000"
 	       URIEncoding="UTF-8"
