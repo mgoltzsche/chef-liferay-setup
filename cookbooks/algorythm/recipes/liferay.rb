@@ -163,7 +163,7 @@ template "#{liferayHome}/tomcat/conf/server.xml" do
   source "liferay.tomcat.server.xml.erb"
   mode 00700
   variables({
-    :hostname => hostname,
+    :hostname => node['liferay']['hostname'],
     :http_port => node['liferay']['http_port'],
     :https_port => node['liferay']['https_port']
   })
