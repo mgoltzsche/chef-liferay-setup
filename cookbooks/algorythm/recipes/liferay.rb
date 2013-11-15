@@ -48,7 +48,7 @@ execute "Create symlinks and change owner" do
   user 'root'
   group 'root'
   command <<-EOH
-rm -rf #{node['liferay']['install_directory']}/liferay &&
+rm -rf #{liferayHomeLink} &&
 ln -s #{liferayHome} #{liferayHomeLink} &&
 ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
 chown -R #{usr}:#{usr} #{liferayHome}

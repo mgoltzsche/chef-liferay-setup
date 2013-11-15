@@ -49,13 +49,6 @@ git checkout #{redmineVersion}
   not_if {File.exist?(redmineHome)}
 end
 
-directory "#{redmineHome}/public/plugin_assets" do
-  owner usr
-  group usr
-  mode 00755
-  action :create
-end
-
 execute "Checkout Redmine Backlogs version #{backlogsVersion}" do
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
@@ -79,9 +72,16 @@ execute "Copy Redmine Backlogs plugin to Redmine's plugins directory" do
   not_if {File.exist?(backlogsHome)}
 end
 
+directory "#{redmineHome}/public/plugin_assets" do
+  owner usr
+  group usr
+  mode 00755
+  action :create
+end
+
 execute "Create redmine symlink" do
   command <<-EOH
-rm -rf #{node['redmine']['install_directory']}/redmine &&
+rm -rf #{redmineHomeLink} &&
 ln -s #{redmineHome} #{redmineHomeLink}
   EOH
 end
