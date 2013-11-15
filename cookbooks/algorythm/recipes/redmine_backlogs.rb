@@ -55,20 +55,23 @@ directory "#{redmineHome}/public/plugin_assets" do
   action :nothing
 end
 
-execute "Put Redmine Backlogs plugin in place" do
-  user usr
-  group usr
+execute "Checkout Redmine Backlogs version #{node['redmine']['backlogs_version']}" do
   cwd "#{downloadDir}/redmine_backlogs"
   command <<-EOH
-git checkout #{node['redmine']['backlogs_version']} &&
-cp -R . #{backlogsHome}
+git fetch --tags origin &&
+git checkout #{node['redmine']['backlogs_version']}
   EOH
   not_if {File.exist?(backlogsHome)}
 end
 
+execute "Put Redmine Backlogs plugin in place" do
+  user usr
+  group usr
+  command "cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}"
+  not_if {File.exist?(backlogsHome)}
+end
+
 execute "Create symlink" do
-  user 'root'
-  group 'root'
   command <<-EOH
 rm -rf #{node['redmine']['install_directory']}/redmine &&
 ln -s #{redmineHome} #{redmineHomeLink}
