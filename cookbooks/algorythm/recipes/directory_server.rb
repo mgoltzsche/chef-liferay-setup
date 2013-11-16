@@ -35,7 +35,7 @@ echo "*		 soft	 nofile		 #{maxOpenFiles}
   not_if('cat /etc/security/limits.conf | grep "*		 soft	 nofile		 #{maxOpenFiles}"')
 end
 
-execute "Increase open file limit" do
+execute "Configure initial single instance" do
   command <<-EOH
 echo "[General]
 FullMachineName= #{fullMachineName}
@@ -58,6 +58,19 @@ setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
   EOH
   not_if {File.exist?("/etc/dirsrv/slapd-#{hostname}")}
+  notifies :run, "execute[Add admin user]", :immediately
+end
+
+
+execute "Configure TCPv4 localhost listening" do
+  command <<-EOH
+echo "dn: cn=config
+changetype: modify
+replace: nsslapd-listenhost
+nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
+rm -f /tmp/nsslapd-listenhost.ldif
+  EOH
 end
 
 execute "Add admin user" do
@@ -75,21 +88,10 @@ userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
 givenName: Max
 mail: max.goltzsche@gmail.com
 " > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
-end
-
-
-execute "Configure TCPv4 localhost listening" do
-  command <<-EOH
-echo "dn: cn=config
-changetype: modify
-replace: nsslapd-listenhost
-nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
-ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
-rm -f /tmp/nsslapd-listenhost.ldif
-  EOH
+  action :nothing
 end
 
 # --- Restart dirsrv ---
