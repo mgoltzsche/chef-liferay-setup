@@ -40,7 +40,7 @@ end
 
 execute "Configure postfix vmaps" do
   command <<-EOH
-echo 'admin@#{hostname}	#{hostname}/admin/' > /etc/postfix/vmaps &&
+echo 'admin@#{hostname}  #{hostname}/admin/' > /etc/postfix/vmaps &&
 postmap /etc/postfix/vmaps
   EOH
 end
