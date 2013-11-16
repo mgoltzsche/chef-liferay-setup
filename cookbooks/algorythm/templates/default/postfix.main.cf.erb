@@ -32,12 +32,13 @@ recipient_delimiter = +
 inet_interfaces = all
 inet_protocols = all
 home_mailbox = Maildir/
+
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_type = dovecot
-smtpd_sasl_path = private/dovecot-auth
+smtpd_sasl_path = private/auth-client
 smtpd_sasl_authenticated_header = yes
 smtpd_sasl_security_options = noanonymous
-smtpd_sasl_local_domain = $myhostname
+smtpd_sasl_local_domain =
 broken_sasl_auth_clients = yes
 smtpd_recipient_restrictions = reject_unknown_sender_domain, reject_unknown_recipient_domain, reject_unauth_pipelining, permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
 smtpd_sender_restrictions = reject_unknown_sender_domain
