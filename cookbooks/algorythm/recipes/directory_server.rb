@@ -1,6 +1,7 @@
 package '389-ds-base'
 package 'ldap-utils'
 
+listenhost = '0.0.0.0'
 dirman = 'manager'
 dirman_pwd = 'maximum!'
 maxOpenFiles = 4096
@@ -64,7 +65,7 @@ execute "Configure TCPv4 localhost listening" do
 echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
-nsslapd-listenhost: 127.0.0.1" > /tmp/nsslapd-listenhost.ldif &&
+nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
 ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
