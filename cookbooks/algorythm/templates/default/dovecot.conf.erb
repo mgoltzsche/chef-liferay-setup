@@ -1,0 +1,41 @@
+auth_mechanisms = plain cram-md5
+auth_verbose = yes
+base_dir = /var/run/dovecot/
+info_log_path = /var/log/dovecot.info
+log_path = /var/log/dovecot
+log_timestamp = "%Y-%m-%d %H:%M:%S "
+mail_location = maildir:<%=@vmail_directory%>/%d/%n
+passdb {
+  args = /etc/dovecot/passwd
+  driver = passwd-file
+}
+protocols = imap pop3
+service auth {
+  executable = /usr/lib/dovecot/auth
+  user = root
+}
+service imap-login {
+  chroot = login
+  executable = /usr/lib/dovecot/imap-login
+  user = dovecot
+}
+service imap {
+  executable = /usr/lib/dovecot/imap
+}
+service pop3-login {
+  chroot = login
+  executable = /usr/lib/dovecot/pop3-login
+  user = dovecot
+}
+service pop3 {
+  executable = /usr/lib/dovecot/pop3
+}
+ssl = no
+userdb {
+  args = /etc/dovecot/users
+  driver = passwd-file
+}
+valid_chroot_dirs = /var/spool/vmail
+protocol pop3 {
+  pop3_uidl_format = %08Xu%08Xv
+}
