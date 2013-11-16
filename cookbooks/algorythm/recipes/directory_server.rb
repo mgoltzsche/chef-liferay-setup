@@ -1,7 +1,7 @@
 package '389-ds-base'
 package 'ldap-utils'
 
-dirman = 'manager'
+usr = 'manager'
 passwd = 'maximum!'
 maxOpenFiles = 4096
 hostname = node['hostname']
@@ -49,7 +49,7 @@ AdminDomain= #{domain}
 ServerIdentifier= #{hostname}
 ServerPort= 389
 Suffix= #{domainContexts}
-RootDN= cn=#{dirman}
+RootDN= cn=#{usr}
 RootDNPwd= #{passwd}
 
 [admin]
