@@ -8,7 +8,7 @@ hostname = node['hostname']
 domain = node['liferay']['hostname']
 
 fullMachineName = "#{hostname}.#{domain}"
-domainContexts = domain.each_line('\\.').map{|dc| "dc=#{dc}"}.join(', ')
+domainContexts = domain.each_line('.').map{|dc| "dc=#{dc}"}.join(', ')
 print domainContexts
 
 execute "Decrease TCP timeout" do
