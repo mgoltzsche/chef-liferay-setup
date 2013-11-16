@@ -2,4 +2,5 @@
 	"run_list": [
 		"recipe[algorythm::default]",
 		"recipe[algorythm::dovecot_postfix]"
+	]
 }
