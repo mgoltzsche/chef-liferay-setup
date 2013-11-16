@@ -4,7 +4,7 @@ package 'unzip'
 package 'openjdk-7-jdk'
 
 # --- Set host name ---
-hostname = node['liferay']['hostname']
+hostname = node['hostname']
 
 file '/etc/hostname' do
   content "#{hostname}\n"

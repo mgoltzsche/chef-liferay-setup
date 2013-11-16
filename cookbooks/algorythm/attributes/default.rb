@@ -1,5 +1,5 @@
 # Hostname
-default['liferay']['hostname'] = 'dev.algorythm.de'
+default['hostname'] = "dev"
 
 # Postgresql installation
 default['postgresql']['version'] = "9.1"
@@ -17,6 +17,7 @@ default['liferay']['http_port'] = 8087
 default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
+default['liferay']['hostname'] = 'dev.algorythm.de'
 default['liferay']['company_default_name'] = "algorythm"
 default['liferay']['admin']['name'] = "Max Goltzsche"
 default['liferay']['admin']['email'] = "max.goltzsche@gmail.com"

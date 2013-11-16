@@ -1,8 +1,8 @@
 package 'dovecot-postfix'
 
 usr = 'vmail'
-vmailDirectory = '/home/vmail'
-hostname = node['liferay']['hostname']
+vmailDirectory = "/home/#{usr}"
+domain = node['liferay']['hostname']
 
 # --- Create postfix virtual mail user ---
 user usr do
@@ -19,7 +19,7 @@ template "/etc/postfix/main.cf" do
   source "postfix.main.cf.erb"
   mode 0644
   variables({
-    :hostname => hostname,
+    :hostname => node['hostname'],
     :vmail_directory => vmailDirectory
   })
 end
@@ -35,12 +35,12 @@ template "/etc/postfix/dynamicmaps.cf" do
 end
 
 execute "Configure postfix vhosts" do
-  command "echo '#{hostname}' > /etc/postfix/vhosts"
+  command "echo '#{domain}' > /etc/postfix/vhosts"
 end
 
 execute "Configure postfix vmaps" do
   command <<-EOH
-echo 'admin@#{hostname}  #{hostname}/admin/' > /etc/postfix/vmaps &&
+echo 'admin@#{domain}  #{domain}/admin/' > /etc/postfix/vmaps &&
 postmap /etc/postfix/vmaps
   EOH
 end
