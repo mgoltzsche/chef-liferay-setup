@@ -61,6 +61,7 @@ ulimit -n #{maxOpenFiles} &&
 setup-ds -sf ds-config.inf &&
 rm -f ds-config.inf
   EOH
+  not_if {File.exist?("/etc/dirsrv/slapd-#{hostname}")}
 end
 
 #execute "Configure TCPv4 localhost listening" do
