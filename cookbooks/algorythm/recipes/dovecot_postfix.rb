@@ -58,7 +58,11 @@ template "/etc/dovecot/dovecot.conf" do
   })
 end
 
-# --- Restart postfix ---
+# --- Restart postfix & dovecot ---
 service "postfix" do
+  action :restart
+end
+
+service "dovecot" do
   action :restart
 end
