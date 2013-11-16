@@ -1,4 +1,5 @@
 package 'dovecot-postfix'
+package 'postfix-ldap'
 
 usr = 'vmail'
 vmailDirectory = "/home/#{usr}"
