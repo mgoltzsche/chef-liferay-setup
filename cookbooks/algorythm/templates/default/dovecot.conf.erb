@@ -9,7 +9,7 @@ passdb {
   args = /etc/dovecot/passwd
   driver = passwd-file
 }
-protocols = imap pop3
+protocols = imap imaps pop3 pop3s
 service auth {
   executable = /usr/lib/dovecot/auth
   user = root
@@ -30,7 +30,11 @@ service pop3-login {
 service pop3 {
   executable = /usr/lib/dovecot/pop3
 }
+ssl_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
+ssl_key_file = /etc/ssl/private/ssl-cert-snakeoil.key
 ssl = yes
+ssl_disable = no
+disable_plaintext_auth = yes
 userdb {
   args = /etc/dovecot/users
   driver = passwd-file
