@@ -17,7 +17,7 @@ end
 # --- Configure postfix ---
 template "/etc/postfix/main.cf" do
   source "postfix.main.cf.erb"
-  mode 0600
+  mode 0644
   variables({
     :hostname => hostname,
     :vmail_directory => vmailDirectory
@@ -26,12 +26,12 @@ end
 
 template "/etc/postfix/master.cf" do
   source "postfix.master.cf.erb"
-  mode 0600
+  mode 0644
 end
 
 template "/etc/postfix/dynamicmaps.cf" do
   source "postfix.dynamicmaps.cf.erb"
-  mode 0600
+  mode 0644
 end
 
 execute "Configure postfix vhosts" do
