@@ -1,11 +1,6 @@
 {
 	"run_list": [
 		"recipe[algorythm::default]",
-		"recipe[algorythm::dovecot_postfix]",
-		"recipe[algorythm::postgresql]",
-		"recipe[algorythm::nginx]",
-		"recipe[algorythm::liferay]",
-		"recipe[algorythm::sonatype_nexus_oss]",
-		"recipe[algorythm::redmine_backlogs]"
+		"recipe[algorythm::dovecot_postfix]"
 	]
 }
