@@ -74,3 +74,8 @@ ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{usr}" -w #{passwd} -f nssla
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
 end
+
+# --- Restart dirsrv ---
+service "dirsrv" do
+  action :restart
+end
