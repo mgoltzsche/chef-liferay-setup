@@ -9,7 +9,6 @@ domain = node['liferay']['hostname']
 
 fullMachineName = "#{hostname}.#{domain}"
 domainContexts = domain.split('.').map{|dc| "dc=#{dc}"}.join(', ')
-print domainContexts
 
 execute "Decrease TCP timeout" do
   command <<-EOH
