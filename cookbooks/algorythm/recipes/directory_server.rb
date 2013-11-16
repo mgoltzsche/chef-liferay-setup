@@ -60,6 +60,27 @@ rm -f /tmp/ds-config.inf
   not_if {File.exist?("/etc/dirsrv/slapd-#{hostname}")}
 end
 
+execute "Add admin user" do
+  command <<-EOH
+echo "dn: cn=devilopa,ou=People,dc=dev,dc=algorythm,dc=de
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: devilopa
+sn: Goltzsche
+userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
+ Q==
+givenName: Max
+mail: max.goltzsche@gmail.com
+" > /tmp/admin_user.ldif &&
+ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
+rm -f /tmp/admin_user.ldif
+  EOH
+end
+
+
 execute "Configure TCPv4 localhost listening" do
   command <<-EOH
 echo "dn: cn=config
