@@ -56,21 +56,21 @@ RootDNPwd= #{passwd}
 ServerAdminID= admin
 ServerAdminPwd= thepassword
 SysUser= dirsrv
-" > ds-config.inf &&
+" > /tmp/ds-config.inf &&
 ulimit -n #{maxOpenFiles} &&
-setup-ds -sf ds-config.inf &&
-rm -f ds-config.inf
+setup-ds -sf /tmp/ds-config.inf &&
+rm -f /tmp/ds-config.inf
   EOH
   not_if {File.exist?("/etc/dirsrv/slapd-#{hostname}")}
 end
 
-#execute "Configure TCPv4 localhost listening" do
-#  command <<-EOH
-#echo "dn: cn=config
-#changetype: modify
-#replace: nsslapd-listenhost
-#nsslapd-listenhost: 127.0.0.1" > nsslapd-listenhost.ldif &&
-#ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{usr}" -w #{passwd} -f nsslapd-listenhost.ldif
-#rm -f nsslapd-listenhost.ldif
-#  EOH
-#end
+execute "Configure TCPv4 localhost listening" do
+  command <<-EOH
+echo "dn: cn=config
+changetype: modify
+replace: nsslapd-listenhost
+nsslapd-listenhost: 127.0.0.1" > /tmp/nsslapd-listenhost.ldif &&
+ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{usr}" -w #{passwd} -f nsslapd-listenhost.ldif
+rm -f /tmp/nsslapd-listenhost.ldif
+  EOH
+end
