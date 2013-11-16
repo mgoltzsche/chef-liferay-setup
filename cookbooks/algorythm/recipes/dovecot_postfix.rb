@@ -15,14 +15,6 @@ user usr do
 end
 
 # --- Configure postfix ---
-execute "Configure postfix initially" do
-  command <<-EOH
-debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
-debconf-set-selections <<< "postfix postfix/mailname string #{hostname}"
-dpkg-reconfigure postfix
-  EOH
-end
-
 template "/etc/postfix/main.cf" do
   source "postfix.main.cf.erb"
   mode 0600
@@ -32,8 +24,14 @@ template "/etc/postfix/main.cf" do
   })
 end
 
-execute "Configure postfix mail-stack-delivery" do
-  command "dpkg-reconfigure mail-stack-delivery"
+template "/etc/postfix/master.cf" do
+  source "postfix.master.cf.erb"
+  mode 0600
+end
+
+template "/etc/postfix/dynamicmaps.cf" do
+  source "postfix.dynamicmaps.cf.erb"
+  mode 0600
 end
 
 execute "Configure postfix vhosts" do
@@ -45,6 +43,10 @@ execute "Configure postfix vmaps" do
 echo 'admin@#{hostname}	#{hostname}/admin/' > /etc/postfix/vmaps &&
 postmap /etc/postfix/vmaps
   EOH
+end
+
+execute "Configure postfix mail-stack-delivery" do
+  command "dpkg-reconfigure mail-stack-delivery"
 end
 
 # --- Configure dovecot ---
