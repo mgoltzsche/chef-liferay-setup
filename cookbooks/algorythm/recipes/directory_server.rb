@@ -59,7 +59,7 @@ ServerAdminPwd= thepassword
 SysUser= dirsrv
 " > ds-config.inf &&
 ulimit -n #{maxOpenFiles} &&
-setup-ds -sf ds-config.inf
+setup-ds -sf ds-config.inf &&
 rm -f ds-config.inf
   EOH
 end
