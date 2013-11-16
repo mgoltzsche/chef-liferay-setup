@@ -10,15 +10,21 @@ unless ENV['LANGUAGE'] == "en_US.UTF-8" && ENV['LANG'] == "en_US.UTF-8" && ENV['
   ENV['LANGUAGE'] = ENV['LANG'] = ENV['LC_ALL'] = "en_US.UTF-8"
 end
 
+version = node['postgresql']['version']
+
 # --- Install postgresql ---
-package 'postgresql'
+package "postgresql-#{version}"
 
 # --- Write config ---
-template "#{node['liferay']['postgresql']['dir']}/postgresql.conf" do
+template "/etc/postgresql/#{version}/main/postgresql.conf" do
   source "postgresql.conf.erb"
   owner "postgres"
   group "postgres"
   mode 0600
+  variables({
+    :version => version,
+    :port => node['postgresql']['port']
+  })
 end
 
 # --- (Re)start postgresql ---

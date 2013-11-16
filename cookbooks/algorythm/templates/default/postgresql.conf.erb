@@ -1,8 +1,8 @@
-data_directory = '/var/lib/postgresql/<%=node['liferay']['postgresql']['version']%>/main'
-hba_file = '/etc/postgresql/<%=node['liferay']['postgresql']['version']%>/main/pg_hba.conf'
-ident_file = '/etc/postgresql/<%=node['liferay']['postgresql']['version']%>/main/pg_ident.conf'
-external_pid_file = '/var/run/postgresql/<%=node['liferay']['postgresql']['version']%>-main.pid'
-port = <%=node['liferay']['postgresql']['port']%>
+data_directory = '/var/lib/postgresql/<%=@version%>/main'
+hba_file = '/etc/postgresql/<%=@version%>/main/pg_hba.conf'
+ident_file = '/etc/postgresql/<%=@version%>/main/pg_ident.conf'
+external_pid_file = '/var/run/postgresql/<%=@version%>-main.pid'
+port = <%=@port%>
 listen_addresses = localhost
 max_connections = 100
 unix_socket_directory = '/var/run/postgresql'
