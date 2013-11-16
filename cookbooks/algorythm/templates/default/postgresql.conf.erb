@@ -3,7 +3,7 @@ hba_file = '/etc/postgresql/<%=@version%>/main/pg_hba.conf'
 ident_file = '/etc/postgresql/<%=@version%>/main/pg_ident.conf'
 external_pid_file = '/var/run/postgresql/<%=@version%>-main.pid'
 port = <%=@port%>
-listen_addresses = localhost
+listen_addresses = <%=@address%>
 max_connections = 100
 unix_socket_directory = '/var/run/postgresql'
 ssl = false

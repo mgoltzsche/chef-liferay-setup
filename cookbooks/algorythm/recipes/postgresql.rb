@@ -23,6 +23,7 @@ template "/etc/postgresql/#{version}/main/postgresql.conf" do
   mode 0600
   variables({
     :version => version,
+    :address => node['postgresql']['address'],
     :port => node['postgresql']['port']
   })
 end
