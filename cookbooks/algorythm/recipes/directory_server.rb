@@ -4,12 +4,15 @@ package 'ldap-utils'
 listenhost = '0.0.0.0'
 dirman = 'manager'
 dirman_pwd = 'maximum!'
+userCN = 'devilopa'
+userSN = 'Goltzsche'
+userGivenName = 'Max'
+userMailPrefix = 'admin'
 maxOpenFiles = 4096
 hostname = node['hostname']
 domain = node['liferay']['hostname']
-
 fullMachineName = "#{hostname}.#{domain}"
-domainContexts = domain.split('.').map{|dc| "dc=#{dc}"}.join(', ')
+suffix = domain.split('.').map{|dc| "dc=#{dc}"}.join(', ')
 
 execute "Decrease TCP timeout" do
   command <<-EOH
@@ -35,7 +38,7 @@ echo "*		 soft	 nofile		 #{maxOpenFiles}
   not_if('cat /etc/security/limits.conf | grep "*		 soft	 nofile		 #{maxOpenFiles}"')
 end
 
-execute "Configure initial single instance" do
+execute "Configure single instance" do
   command <<-EOH
 echo "[General]
 FullMachineName= #{fullMachineName}
@@ -49,7 +52,7 @@ AdminDomain= #{domain}
 [slapd]
 ServerIdentifier= #{hostname}
 ServerPort= 389
-Suffix= #{domainContexts}
+Suffix= #{suffix}
 RootDN= cn=#{dirman}
 RootDNPwd= #{dirman_pwd}
 " > /tmp/ds-config.inf &&
@@ -75,18 +78,18 @@ end
 
 execute "Add admin user" do
   command <<-EOH
-echo "dn: cn=devilopa,ou=People,dc=dev,dc=algorythm,dc=de
+echo "dn: cn=#{userCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
-cn: devilopa
-sn: Goltzsche
+cn: #{userCN}
+sn: #{userSN}
+givenName: #{userGivenName}
+mail: #{userMailPrefix}@#{domain}
 userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q==
-givenName: Max
-mail: max.goltzsche@gmail.com
 " > /tmp/admin_user.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
