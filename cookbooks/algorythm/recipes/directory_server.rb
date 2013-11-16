@@ -1,8 +1,8 @@
 package '389-ds-base'
 package 'ldap-utils'
 
-usr = 'manager'
-passwd = 'maximum!'
+dirman = 'manager'
+dirman_pwd = 'maximum!'
 maxOpenFiles = 4096
 hostname = node['hostname']
 domain = node['liferay']['hostname']
@@ -49,13 +49,8 @@ AdminDomain= #{domain}
 ServerIdentifier= #{hostname}
 ServerPort= 389
 Suffix= #{domainContexts}
-RootDN= cn=#{usr}
-RootDNPwd= #{passwd}
-
-[admin]
-ServerAdminID= admin
-ServerAdminPwd= thepassword
-SysUser= dirsrv
+RootDN= cn=#{dirman}
+RootDNPwd= #{dirman_pwd}
 " > /tmp/ds-config.inf &&
 ulimit -n #{maxOpenFiles} &&
 setup-ds -sf /tmp/ds-config.inf &&
@@ -70,7 +65,7 @@ echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
 nsslapd-listenhost: 127.0.0.1" > /tmp/nsslapd-listenhost.ldif &&
-ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{usr}" -w #{passwd} -f /tmp/nsslapd-listenhost.ldif &&
+ldapmodify -a -x -h dev.algorythm.de -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
 end
