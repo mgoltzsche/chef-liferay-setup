@@ -99,7 +99,7 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing
-  notifies :restart, "service[dirsrv]"
+  notifies :restart, "service[dirsrv]", :immediately
 end
 
 # --- Restart dirsrv ---
