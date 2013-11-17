@@ -173,7 +173,7 @@ end
 template "#{liferayHome}/portal-ext.properties" do
   owner usr
   group usr
-  source "portal-ext.properties.erb"
+  source "liferay.portal-ext.properties.erb"
   mode 00700
   variables({
     :liferay_home => liferayHome,

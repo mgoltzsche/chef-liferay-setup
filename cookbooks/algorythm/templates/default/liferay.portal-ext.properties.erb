@@ -72,7 +72,7 @@ passwords.encryption.algorithm=SSHA
 ### Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
 ldap.auth.required=false
-ldap.auth.search.filter=(mail=@email_address@)
+ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(mail=@email_address@))
 #ldap.auth.method=password-compare
 #ldap.auth.password.encryption.algorithm=SSHA
 

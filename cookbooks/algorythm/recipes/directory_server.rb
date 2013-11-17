@@ -2,9 +2,8 @@ package '389-ds-base'
 package 'ldap-utils'
 
 listenhost = '0.0.0.0'
-port = 389
 dirman = 'manager'
-dirman_pwd = 'maximum!'
+dirman_passwd = 'maximum!'
 userCN = 'devilopa'
 userSN = 'Goltzsche'
 userGivenName = 'Max'
@@ -43,10 +42,10 @@ AdminDomain= #{domain}
 
 [slapd]
 ServerIdentifier= #{hostname}
-ServerPort= #{port}
+ServerPort= 389
 Suffix= #{suffix}
 RootDN= cn=#{dirman}
-RootDNPwd= #{dirman_pwd}
+RootDNPwd= #{dirman_passwd}
 " > /tmp/ds-config.inf &&
 ulimit -n #{maxOpenFiles} &&
 setup-ds -sf /tmp/ds-config.inf &&
@@ -62,7 +61,7 @@ echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
 nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/nsslapd-listenhost.ldif &&
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
   action :nothing
@@ -83,7 +82,7 @@ objectClass: top
 ou: #{domain}
 associatedDomain: #{domain}
 " > /tmp/domain.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/domain.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/domain.ldif &&
 rm -f /tmp/domain.ldif
   EOH
   action :nothing
@@ -105,7 +104,7 @@ mail: #{userMailPrefix}@#{domain}
 userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q==
 " > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing

@@ -6,13 +6,13 @@ usr = 'vmail'
 vmailDirectory = "/var/vmail"
 domain = node['liferay']['hostname']
 ldapHost = 'localhost'
-ldapPort = 389
 ldapSuffix = node['liferay']['hostname'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+dirman = 'manager'
+dirman_passwd = 'maximum!'
 
 # --- Create postfix virtual mail user ---
 user usr do
   comment 'postfix virtual mail user'
-  home "/home/#{usr}"
   shell '/bin/bash'
   uid 5000
   gid 5000
@@ -67,7 +67,6 @@ template "/etc/postfix/ldap/virtual_aliases.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :port => ldapPort,
     :suffix => ldapSuffix
   })
 end
@@ -79,7 +78,6 @@ template "/etc/postfix/ldap/virtual_domains.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :port => ldapPort,
     :suffix => ldapSuffix
   })
 end
@@ -91,22 +89,9 @@ template "/etc/postfix/ldap/virtual_mailboxes.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :port => ldapPort,
     :suffix => ldapSuffix
   })
 end
-
-
-#execute "Configure postfix vhosts" do
-#  command "echo '#{domain}' > /etc/postfix/vhosts"
-#end
-
-#execute "Configure postfix vmaps" do
-#  command <<-EOH
-#echo 'admin@#{domain}  #{domain}/admin/' > /etc/postfix/vmaps &&
-#postmap /etc/postfix/vmaps
-#  EOH
-#end
 
 # --- Configure mail-stack-delivery ---
 execute "Configure postfix mail-stack-delivery" do
@@ -116,13 +101,26 @@ end
 # --- Configure dovecot ---
 template "/etc/dovecot/dovecot.conf" do
   source "dovecot.conf.erb"
+  owner 'root'
+  group 'root'
   mode 0600
   variables({
     :vmail_directory => vmailDirectory
   })
 end
 
-
+template "/etc/dovecot/dovecot-ldap.conf.ext" do
+  source "dovecot-ldap.conf.ext.erb"
+  owner 'root'
+  group 'root'
+  mode 0600
+  variables({
+    :host => ldapHost,
+    :suffix => ldapSuffix,
+    :dirman => dirman,
+    :dirman_passwd => dirman_passwd
+  })
+end
 
 # --- Restart postfix & dovecot ---
 service "postfix" do
