@@ -4,6 +4,9 @@ package 'postfix-ldap'
 usr = 'vmail'
 vmailDirectory = "/home/#{usr}"
 domain = node['liferay']['hostname']
+ldapHost = 'localhost'
+ldapPort = 389
+ldapSuffix = node['liferay']['hostname'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 
 # --- Create postfix virtual mail user ---
 user usr do
@@ -16,13 +19,11 @@ user usr do
 end
 
 # --- Configure postfix ---
-template "/etc/postfix/main.cf" do
-  source "postfix.main.cf.erb"
-  mode 0644
-  variables({
-    :hostname => node['hostname'],
-    :vmail_directory => vmailDirectory
-  })
+directory '/etc/postfix/ldap' do
+  owner 'postfix'
+  group 'postfix'
+  mode 00700
+  action :create
 end
 
 template "/etc/postfix/master.cf" do
@@ -35,17 +36,58 @@ template "/etc/postfix/dynamicmaps.cf" do
   mode 0644
 end
 
-execute "Configure postfix vhosts" do
-  command "echo '#{domain}' > /etc/postfix/vhosts"
+template "/etc/postfix/main.cf" do
+  source "postfix.main.cf.erb"
+  mode 0644
+  variables({
+    :hostname => node['hostname'],
+    :vmail_directory => vmailDirectory
+  })
 end
 
-execute "Configure postfix vmaps" do
-  command <<-EOH
-echo 'admin@#{domain}  #{domain}/admin/' > /etc/postfix/vmaps &&
-postmap /etc/postfix/vmaps
-  EOH
+template "/etc/postfix/ldap/virtual_aliases.cf" do
+  source "postfix.virtual_aliases.cf.erb"
+  mode 0644
+  variables({
+    :host => ldapHost,
+    :port => ldapPort,
+    :suffix => ldapSuffix
+  })
 end
 
+template "/etc/postfix/ldap/virtual_domains.cf" do
+  source "postfix.virtual_domains.cf.erb"
+  mode 0644
+  variables({
+    :host => ldapHost,
+    :port => ldapPort,
+    :suffix => ldapSuffix
+  })
+end
+
+template "/etc/postfix/ldap/virtual_mailboxes.cf" do
+  source "postfix.virtual_mailboxes.cf.erb"
+  mode 0644
+  variables({
+    :host => ldapHost,
+    :port => ldapPort,
+    :suffix => ldapSuffix
+  })
+end
+
+
+#execute "Configure postfix vhosts" do
+#  command "echo '#{domain}' > /etc/postfix/vhosts"
+#end
+
+#execute "Configure postfix vmaps" do
+#  command <<-EOH
+#echo 'admin@#{domain}  #{domain}/admin/' > /etc/postfix/vmaps &&
+#postmap /etc/postfix/vmaps
+#  EOH
+#end
+
+# --- Configure mail-stack-delivery ---
 execute "Configure postfix mail-stack-delivery" do
   command "dpkg-reconfigure mail-stack-delivery"
 end

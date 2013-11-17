@@ -22,8 +22,8 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 # information on enabling SSL in the smtp client.
 
 myhostname = <%=@hostname%>
-alias_maps = hash:/etc/aliases
-alias_database = hash:/etc/aliases
+#alias_maps = hash:/etc/aliases
+#alias_database = hash:/etc/aliases
 myorigin = $myhostname
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 relayhost =
@@ -32,6 +32,14 @@ recipient_delimiter = +
 inet_interfaces = all
 inet_protocols = all
 home_mailbox = Maildir/
+
+virtual_alias_maps = ldap:/etc/postfix/ldap/virtual_aliases.cf
+virtual_mailbox_domains = ldap:/etc/postfix/ldap/virtual_domains.cf
+virtual_mailbox_base = <%=@vmail_directory%>
+virtual_mailbox_maps = ldap:/etc/postfix/ldap/virtual_mailboxes.cf
+virtual_minimum_uid = 1000
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000
 
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_type = dovecot
@@ -43,10 +51,3 @@ broken_sasl_auth_clients = yes
 smtpd_recipient_restrictions = reject_unknown_sender_domain, reject_unknown_recipient_domain, reject_unauth_pipelining, permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
 smtpd_sender_restrictions = reject_unknown_sender_domain
 # mailbox_command = /usr/lib/dovecot/deliver -c /etc/dovecot/conf.d/01-mail-stack-delivery.conf -m "${EXTENSION}"
-
-virtual_mailbox_domains = /etc/postfix/vhosts
-virtual_mailbox_base = <%=@vmail_directory%>
-virtual_mailbox_maps = hash:/etc/postfix/vmaps
-virtual_minimum_uid = 1000
-virtual_uid_maps = static:5000
-virtual_gid_maps = static:5000

@@ -1,6 +1,7 @@
 {
 	"run_list": [
 		"recipe[algorythm::default]",
-		"recipe[algorythm::directory_server]"
+		"recipe[algorythm::directory_server]",
+		"recipe[algorythm::dovecot_postfix]"
 	]
 }
