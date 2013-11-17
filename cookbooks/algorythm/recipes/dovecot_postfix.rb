@@ -2,7 +2,7 @@ package 'dovecot-postfix'
 package 'postfix-ldap'
 
 usr = 'vmail'
-vmailDirectory = "/var/vmail/"
+vmailDirectory = "/var/vmail"
 domain = node['liferay']['hostname']
 ldapHost = 'localhost'
 ldapPort = 389
