@@ -22,7 +22,7 @@ end
 directory '/etc/postfix/ldap' do
   owner 'root'
   group 'root'
-  mode 00700
+  mode 00755
   action :create
 end
 
