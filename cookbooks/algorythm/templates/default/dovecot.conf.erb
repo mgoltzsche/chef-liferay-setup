@@ -1,3 +1,4 @@
+mechanisms = plain login
 auth_mechanisms = plain cram-md5
 auth_verbose = yes
 base_dir = /var/run/dovecot/
@@ -13,6 +14,12 @@ protocols = imap imaps pop3 pop3s
 service auth {
   executable = /usr/lib/dovecot/auth
   user = root
+
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    user = postfix
+    group = postfix        
+  }
 }
 service imap-login {
   chroot = login
