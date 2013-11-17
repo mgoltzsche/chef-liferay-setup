@@ -20,8 +20,6 @@ end
 
 # --- Configure postfix ---
 directory '/etc/postfix/ldap' do
-  owner 'postfix'
-  group 'postfix'
   mode 00700
   action :create
 end
