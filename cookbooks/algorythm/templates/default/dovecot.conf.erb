@@ -5,11 +5,13 @@ info_log_path = /var/log/dovecot.info
 log_path = /var/log/dovecot
 log_timestamp = "%Y-%m-%d %H:%M:%S "
 mail_location = maildir:<%=@vmail_directory%>/%d/%n
-passdb {
-  args = /etc/dovecot/passwd
-  driver = passwd-file
-}
 protocols = imap pop3
+ssl = yes
+ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
+ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
+disable_plaintext_auth = yes
+valid_chroot_dirs = /var/spool/vmail
+
 service auth {
   executable = /usr/lib/dovecot/auth
   user = root
@@ -20,31 +22,37 @@ service auth {
     group = postfix        
   }
 }
+
+userdb {
+  driver = ldap
+  args = /etc/dovecot/dovecot-ldap.conf.ext
+}
+
+passdb {
+  driver = ldap
+  args = /etc/dovecot/dovecot-ldap.conf.ext
+}
+
 service imap-login {
   chroot = login
   executable = /usr/lib/dovecot/imap-login
   user = dovecot
 }
+
 service imap {
   executable = /usr/lib/dovecot/imap
 }
+
 service pop3-login {
   chroot = login
   executable = /usr/lib/dovecot/pop3-login
   user = dovecot
 }
+
 service pop3 {
   executable = /usr/lib/dovecot/pop3
 }
-ssl = yes
-ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
-ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
-disable_plaintext_auth = yes
-userdb {
-  args = /etc/dovecot/users
-  driver = passwd-file
-}
-valid_chroot_dirs = /var/spool/vmail
+
 protocol pop3 {
   pop3_uidl_format = %08Xu%08Xv
 }
