@@ -1,0 +1,12 @@
+hosts = <%=@host%>
+dn = cn=<%=@dirman%>,<%=@suffix%>
+dnpass = <%=@dirman_passwd%>
+tls = no
+auth_bind = yes
+auth_bind_userdn = cn=%u,ou=People,<%=@suffix%>
+base = ou=People,<%=@suffix%>
+user_attrs = homeDirectory=%d/%u,uidNumber=5000,gidNumber=5000
+user_filter = (&(objectClass=inetOrgPerson)(uid=%u))
+pass_attrs = uid=cn,userPassword=userPassword
+scope = subtree
+ldap_version = 3

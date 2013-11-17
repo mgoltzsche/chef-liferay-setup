@@ -1,5 +1,5 @@
 server_host = <%=@host%>
 server_port = <%=@port%>
 search_base = ou=People,<%=@suffix%>
-query_filter = (|(mail=%s)(mailAlternateAddress=%s))
+query_filter = (&(objectClass=inetOrgPerson)(|(mail=%s)(mailAlternateAddress=%s)))
 result_attribute = mailForwardingAddress
