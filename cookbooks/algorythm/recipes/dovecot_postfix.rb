@@ -2,7 +2,7 @@ package 'dovecot-postfix'
 package 'postfix-ldap'
 
 usr = 'vmail'
-vmailDirectory = "/home/#{usr}"
+vmailDirectory = "/home/#{usr}/maildir/"
 domain = node['liferay']['hostname']
 ldapHost = 'localhost'
 ldapPort = 389
@@ -23,6 +23,13 @@ directory '/etc/postfix/ldap' do
   owner 'root'
   group 'root'
   mode 00755
+  action :create
+end
+
+directory vmailDirectory do
+  owner usr
+  group usr
+  mode 00744
   action :create
 end
 
