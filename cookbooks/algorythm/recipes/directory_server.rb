@@ -26,9 +26,8 @@ end
 execute "Increase open file limit" do
   command <<-EOH
 echo "*		 soft	 nofile		 #{maxOpenFiles}
-*		 hard	 nofile		 #{maxOpenFiles}" >> /etc/security/limits.conf
+*		 hard	 nofile		 #{maxOpenFiles}" > /etc/security/limits.conf
   EOH
-  not_if('cat /etc/security/limits.conf | grep "\\*\\s*soft\\s*nofile\\s*#{maxOpenFiles}"')
 end
 
 execute "Configure single instance" do
