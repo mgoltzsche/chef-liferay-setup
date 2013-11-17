@@ -20,22 +20,30 @@ end
 
 # --- Configure postfix ---
 directory '/etc/postfix/ldap' do
+  owner 'root'
+  group 'root'
   mode 00700
   action :create
 end
 
 template "/etc/postfix/master.cf" do
   source "postfix.master.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
 end
 
 template "/etc/postfix/dynamicmaps.cf" do
   source "postfix.dynamicmaps.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
 end
 
 template "/etc/postfix/main.cf" do
   source "postfix.main.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
   variables({
     :hostname => node['hostname'],
@@ -45,6 +53,8 @@ end
 
 template "/etc/postfix/ldap/virtual_aliases.cf" do
   source "postfix.virtual_aliases.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
   variables({
     :host => ldapHost,
@@ -55,6 +65,8 @@ end
 
 template "/etc/postfix/ldap/virtual_domains.cf" do
   source "postfix.virtual_domains.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
   variables({
     :host => ldapHost,
@@ -65,6 +77,8 @@ end
 
 template "/etc/postfix/ldap/virtual_mailboxes.cf" do
   source "postfix.virtual_mailboxes.cf.erb"
+  owner 'root'
+  group 'root'
   mode 0644
   variables({
     :host => ldapHost,
