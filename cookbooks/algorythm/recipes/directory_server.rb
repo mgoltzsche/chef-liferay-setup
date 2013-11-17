@@ -20,7 +20,7 @@ execute "Decrease TCP timeout" do
 echo "net.ipv4.tcp_keepalive_time = 600" >> /etc/sysctl.conf &&
 sysctl -p
   EOH
-  not_if('cat /etc/sysctl.conf | grep "net.ipv4.tcp_keepalive_time = 600"')
+  not_if('cat /etc/sysctl.conf | grep "net\.ipv4\.tcp_keepalive_time = 600"')
 end
 
 execute "Increase open file limit" do
@@ -28,7 +28,7 @@ execute "Increase open file limit" do
 echo "*		 soft	 nofile		 #{maxOpenFiles}
 *		 hard	 nofile		 #{maxOpenFiles}" >> /etc/security/limits.conf
   EOH
-  not_if('cat /etc/security/limits.conf | grep "*		 soft	 nofile		 #{maxOpenFiles}"')
+  not_if('cat /etc/security/limits.conf | grep "\*\s*soft\s*nofile\s*#{maxOpenFiles}"')
 end
 
 execute "Increase open file limit" do
