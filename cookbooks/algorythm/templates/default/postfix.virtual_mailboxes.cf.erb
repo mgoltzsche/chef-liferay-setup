@@ -1,6 +1,6 @@
 server_host = <%=@host%>
 server_port = <%=@port%>
 search_base = ou=People,<%=@suffix%>
-query_filter = (&(objectclass=domainRelatedObject)(|(mail=%s)(mailAlternateAddress=%s)))
-result_attribute = associatedDomain,cn
-result_filter = %s/%s/
+query_filter = (|(mail=%s)(mailAlternateAddress=%s))
+result_attribute = cn
+result_filter = %s/

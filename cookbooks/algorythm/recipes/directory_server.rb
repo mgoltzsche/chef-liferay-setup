@@ -75,6 +75,27 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
   action :nothing
+  notifies :run, "execute[Add domain]", :immediately
+end
+
+execute "Add domain" do
+  command <<-EOH
+echo "dn: ou=Domains,#{suffix}
+objectClass: organizationalUnit
+objectClass: top
+ou: Domains
+
+dn: ou=#{domain},ou=Domains,#{suffix}
+objectClass: domainRelatedObject
+objectClass: organizationalUnit
+objectClass: top
+ou: #{domain}
+associatedDomain: #{domain}
+" > /tmp/domain.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/domain.ldif &&
+rm -f /tmp/domain.ldif
+  EOH
+  action :nothing
   notifies :run, "execute[Add person]", :immediately
 end
 
