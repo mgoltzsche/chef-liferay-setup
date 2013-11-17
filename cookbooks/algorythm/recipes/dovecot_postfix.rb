@@ -46,7 +46,8 @@ template "/etc/postfix/main.cf" do
   group 'root'
   mode 0644
   variables({
-    :hostname => node['liferay']['hostname'],
+    :hostname => node['hostname'],
+    :domain => node['liferay']['hostname'],
     :vmail_directory => vmailDirectory
   })
 end
