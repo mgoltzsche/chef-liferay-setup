@@ -107,14 +107,12 @@ objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
-objectClass: domainRelatedObject
 cn: #{userCN}
 sn: #{userSN}
 givenName: #{userGivenName}
+mail: #{userMailPrefix}@#{domain}
 userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q==
-mail: #{userMailPrefix}@#{domain}
-associatedDomain: #{domain}
 " > /tmp/admin_user.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
