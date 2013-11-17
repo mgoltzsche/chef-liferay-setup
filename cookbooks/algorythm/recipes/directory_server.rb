@@ -104,5 +104,6 @@ end
 
 # --- Restart dirsrv ---
 service "dirsrv" do
-  supports :restart
+  supports :restart => true
+  action :nothing
 end
