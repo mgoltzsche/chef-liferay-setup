@@ -1,4 +1,4 @@
-auth_mechanisms = plain login cram-md5 SCRAM-SHA-1
+auth_mechanisms = plain login cram-md5
 auth_verbose = yes
 base_dir = /var/run/dovecot/
 info_log_path = /var/log/dovecot.info
@@ -15,7 +15,7 @@ service auth {
   user = root
 
   unix_listener /var/spool/postfix/private/auth {
-    mode = 0660
+    mode = 0600
     user = postfix
     group = postfix        
   }
@@ -36,9 +36,9 @@ service pop3-login {
 service pop3 {
   executable = /usr/lib/dovecot/pop3
 }
-ssl_cert = /etc/ssl/certs/ssl-cert-snakeoil.pem
-ssl_key = /etc/ssl/private/ssl-cert-snakeoil.key
 ssl = yes
+ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
+ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
 disable_plaintext_auth = yes
 userdb {
   args = /etc/dovecot/users
