@@ -62,7 +62,7 @@ setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
   EOH
   not_if {File.exist?("/etc/dirsrv/slapd-#{hostname}")}
-  notifies :run, "execute[Add domain]", :immediately
+  notifies :run, "execute[Configure TCPv4 localhost listening]", :immediately
 end
 
 execute "Configure TCPv4 localhost listening" do
@@ -73,25 +73,6 @@ replace: nsslapd-listenhost
 nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/nsslapd-listenhost.ldif &&
 rm -f /tmp/nsslapd-listenhost.ldif
-  EOH
-end
-
-execute "Add domain" do
-  command <<-EOH
-echo "dn: ou=Domains,#{suffix}
-objectClass: organizationalUnit
-objectClass: top
-ou: Domains
-
-dn: ou=#{domain},ou=Domains,#{suffix}
-objectClass: domainRelatedObject
-objectClass: organizationalUnit
-objectClass: top
-ou: #{domain}
-associatedDomain: #{domain}
-" > /tmp/domain.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/domain.ldif &&
-rm -f /tmp/domain.ldif
   EOH
   action :nothing
   notifies :run, "execute[Add person]", :immediately
@@ -105,20 +86,23 @@ objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
+objectClass: domainRelatedObject
 cn: #{userCN}
 sn: #{userSN}
 givenName: #{userGivenName}
-mail: #{userMailPrefix}@#{domain}
 userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q==
+mail: #{userMailPrefix}@#{domain}
+associatedDomain: #{domain}
 " > /tmp/admin_user.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_pwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing
+  notifies :restart, "service[dirsrv]"
 end
 
 # --- Restart dirsrv ---
 service "dirsrv" do
-  action :restart
+  supports :restart
 end
