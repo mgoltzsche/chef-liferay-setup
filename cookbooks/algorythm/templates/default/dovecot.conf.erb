@@ -30,7 +30,7 @@ service auth {
 
 userdb {
   driver = ldap
-  args = scheme=SSHA /etc/dovecot/dovecot-ldap.conf.ext
+  args = /etc/dovecot/dovecot-ldap.conf.ext
 }
 
 passdb {
