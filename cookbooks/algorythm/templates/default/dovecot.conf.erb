@@ -6,9 +6,9 @@ base_dir = /var/run/dovecot/
 info_log_path = /var/log/dovecot.info
 log_path = /var/log/dovecot
 log_timestamp = "%Y-%m-%d %H:%M:%S "
-mail_location = maildir:<%=@vmail_directory%>/%d/%u/
-mail_uid=vmail
-mail_gid=vmail
+mail_location = maildir:<%=@vmail_directory%>/%d/%n/
+mail_uid=<%=@vmail_user%>
+mail_gid=<%=@vmail_user%>
 protocols = imap pop3
 ssl = yes
 ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
