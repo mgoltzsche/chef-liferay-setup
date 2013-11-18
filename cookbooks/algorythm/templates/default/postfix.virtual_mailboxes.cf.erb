@@ -1,5 +1,5 @@
 server_host = <%=@host%>
 search_base = ou=People,<%=@suffix%>
 query_filter = (&(objectClass=inetOrgPerson)(|(mail=%s)(mailAlternateAddress=%s)))
-result_attribute = mail
-result_filter = %u/
+result_attribute = cn
+result_filter = %s/
