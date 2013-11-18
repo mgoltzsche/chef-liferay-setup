@@ -7,8 +7,8 @@ vmailDirectory = "/var/vmail"
 domain = node['liferay']['hostname']
 ldapHost = 'localhost'
 ldapSuffix = node['liferay']['hostname'].split('.').map{|dc| "dc=#{dc}"}.join(',')
-dirman = 'manager'
-dirman_passwd = 'maximum!'
+ldapUser = 'manager'
+ldapPassword = 'maximum!'
 
 # --- Create postfix virtual mail user ---
 user usr do
@@ -67,7 +67,9 @@ template "/etc/postfix/ldap/virtual_aliases.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :suffix => ldapSuffix
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword
   })
 end
 
@@ -78,7 +80,9 @@ template "/etc/postfix/ldap/virtual_domains.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :suffix => ldapSuffix
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword
   })
 end
 
@@ -89,7 +93,9 @@ template "/etc/postfix/ldap/virtual_mailboxes.cf" do
   mode 0644
   variables({
     :host => ldapHost,
-    :suffix => ldapSuffix
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword
   })
 end
 
@@ -118,8 +124,8 @@ template "/etc/dovecot/dovecot-ldap.conf.ext" do
   variables({
     :host => ldapHost,
     :suffix => ldapSuffix,
-    :dirman => dirman,
-    :dirman_passwd => dirman_passwd
+    :user => ldapUser,
+    :password => ldapPassword
   })
 end
 

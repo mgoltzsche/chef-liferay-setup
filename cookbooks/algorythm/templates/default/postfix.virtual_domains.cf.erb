@@ -2,3 +2,6 @@ server_host = <%=@host%>
 search_base = ou=Domains,<%=@suffix%>
 query_filter = (associatedDomain=%s)
 result_attribute = associatedDomain
+bind = yes
+bind_dn = cn=<%=@user%>
+bind_pw = <%=@password%>
