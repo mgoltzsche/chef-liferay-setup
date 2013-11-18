@@ -32,9 +32,12 @@ virtual_uid_maps = static:5000
 virtual_gid_maps = static:5000
 
 # TLS parameters
-smtpd_use_tls=yes
-smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
-smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls = yes
+smtpd_tls_mandatory_protocols = SSLv3, TLSv1
+smtpd_tls_mandatory_ciphers = medium
+smtpd_tls_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file = /etc/ssl/private/ssl-cert-snakeoil.key
+tls_random_source = dev:/dev/urandom
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 
@@ -47,7 +50,7 @@ smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 smtpd_sasl_authenticated_header = yes
 smtpd_sasl_security_options = noanonymous
-smtpd_sasl_local_domain =
+smtpd_sasl_local_domain = $myhostname
 broken_sasl_auth_clients = yes
 
  # Set SMTP permissions/restrictions
