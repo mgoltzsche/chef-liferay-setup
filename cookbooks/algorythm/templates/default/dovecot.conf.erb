@@ -1,5 +1,6 @@
 auth_mechanisms = plain login
 auth_verbose = yes
+auth_debug = yes
 auth_debug_passwords = yes
 base_dir = /var/run/dovecot/
 info_log_path = /var/log/dovecot.info
@@ -10,7 +11,7 @@ protocols = imap pop3
 ssl = yes
 ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
 ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
-disable_plaintext_auth = no
+disable_plaintext_auth = no # TODO: set yes
 valid_chroot_dirs = /var/spool/vmail
 
 service auth {
