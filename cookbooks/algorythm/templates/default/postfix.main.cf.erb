@@ -14,7 +14,7 @@ readme_directory = no
 alias_maps=hash:/etc/aliases
 myorigin = <%=@domain%>
 myhostname = <%=@hostname%>.$myorigin
-mydestination = localhost, <%=@hostname%>
+mydestination = localhost, localhost.$myorigin, <%=@hostname%>
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 relayhost =
 mailbox_size_limit = 0
