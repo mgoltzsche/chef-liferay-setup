@@ -5,7 +5,7 @@ tls = no
 auth_bind = yes
 auth_bind_userdn = cn=%u,ou=People,<%=@suffix%>
 base = ou=People,<%=@suffix%>
-user_attrs = =home=maildir:/var/vmail/%d/%u/
+user_attrs = homeDirectory=maildir:/var/vmail/%d/%u/
 user_filter = (&(objectClass=inetOrgPerson)(cn=%u))
 pass_attrs = uid=cn,userPassword=userPassword
 default_pass_scheme = SSHA
