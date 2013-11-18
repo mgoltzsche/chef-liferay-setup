@@ -60,19 +60,6 @@ template "/etc/postfix/main.cf" do
   })
 end
 
-template "/etc/postfix/ldap/virtual_aliases.cf" do
-  source "postfix.virtual_aliases.cf.erb"
-  owner 'root'
-  group 'root'
-  mode 0644
-  variables({
-    :host => ldapHost,
-    :suffix => ldapSuffix,
-    :user => ldapUser,
-    :password => ldapPassword
-  })
-end
-
 template "/etc/postfix/ldap/virtual_domains.cf" do
   source "postfix.virtual_domains.cf.erb"
   owner 'root'
@@ -86,8 +73,8 @@ template "/etc/postfix/ldap/virtual_domains.cf" do
   })
 end
 
-template "/etc/postfix/ldap/virtual_mailboxes.cf" do
-  source "postfix.virtual_mailboxes.cf.erb"
+template "/etc/postfix/ldap/virtual_aliases.cf" do
+  source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
   group 'root'
   mode 0644
@@ -95,7 +82,36 @@ template "/etc/postfix/ldap/virtual_mailboxes.cf" do
     :host => ldapHost,
     :suffix => ldapSuffix,
     :user => ldapUser,
-    :password => ldapPassword
+    :password => ldapPassword,
+    :result_attibute => 'mailForwardingAddress'
+  })
+end
+
+template "/etc/postfix/ldap/virtual_mailboxes.cf" do
+  source "postfix.virtual_mailbox_query.cf.erb"
+  owner 'root'
+  group 'root'
+  mode 0644
+  variables({
+    :host => ldapHost,
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword,
+    :result_attibute => "cn\nresult_filter = %s/"
+  })
+end
+
+template "/etc/postfix/ldap/permitted_senders.cf" do
+  source "postfix.virtual_mailbox_query.cf.erb"
+  owner 'root'
+  group 'root'
+  mode 0644
+  variables({
+    :host => ldapHost,
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword,
+    :result_attibute => "cn"
   })
 end
 

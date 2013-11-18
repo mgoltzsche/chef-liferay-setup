@@ -1,7 +1,7 @@
 server_host = <%=@host%>
 search_base = ou=People,<%=@suffix%>
 query_filter = (&(objectClass=inetOrgPerson)(|(mail=%s)(mailAlternateAddress=%s)))
-result_attribute = mailForwardingAddress
+result_attribute = <%=@result_attribute%>
 bind = yes
 bind_dn = cn=<%=@user%>
 bind_pw = <%=@password%>

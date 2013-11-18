@@ -1,8 +1,0 @@
-server_host = <%=@host%>
-search_base = ou=People,<%=@suffix%>
-query_filter = (&(objectClass=inetOrgPerson)(|(mail=%s)(mailAlternateAddress=%s)))
-result_attribute = cn
-result_filter = %s/
-bind = yes
-bind_dn = cn=<%=@user%>
-bind_pw = <%=@password%>
