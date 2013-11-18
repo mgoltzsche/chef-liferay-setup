@@ -8,5 +8,6 @@ base = ou=People,<%=@suffix%>
 user_attrs = homeDirectory=%d/%u,uidNumber=5000,gidNumber=5000
 user_filter = (&(objectClass=inetOrgPerson)(uid=%u))
 pass_attrs = uid=cn,userPassword=userPassword
+default_pass_scheme = SSHA
 scope = subtree
 ldap_version = 3
