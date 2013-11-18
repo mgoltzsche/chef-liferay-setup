@@ -6,7 +6,7 @@ auth_bind = yes
 auth_bind_userdn = cn=%u,ou=People,<%=@suffix%>
 base = ou=People,<%=@suffix%>
 user_attrs = homeDirectory=%d/%u,uidNumber=5000,gidNumber=5000
-user_filter = (&(objectClass=inetOrgPerson)(mail=%u))
+user_filter = (&(objectClass=inetOrgPerson)(cn=%u))
 pass_attrs = uid=cn,userPassword=userPassword
 default_pass_scheme = SSHA
 scope = subtree
