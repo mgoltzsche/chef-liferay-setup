@@ -1,5 +1,5 @@
 # Hostname
-default['hostname'] = "dev"
+default['hostname'] = "dev-master"
 
 # Postgresql installation
 default['postgresql']['version'] = "9.1"
