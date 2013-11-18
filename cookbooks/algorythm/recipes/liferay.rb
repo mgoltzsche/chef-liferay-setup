@@ -190,11 +190,11 @@ template "#{liferayHome}/portal-ext.properties" do
     :hostname => node['liferay']['hostname'],
     :admin_name => node['liferay']['admin']['name'],
     :admin_email => node['liferay']['admin']['email'],
-    :ldapHost = ldapHost,
-    :ldapPort = ldapPort,
-    :ldapSuffix = ldapSuffix,
-    :ldapUser = ldapUser,
-    :ldapPassword = ldapPassword
+    :ldapHost => ldapHost,
+    :ldapPort => ldapPort,
+    :ldapSuffix => ldapSuffix,
+    :ldapUser => ldapUser,
+    :ldapPassword => ldapPassword
   })
 end
 
