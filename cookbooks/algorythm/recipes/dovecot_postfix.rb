@@ -83,7 +83,7 @@ template "/etc/postfix/ldap/virtual_aliases.cf" do
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
-    :result_attibute => 'mailForwardingAddress'
+    :result_attribute => 'mailForwardingAddress'
   })
 end
 
@@ -97,11 +97,11 @@ template "/etc/postfix/ldap/virtual_mailboxes.cf" do
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
-    :result_attibute => "cn\nresult_filter = %s/"
+    :result_attribute => "cn\nresult_filter = %s/"
   })
 end
 
-template "/etc/postfix/ldap/permitted_senders.cf" do
+template "/etc/postfix/ldap/virtual_senders.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
   group 'root'
@@ -111,7 +111,7 @@ template "/etc/postfix/ldap/permitted_senders.cf" do
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
-    :result_attibute => "cn"
+    :result_attribute => "cn"
   })
 end
 
