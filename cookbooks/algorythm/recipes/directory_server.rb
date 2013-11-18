@@ -97,6 +97,7 @@ objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
+objectClass: mailRecipient
 cn: #{userCN}
 sn: #{userSN}
 givenName: #{userGivenName}
