@@ -118,7 +118,8 @@ template "/etc/dovecot/dovecot-ldap.conf.ext" do
     :host => ldapHost,
     :suffix => ldapSuffix,
     :dirman => dirman,
-    :dirman_passwd => dirman_passwd
+    :dirman_passwd => dirman_passwd,
+    :maildir_user => usr
   })
 end
 
