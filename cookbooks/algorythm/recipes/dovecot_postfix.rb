@@ -104,9 +104,6 @@ template "/etc/dovecot/dovecot.conf" do
   owner 'root'
   group 'root'
   mode 0600
-  variables({
-    :vmail_directory => vmailDirectory
-  })
 end
 
 template "/etc/dovecot/dovecot-ldap.conf.ext" do
@@ -119,6 +116,7 @@ template "/etc/dovecot/dovecot-ldap.conf.ext" do
     :suffix => ldapSuffix,
     :dirman => dirman,
     :dirman_passwd => dirman_passwd,
+    :vmail_directory => vmailDirectory,
     :maildir_user => usr
   })
 end
