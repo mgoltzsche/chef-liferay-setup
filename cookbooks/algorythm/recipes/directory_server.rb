@@ -1,7 +1,3 @@
-require 'sha1'
-require 'base64'
-
-
 package '389-ds-base'
 package 'ldap-utils'
 
