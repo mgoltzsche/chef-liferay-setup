@@ -1,3 +1,7 @@
+require 'sha1'
+require 'base64'
+
+
 package '389-ds-base'
 package 'ldap-utils'
 
@@ -10,6 +14,14 @@ dirmanager_passwd = node['ldap']['dirmanager_password']
 userCN = node['ldap']['user_cn']
 userSN = node['ldap']['user_sn']
 userGivenName = node['ldap']['user_givenName']
+
+# --- SSHA hash password
+password = node['ldap']['user_password']
+chars = ('a'..'z').to_a + ('0'..'9').to_a
+salt = Array.new(10, '').collect { chars[rand(chars.size)] }
+password = join '{SSHA}' + Base64.encode64(Digest::SHA1.digest(password+salt)+salt).chomp!
+
+print password
 
 # --- Create instance if not exists ---
 execute "Configure single instance" do
@@ -52,7 +64,7 @@ rm -f /tmp/nsslapd-listenhost.ldif
 end
 
 # --- Add initial data to instance ---
-execute "Add domain" do
+execute "Register domain #{domain}" do
   command <<-EOH
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
@@ -73,7 +85,7 @@ rm -f /tmp/domain.ldif
   notifies :run, "execute[Add person]", :immediately
 end
 
-execute "Add person" do
+execute "Register person" do
   command <<-EOH
 echo "dn: cn=#{userCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject

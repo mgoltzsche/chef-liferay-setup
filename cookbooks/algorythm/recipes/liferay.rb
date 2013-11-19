@@ -180,7 +180,7 @@ template "#{liferayHome}/portal-ext.properties" do
   owner usr
   group usr
   source "liferay.portal-ext.properties.erb"
-  mode 00700
+  mode 00400
   variables({
     :liferay_home => liferayHome,
     :postgres_port => node['liferay']['postgresql']['port'],

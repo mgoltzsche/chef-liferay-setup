@@ -7,6 +7,7 @@ redmineVersion = node['redmine']['version']
 dbname = node['redmine']['postgresql']['database']
 backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
+mailServerHost = node['mail_server']['hostname']
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -127,12 +128,23 @@ end
 template "#{redmineHome}/config/database.yml" do
   owner usr
   group usr
-  source "redmine.database.config.erb"
-  mode 01700
+  source "redmine.database.yml.erb"
+  mode 00400
   variables({
     :database => dbname,
     :user => node['redmine']['postgresql']['user'],
     :password => node['redmine']['postgresql']['password']
+  })
+end
+
+# --- Configure Redmine SMPT connection ---
+template "#{redmineHome}/config/configuration.yml" do
+  owner usr
+  group usr
+  source "redmine.database.yml.erb"
+  mode 00400
+  variables({
+    :mailServerHost => mailServerHost
   })
 end
 
