@@ -11,7 +11,7 @@ remote_file nexusWarFile do
   action :create_if_missing
 end
 
-execute "Deploy Nexus OSS" do
+execute "Deploy Sonatype Nexus" do
   user usr
   group usr
   command "cp #{nexusWarFile} #{nexusDeployWarFile}"
