@@ -12,9 +12,8 @@ append_dot_mydomain = yes
 readme_directory = no
 
 alias_maps=hash:/etc/aliases
-myorigin = <%=@domain%>
-myhostname = <%=@hostname%>.$myorigin
-mydestination = localhost, localhost.$myorigin, <%=@hostname%>
+myhostname = <%=@machineFQN%>
+mydestination = localhost, $myhostname
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 relayhost =
 mailbox_size_limit = 0
@@ -51,7 +50,7 @@ smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 smtpd_sasl_authenticated_header = yes
 smtpd_sasl_security_options = noanonymous
-smtpd_sasl_local_domain = $myorigin
+smtpd_sasl_local_domain = $myhostname
 broken_sasl_auth_clients = yes
 
  # Set SMTP permissions/restrictions

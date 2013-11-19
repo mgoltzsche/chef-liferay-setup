@@ -2,13 +2,14 @@ package 'dovecot-postfix'
 package 'postfix-ldap'
 package 'dovecot-ldap'
 
-usr = 'vmail'
-vmailDirectory = "/var/vmail"
-domain = node['liferay']['hostname']
-ldapHost = 'localhost'
-ldapSuffix = node['liferay']['hostname'].split('.').map{|dc| "dc=#{dc}"}.join(',')
-ldapUser = 'manager'
-ldapPassword = 'maximum!'
+machineFQN = "#{node['hostname']}.#{node['domainname']}"
+usr = node['mail_server']['vmail_user']
+vmailDirectory = node['mail_server']['vmail_directory']
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['port']
+ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapUser = node['ldap']['dirmanager']
+ldapPassword = node['ldap']['dirmanager_password']
 
 # --- Create postfix virtual mail user ---
 user usr do
@@ -54,8 +55,7 @@ template "/etc/postfix/main.cf" do
   group 'root'
   mode 0644
   variables({
-    :hostname => node['hostname'],
-    :domain => node['liferay']['hostname'],
+    :machineFQN => machineFQN,
     :vmail_directory => vmailDirectory
   })
 end
@@ -64,9 +64,10 @@ template "/etc/postfix/ldap/virtual_domains.cf" do
   source "postfix.virtual_domains.cf.erb"
   owner 'root'
   group 'root'
-  mode 0644
+  mode 0600
   variables({
     :host => ldapHost,
+    :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword
@@ -77,9 +78,10 @@ template "/etc/postfix/ldap/virtual_aliases.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
   group 'root'
-  mode 0644
+  mode 0600
   variables({
     :host => ldapHost,
+    :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
@@ -91,9 +93,10 @@ template "/etc/postfix/ldap/virtual_mailboxes.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
   group 'root'
-  mode 0644
+  mode 0600
   variables({
     :host => ldapHost,
+    :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
@@ -105,14 +108,25 @@ template "/etc/postfix/ldap/virtual_senders.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
   group 'root'
-  mode 0644
+  mode 0600
   variables({
     :host => ldapHost,
+    :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword,
     :result_attribute => "cn"
   })
+end
+
+file "/etc/aliases" do
+  owner 'root'
+  group 'root'
+  mode 0644
+  content <<-EOH
+postmaster: root
+root: #{node['ldap']['user_cn']}@#{node['ldap']['domain']}
+  EOH
 end
 
 # --- Configure mail-stack-delivery ---
@@ -139,6 +153,7 @@ template "/etc/dovecot/dovecot-ldap.conf.ext" do
   mode 0600
   variables({
     :host => ldapHost,
+    :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
     :password => ldapPassword

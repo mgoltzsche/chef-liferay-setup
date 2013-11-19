@@ -7,7 +7,7 @@ imagemagick.enabled=true
 ### Webserver aware
 web.server.http.port=80
 web.server.https.port=443
-web.server.host=<%=@hostname%>
+web.server.host=<%=@domain%>
 
 ### Persistence
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
@@ -37,7 +37,7 @@ default.admin.last.name=Goltzsche
 
 ### Company
 company.default.name=<%=@company_name%>
-company.default.web.id=<%=@hostname%>
+company.default.web.id=<%=@domain%>
 company.default.home.url=/web/guest/home
 company.default.locale=en_US
 company.default.time.zone=Europe/Berlin
@@ -63,8 +63,8 @@ terms.of.use.required=false
 system.site.roles=Developer,Manager,Redakteur
 
 ### Login
-login.email.from.name=<%=@hostname%>
-login.email.from.address=no-reply@<%=@hostname%>
+login.email.from.name=<%=@domain%>
+login.email.from.address=no-reply@<%=@domain%>
 #passwords.encryption.algorithm=SSHA # not required
 #passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
@@ -99,3 +99,17 @@ ldap.export.enabled=false # true doesn't work due to Nullpointerexception
 ldap.export.group.enabled=false
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
+
+### Mailing
+mail.session.jndi.name=mail/MailSession
+mail.session.mail.store.protocol=pop3
+mail.session.mail.transport.protocol=smtp
+mail.session.mail.pop3.host=<%=@mailServerHost%>
+mail.session.mail.pop3.password=
+mail.session.mail.pop3.port=110
+mail.session.mail.pop3.user=
+mail.session.mail.smtp.auth=false
+mail.session.mail.smtp.host=<%=@mailServerHost%>
+mail.session.mail.smtp.password=
+mail.session.mail.smtp.port=25
+mail.session.mail.smtp.user=

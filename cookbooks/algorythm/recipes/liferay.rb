@@ -13,11 +13,12 @@ nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
 liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
 dbname = node['liferay']['postgresql']['database']
-ldapHost = 'localhost'
-ldapPort = 389
-ldapUser = 'manager'
-ldapPassword = 'maximum!'
-ldapSuffix = node['liferay']['hostname'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['port']
+ldapUser = node['ldap']['dirmanager']
+ldapPassword = node['ldap']['dirmanager_password']
+ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+mailServerHost = node['mail_server']['hostname']
 
 package 'libssl-dev'
 
@@ -194,7 +195,8 @@ template "#{liferayHome}/portal-ext.properties" do
     :ldapPort => ldapPort,
     :ldapSuffix => ldapSuffix,
     :ldapUser => ldapUser,
-    :ldapPassword => ldapPassword
+    :ldapPassword => ldapPassword,
+    :mailServerHost => mailServerHost
   })
 end
 

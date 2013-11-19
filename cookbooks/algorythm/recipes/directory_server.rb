@@ -1,53 +1,36 @@
 package '389-ds-base'
 package 'ldap-utils'
 
-listenhost = '0.0.0.0'
-dirman = 'manager'
-dirman_passwd = 'maximum!'
-userCN = 'devilopa'
-userSN = 'Goltzsche'
-userGivenName = 'Max'
-userMailPrefix = 'admin'
-maxOpenFiles = 4096
-hostname = node['hostname']
-domain = node['liferay']['hostname']
-fullMachineName = "#{hostname}.#{domain}"
+listenhost = node['ldap']['listenhost']
+port = node['ldap']['port']
+domain = node['ldap']['domain']
 suffix = domain.split('.').map{|dc| "dc=#{dc}"}.join(',')
+dirmanager = node['ldap']['dirmanager']
+dirmanager_passwd = node['ldap']['dirmanager_password']
+userCN = node['ldap']['user_cn']
+userSN = node['ldap']['user_sn']
+userGivenName = node['ldap']['user_givenName']
 
-execute "Decrease TCP timeout" do
-  command <<-EOH
-echo "net.ipv4.tcp_keepalive_time = 600" >> /etc/sysctl.conf &&
-sysctl -p
-  EOH
-  not_if('cat /etc/sysctl.conf | grep "net\\.ipv4\\.tcp_keepalive_time = 600"')
-end
-
-execute "Increase open file limit" do
-  command <<-EOH
-echo "*		 soft	 nofile		 #{maxOpenFiles}
-*		 hard	 nofile		 #{maxOpenFiles}" > /etc/security/limits.conf
-  EOH
-end
-
+# --- Create instance if not exists ---
 execute "Configure single instance" do
   command <<-EOH
 echo "[General]
-FullMachineName= #{fullMachineName}
+FullMachineName= #{node['hostname']}.#{node['domainname']}
 SuiteSpotUserID= dirsrv
 SuiteSpotGroup= dirsrv
-ConfigDirectoryLdapURL= ldap://#{fullMachineName}:389/o=NetscapeRoot
+ConfigDirectoryLdapURL= ldap://#{node['ldap']['hostname']}:389/o=NetscapeRoot
 ConfigDirectoryAdminID= admin
 ConfigDirectoryAdminPwd= thepassword
-AdminDomain= #{domain}
+AdminDomain= #{node['domainname']}
 
 [slapd]
-ServerIdentifier= #{hostname}
-ServerPort= 389
+ServerIdentifier= #{node['hostname']}
+ServerPort= #{port}
 Suffix= #{suffix}
-RootDN= cn=#{dirman}
-RootDNPwd= #{dirman_passwd}
+RootDN= cn=#{dirmanager}
+RootDNPwd= #{dirmanager_passwd}
 " > /tmp/ds-config.inf &&
-ulimit -n #{maxOpenFiles} &&
+ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
   EOH
@@ -61,13 +44,14 @@ echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
 nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/nsslapd-listenhost.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/nsslapd-listenhost.ldif &&
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
   action :nothing
   notifies :run, "execute[Add domain]", :immediately
 end
 
+# --- Add initial data to instance ---
 execute "Add domain" do
   command <<-EOH
 echo "dn: ou=Domains,#{suffix}
@@ -82,7 +66,7 @@ objectClass: top
 ou: #{domain}
 associatedDomain: #{domain}
 " > /tmp/domain.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/domain.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/domain.ldif &&
 rm -f /tmp/domain.ldif
   EOH
   action :nothing
@@ -101,11 +85,11 @@ objectClass: mailRecipient
 cn: #{userCN}
 sn: #{userSN}
 givenName: #{userGivenName}
-mail: #{userMailPrefix}@#{domain}
+mail: #{userCN}@#{domain}
 userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q==
 " > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirman}" -w #{dirman_passwd} -f /tmp/admin_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing

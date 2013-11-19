@@ -16,7 +16,6 @@ package 'git'
 # --- Create Redmine system user ---
 user usr do
   comment 'Redmine User'
-  home "/home/#{usr}"
   shell '/bin/bash'
   supports :manage_home=>true
 end

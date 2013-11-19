@@ -1,10 +1,29 @@
 # Hostname
-default['hostname'] = "dev-master"
+default['hostname'] = 'dev-master'
+default['domainname'] = 'dev.algorythm.de'
+default['max_open_files'] = 4096 # Should be > 1024
+default['tcp_timeout'] = 600 # Should be lower to free worker threads earlier
+
+# LDAP configuration
+default['ldap']['listenhost'] = '0.0.0.0'
+default['ldap']['hostname'] = 'localhost'
+default['ldap']['port'] = 389
+default['ldap']['dirmanager'] = 'dirmanager'
+default['ldap']['dirmanager_password'] = 'password']
+default['ldap']['domain'] = 'dev.algorythm.de'
+default['ldap']['user_cn'] = 'admin'
+default['ldap']['user_sn'] = 'Goltzsche'
+default['ldap']['user_givenName'] = 'Max'
+
+# Mail Server configuration
+default['mail_server']['hostname'] = 'localhost'
+default['mail_server']['vmail_user'] = 'vmail'
+default['mail_server']['vmail_directory'] = '/var/vmail'
 
 # Postgresql installation
-default['postgresql']['version'] = "9.1"
 default['postgresql']['address'] = "localhost"
 default['postgresql']['port'] = 5432
+default['postgresql']['version'] = "9.1"
 
 # Liferay installation
 default['liferay']['download_url'] = "http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr"
@@ -17,10 +36,10 @@ default['liferay']['http_port'] = 8087
 default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
-default['liferay']['hostname'] = 'dev.algorythm.de'
+default['liferay']['hostname'] = default['ldap']['domain']
 default['liferay']['company_default_name'] = "algorythm"
 default['liferay']['admin']['name'] = "Max Goltzsche"
-default['liferay']['admin']['email'] = "max.goltzsche@gmail.com"
+default['liferay']['admin']['email'] = "admin@#{default['ldap']['domain']}"
 default['liferay']['postgresql']['database'] = "liferay"
 default['liferay']['postgresql']['user'] = default['liferay']['user']
 default['liferay']['postgresql']['password'] = "liferay"
