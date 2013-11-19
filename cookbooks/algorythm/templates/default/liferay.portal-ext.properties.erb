@@ -65,7 +65,7 @@ system.site.roles=Developer,Manager,Redakteur
 ### Login
 login.email.from.name=<%=@hostname%>
 login.email.from.address=no-reply@<%=@hostname%>
-passwords.encryption.algorithm=SSHA
+#passwords.encryption.algorithm=SSHA # not required
 #passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
 
@@ -73,8 +73,6 @@ passwords.encryption.algorithm=SSHA
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(mail=@email_address@))
-#ldap.auth.method=password-compare
-#ldap.auth.password.encryption.algorithm=SSHA
 
 ldap.base.provider.url=ldap://<%=@ldapHost%>:<%=@ldapPort%>
 ldap.base.dn=<%=@ldapSuffix%>
