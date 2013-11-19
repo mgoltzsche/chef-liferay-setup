@@ -14,8 +14,8 @@ userGivenName = node['ldap']['user_givenName']
 # --- SSHA hash password
 password = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
-salt = join Array.new(10, '').collect { chars[rand(chars.size)] }
-password = join '{SSHA}' + Base64.encode64(Digest::SHA1.digest(password+salt)+salt).chomp!
+salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
+password = '{SSHA}' + Base64.encode64(Digest::SHA1.digest(password+salt)+salt).chomp!
 
 print password
 
