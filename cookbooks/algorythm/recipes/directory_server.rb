@@ -56,11 +56,11 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passw
 rm -f /tmp/nsslapd-listenhost.ldif
   EOH
   action :nothing
-  notifies :run, "execute[Add domain]", :immediately
+  notifies :run, "execute[Register domain]", :immediately
 end
 
 # --- Add initial data to instance ---
-execute "Register domain #{domain}" do
+execute "Register domain" do
   command <<-EOH
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
@@ -78,7 +78,7 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passw
 rm -f /tmp/domain.ldif
   EOH
   action :nothing
-  notifies :run, "execute[Add person]", :immediately
+  notifies :run, "execute[Register person]", :immediately
 end
 
 execute "Register person" do
