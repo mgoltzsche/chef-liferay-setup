@@ -1,4 +1,4 @@
-auth_mechanisms = plain login
+auth_mechanisms = plain login cram-md5
 auth_verbose = yes
 auth_debug = yes
 auth_debug_passwords = yes
@@ -11,10 +11,10 @@ mail_location = maildir:<%=@vmail_directory%>/%u/
 mail_uid=<%=@vmail_user%>
 mail_gid=<%=@vmail_user%>
 protocols = imap pop3
-ssl = yes
+ssl = required
 ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
 ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
-disable_plaintext_auth = no # TODO: set yes
+disable_plaintext_auth = yes # TODO: set yes
 valid_chroot_dirs = /var/spool/vmail
 
 service auth {

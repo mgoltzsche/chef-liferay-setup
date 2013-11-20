@@ -55,6 +55,14 @@ user.timezone=Europe/Berlin
 user.country=US
 user.language=en
 
+### System Email address
+#login.email.from.name=<%=@hostname%>
+#login.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+#sites.email.from.name=<%=@hostname%>
+#sites.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+#wiki.email.from.name=<%=@hostname%>
+#wiki.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+
 ### Users
 users.update.last.login=true
 users.reminder.queries.enabled=false
@@ -63,8 +71,6 @@ terms.of.use.required=false
 system.site.roles=Developer,Manager,Redakteur
 
 ### Login
-login.email.from.name=<%=@hostname%>
-login.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
 #passwords.encryption.algorithm=SSHA # not required
 #passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
