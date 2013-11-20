@@ -3,8 +3,8 @@ production:
     delivery_method: :smtp
     smtp_settings:
       address: "<%=@mailServerHost%>"
-      port: '25'
+      port: 25
       domain: "<%=@domain%>"
       authentication: :plain
-      user_name: "<%=@mailServerUser%>" 
+      user_name: "<%=@mailServerUser%>@<%=@domain%>" 
       password: "<%=@mailServerPassword%>" 
