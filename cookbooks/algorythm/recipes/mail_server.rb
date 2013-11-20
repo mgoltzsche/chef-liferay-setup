@@ -21,17 +21,17 @@ user usr do
 end
 
 # --- Configure postfix ---
-directory '/etc/postfix/ldap' do
-  owner 'root'
-  group 'root'
-  mode 00755
-  action :create
-end
-
 directory vmailDirectory do
   owner usr
   group usr
   mode 00744
+  action :create
+end
+
+directory '/etc/postfix/ldap' do
+  owner 'root'
+  group 'root'
+  mode 00755
   action :create
 end
 
@@ -63,8 +63,8 @@ end
 template "/etc/postfix/ldap/virtual_domains.cf" do
   source "postfix.virtual_domains.cf.erb"
   owner 'root'
-  group 'root'
-  mode 0600
+  group 'postfix'
+  mode 0640
   variables({
     :host => ldapHost,
     :port => ldapPort,
@@ -77,8 +77,8 @@ end
 template "/etc/postfix/ldap/virtual_aliases.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
-  group 'root'
-  mode 0600
+  group 'postfix'
+  mode 0640
   variables({
     :host => ldapHost,
     :port => ldapPort,
@@ -92,8 +92,8 @@ end
 template "/etc/postfix/ldap/virtual_mailboxes.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
-  group 'root'
-  mode 0600
+  group 'postfix'
+  mode 0640
   variables({
     :host => ldapHost,
     :port => ldapPort,
@@ -107,8 +107,8 @@ end
 template "/etc/postfix/ldap/virtual_senders.cf" do
   source "postfix.virtual_mailbox_query.cf.erb"
   owner 'root'
-  group 'root'
-  mode 0600
+  group 'postfix'
+  mode 0640
   variables({
     :host => ldapHost,
     :port => ldapPort,

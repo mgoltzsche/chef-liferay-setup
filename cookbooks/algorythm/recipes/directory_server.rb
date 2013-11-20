@@ -114,7 +114,7 @@ echo "dn: cn=#{systemMailUser},ou=People,#{suffix}
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
-cn: #{userCN}
+cn: #{systemMailUser}
 mail: #{systemMailUser}@#{domain}
 mailForwardingAddress: #{userCN}@#{domain}
 userPassword:: #{systemMailPassword}
