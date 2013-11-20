@@ -29,8 +29,8 @@ time.zones=Europe/Berlin
 admin.email.from.name=<%=@admin_name%>
 admin.email.from.address=<%=@admin_email%>
 default.admin.screen.name=admin
-default.admin.password=maximum!
-default.admin.email.address.prefix=admin
+default.admin.password=<%=@admin_password%>
+default.admin.email.address.prefix=<%=@mailServerUser%>
 default.admin.first.name=Max
 default.admin.middle.name=
 default.admin.last.name=Goltzsche
@@ -112,4 +112,4 @@ mail.session.mail.smtp.auth=true
 mail.session.mail.smtp.host=<%=@mailServerHost%>
 mail.session.mail.smtp.port=25
 mail.session.mail.smtp.user=<%=@mailServerUser%>
-mail.session.mail.smtp.password=<%=@mailServerPassword%>
+mail.session.mail.smtp.password=<%=@admin_password%>

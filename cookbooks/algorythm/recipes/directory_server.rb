@@ -7,9 +7,9 @@ domain = node['ldap']['domain']
 suffix = domain.split('.').map{|dc| "dc=#{dc}"}.join(',')
 dirmanager = node['ldap']['dirmanager']
 dirmanager_passwd = node['ldap']['dirmanager_password']
-userCN = node['ldap']['user_cn']
-userSN = node['ldap']['user_sn']
-userGivenName = node['ldap']['user_givenName']
+userCN = node['ldap']['admin_cn']
+userSN = node['ldap']['admin_sn']
+userGivenName = node['ldap']['admin_givenName']
 
 # --- SSHA hash password ---
 def sshaPassword(password)
@@ -19,9 +19,7 @@ def sshaPassword(password)
 	Base64.encode64(password).chomp!.sub("\n", "\n ")
 end
 
-userPassword = sshaPassword(node['ldap']['user_password'])
-systemMailPassword = sshaPassword(node['ldap']['system_mail_password'])
-systemMailUser = node['ldap']['system_mail_user']
+userPassword = sshaPassword(node['ldap']['admin_password'])
 
 
 # --- Create instance if not exists ---

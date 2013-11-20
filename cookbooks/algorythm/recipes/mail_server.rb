@@ -125,7 +125,7 @@ file "/etc/aliases" do
   mode 0644
   content <<-EOH
 postmaster: root
-root: #{node['ldap']['user_cn']}@#{node['ldap']['domain']}
+root: #{node['ldap']['admin_cn']}@#{node['ldap']['domain']}
   EOH
   notifies :run, "execute[newaliases]", :immediately
 end

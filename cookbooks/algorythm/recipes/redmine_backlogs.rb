@@ -8,8 +8,8 @@ dbname = node['redmine']['postgresql']['database']
 backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
-mailServerUser = node['ldap']['system_mail_user']
-mailServerPassword = node['ldap']['system_mail_password']
+mailServerUser = node['ldap']['admin_cn']
+mailServerPassword = node['ldap']['admin_password']
 
 package 'libpq-dev'
 package 'libmagick-dev'
