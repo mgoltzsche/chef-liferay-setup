@@ -26,8 +26,9 @@ print "SALT: #{hSalt}\n"
 password = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
-salt = hSalt
+#salt = hSalt
 #password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(salt+password)+salt).chomp!
+salt = "xf6FLWW3"
 password = '->   ' + Digest::SHA1.digest(salt+password)+'/'+salt
 
 print password+"\n"
