@@ -127,6 +127,14 @@ file "/etc/aliases" do
 postmaster: root
 root: #{node['ldap']['user_cn']}@#{node['ldap']['domain']}
   EOH
+  notifies :run, "execute[newaliases]", :immediately
+end
+
+execute "newaliases" do
+  user 'root'
+  group 'root'
+  command 'newaliases'
+  action :nothing
 end
 
 # --- Configure mail-stack-delivery ---
