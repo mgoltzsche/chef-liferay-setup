@@ -26,13 +26,12 @@ virtual_alias_maps = ldap:/etc/postfix/ldap/virtual_aliases.cf
 virtual_mailbox_domains = ldap:/etc/postfix/ldap/virtual_domains.cf
 virtual_mailbox_maps = ldap:/etc/postfix/ldap/virtual_mailboxes.cf
 virtual_mailbox_base = <%=@vmail_directory%>
-virtual_minimum_uid = 1000
 virtual_uid_maps = static:5000
 virtual_gid_maps = static:5000
 
 # TLS parameters
 smtpd_use_tls = yes
-smtpd_tls_wrappermode=yes
+#smtpd_tls_wrappermode=yes
 smtpd_tls_mandatory_protocols = SSLv3, TLSv1
 smtpd_tls_mandatory_ciphers = medium
 smtpd_tls_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
