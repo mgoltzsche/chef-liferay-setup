@@ -31,6 +31,7 @@ password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(password+salt)+salt).c
 #password = '->   ' + Digest::SHA1.digest(salt+password)+'/'+salt
 
 print password+", length: #{password.length}\n"
+print Base64.encode64(Digest::SHA1.digest(password)).length
 
 # --- Create instance if not exists ---
 execute "Configure single instance" do
