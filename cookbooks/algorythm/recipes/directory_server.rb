@@ -12,22 +12,13 @@ userSN = node['ldap']['user_sn']
 userGivenName = node['ldap']['user_givenName']
 
 # --- SSHA hash password
-hPwd = "{ssha}67hwclTQ4EMdGHCBz5xK3IFxknCd2egJQpS8vQ=="
-hPwd = hPwd[6..hPwd.length]
-print hPwd+"\n"
-hPwd = Base64.decode64(hPwd)
-hSalt = hPwd[-8, 8]
-print "SALT: #{hSalt}, length: #{hSalt.length}, pwdlength: #{hPwd.length}\n"
-
-password = 'maximum!'#node['ldap']['user_password']
+userPassword = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
-salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
-salt = hSalt
-encPassword = Base64.encode64(Digest::SHA1.digest(password+salt)+salt).chomp!
-#password = '->   ' + Digest::SHA1.digest(salt+password)+'/'+salt
+salt = Array.new(8, '').collect { chars[rand(chars.size)] }.join('')
+print "#{salt.length}\n"
+userPassword = '{ssha}' + Base64.encode64(Digest::SHA1.digest(userPassword+salt)+salt).chomp!
+userPassword = Base64.encode64(userPassword)
 
-print encPassword+", length: #{encPassword.length}\n"
-print Base64.encode64(Digest::SHA1.digest(password+salt)).length
 
 # --- Create instance if not exists ---
 execute "Configure single instance" do
@@ -104,8 +95,7 @@ cn: #{userCN}
 sn: #{userSN}
 givenName: #{userGivenName}
 mail: #{userCN}@#{domain}
-userPassword:: e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
- Q==
+userPassword:: #{userPassword}
 " > /tmp/admin_user.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
