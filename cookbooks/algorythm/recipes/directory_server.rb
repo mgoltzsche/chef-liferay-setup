@@ -12,9 +12,7 @@ userSN = node['ldap']['user_sn']
 userGivenName = node['ldap']['user_givenName']
 
 # --- SSHA hash password
-hPwd = "e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
- Q=="
-hPwd = Base64.decode64(hPwd)
+hPwd = "{ssha}67hwclTQ4EMdGHCBz5xK3IFxknCd2egJQpS8vQ=="
 hPwd = hPwd[6..hPwd.length]
 print hPwd+"\n"
 hPwd = Base64.decode64(hPwd)
