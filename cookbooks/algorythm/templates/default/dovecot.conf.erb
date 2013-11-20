@@ -14,8 +14,7 @@ protocols = imap pop3
 ssl = required
 ssl_cert = </etc/ssl/certs/ssl-cert-snakeoil.pem
 ssl_key = </etc/ssl/private/ssl-cert-snakeoil.key
-disable_plaintext_auth = yes # TODO: set yes
-valid_chroot_dirs = /var/spool/vmail
+disable_plaintext_auth = yes
 
 service auth {
   executable = /usr/lib/dovecot/auth
