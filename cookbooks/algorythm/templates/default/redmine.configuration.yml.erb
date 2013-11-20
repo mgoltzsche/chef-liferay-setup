@@ -4,7 +4,7 @@ production:
     smtp_settings:
       address: "<%=@mailServerHost%>"
       port: 25
-      domain: "<%=@domain%>"
+      domain: "<%=@mailServerHost%>"
       authentication: :plain
-      user_name: "<%=@mailServerUser%>@<%=@domain%>" 
+      user_name: "<%=@mailServerUser%>" 
       password: "<%=@mailServerPassword%>" 

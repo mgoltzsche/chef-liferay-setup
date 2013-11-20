@@ -10,7 +10,6 @@ backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['system_mail_user']
 mailServerPassword = node['ldap']['system_mail_password']
-domain = node['ldap']['domain']
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -149,8 +148,7 @@ template "#{redmineHome}/config/configuration.yml" do
   variables({
     :mailServerHost => mailServerHost,
     :mailServerUser => mailServerUser,
-    :mailServerPassword => mailServerPassword,
-    :domain => domain
+    :mailServerPassword => mailServerPassword
   })
 end
 
