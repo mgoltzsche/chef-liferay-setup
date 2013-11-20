@@ -18,7 +18,7 @@ hPwd = Base64.decode64(hPwd)
 print hPwd+"\n"
 hPwd = hPwd[6..hPwd.length]
 print hPwd+"\n"
-hPwd = Base64.decode(hPwd)
+hPwd = Base64.decode64(hPwd)
 print hPwd+"\n"
 hSalt = hPwd[20..hPwd.length]
 print "SALT: #{hSalt}"
