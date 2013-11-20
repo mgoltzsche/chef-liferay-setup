@@ -8,6 +8,8 @@ dbname = node['redmine']['postgresql']['database']
 backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
+mailServerUser = node['ldap']['system_mail_user']
+mailServerPassword = node['ldap']['system_mail_password']
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -144,7 +146,9 @@ template "#{redmineHome}/config/configuration.yml" do
   source "redmine.database.yml.erb"
   mode 00400
   variables({
-    :mailServerHost => mailServerHost
+    :mailServerHost => mailServerHost,
+    :mailServerUser => mailServerUser,
+    :mailServerPassword => mailServerPassword
   })
 end
 

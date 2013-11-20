@@ -19,6 +19,8 @@ ldapUser = node['ldap']['dirmanager']
 ldapPassword = node['ldap']['dirmanager_password']
 ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 mailServerHost = node['mail_server']['hostname']
+mailServerUser = node['ldap']['system_mail_user']
+mailServerPassword = node['ldap']['system_mail_password']
 
 package 'libssl-dev'
 
@@ -196,7 +198,9 @@ template "#{liferayHome}/portal-ext.properties" do
     :ldapSuffix => ldapSuffix,
     :ldapUser => ldapUser,
     :ldapPassword => ldapPassword,
-    :mailServerHost => mailServerHost
+    :mailServerHost => mailServerHost,
+    :mailServerUser => mailServerUser,
+    :mailServerPassword => mailServerPassword
   })
 end
 

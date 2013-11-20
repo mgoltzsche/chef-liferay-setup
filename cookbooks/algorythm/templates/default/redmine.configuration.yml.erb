@@ -2,9 +2,9 @@ production:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      address: "<%=@mailServerHost%>" 
+      address: "<%=@mailServerHost%>"
       port: '25'
-      domain: "<%=@mailServerHost%>" 
+      domain: "<%=@mailServerHost%>"
       authentication: :plain
-      user_name: "your_email@gmail.com" 
-      password: "your_password" 
+      user_name: "<%=@mailServerUser%>" 
+      password: "<%=@mailServerPassword%>" 

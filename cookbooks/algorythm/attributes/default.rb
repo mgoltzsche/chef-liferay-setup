@@ -12,9 +12,11 @@ default['ldap']['dirmanager'] = 'dirmanager'
 default['ldap']['dirmanager_password'] = 'password'
 default['ldap']['domain'] = 'dev.algorythm.de'
 default['ldap']['user_cn'] = 'admin'
-default['ldap']['user_password'] = 'maximum!'
 default['ldap']['user_sn'] = 'Goltzsche'
 default['ldap']['user_givenName'] = 'Max'
+default['ldap']['user_password'] = 'password'
+default['ldap']['system_mail_user'] = 'system'
+default['ldap']['system_mail_password'] = 'password'
 
 # Mail Server configuration
 default['mail_server']['hostname'] = 'localhost'

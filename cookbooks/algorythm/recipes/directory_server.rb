@@ -11,12 +11,17 @@ userCN = node['ldap']['user_cn']
 userSN = node['ldap']['user_sn']
 userGivenName = node['ldap']['user_givenName']
 
-# --- SSHA hash password
-userPassword = node['ldap']['user_password']
-chars = ('a'..'z').to_a + ('0'..'9').to_a
-salt = Array.new(8, '').collect { chars[rand(chars.size)] }.join('')
-userPassword = '{ssha}' + Base64.encode64(Digest::SHA1.digest(userPassword+salt)+salt).chomp!
-userPassword = Base64.encode64(userPassword).chomp!.sub("\n", "\n ")
+# --- SSHA hash password ---
+def sshaPassword(password) {
+	chars = ('a'..'z').to_a + ('0'..'9').to_a
+	salt = Array.new(8, '').collect { chars[rand(chars.size)] }.join('')
+	password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(password+salt)+salt).chomp!
+	Base64.encode64(password).chomp!.sub("\n", "\n ")
+}
+
+userPassword = sshaPassword(node['ldap']['user_password'])
+systemMailPassword = sshaPassword(node['ldap']['system_mail_password'])
+systemMailUser = node['ldap']['system_mail_user']
 
 
 # --- Create instance if not exists ---
@@ -95,6 +100,24 @@ sn: #{userSN}
 givenName: #{userGivenName}
 mail: #{userCN}@#{domain}
 userPassword:: #{userPassword}
+" > /tmp/admin_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
+rm -f /tmp/admin_user.ldif
+  EOH
+  action :nothing
+  notifies :restart, "service[dirsrv]", :immediately
+end
+
+execute "Register system mail account" do
+  command <<-EOH
+echo "dn: cn=#{systemMailUser},ou=People,#{suffix}
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: mailRecipient
+cn: #{userCN}
+mail: #{systemMailUser}@#{domain}
+mailForwardingAddress: #{userCN}@#{domain}
+userPassword:: #{systemMailPassword}
 " > /tmp/admin_user.ldif &&
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
