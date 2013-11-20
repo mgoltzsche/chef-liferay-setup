@@ -43,6 +43,7 @@ default['liferay']['hostname'] = default['ldap']['domain']
 default['liferay']['company_default_name'] = "algorythm"
 default['liferay']['admin']['name'] = "Max Goltzsche"
 default['liferay']['admin']['email'] = "admin@#{default['ldap']['domain']}"
+default['liferay']['admin']['password'] = "password"
 default['liferay']['postgresql']['database'] = "liferay"
 default['liferay']['postgresql']['user'] = default['liferay']['user']
 default['liferay']['postgresql']['password'] = "liferay"

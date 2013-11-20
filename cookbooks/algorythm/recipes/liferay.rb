@@ -193,6 +193,7 @@ template "#{liferayHome}/portal-ext.properties" do
     :hostname => node['liferay']['hostname'],
     :admin_name => node['liferay']['admin']['name'],
     :admin_email => node['liferay']['admin']['email'],
+    :admin_password => node['liferay']['admin']['password'],
     :ldapHost => ldapHost,
     :ldapPort => ldapPort,
     :ldapSuffix => ldapSuffix,
