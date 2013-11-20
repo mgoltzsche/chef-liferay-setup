@@ -15,15 +15,13 @@ userGivenName = node['ldap']['user_givenName']
 hPwd = "e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
  Q=="
 hPwd = Base64.decode64(hPwd)
-print hPwd+"\n"
 hPwd = hPwd[6..hPwd.length]
 print hPwd+"\n"
 hPwd = Base64.decode64(hPwd)
-print hPwd+"\n"
 hSalt = hPwd[20..hPwd.length]
 print "SALT: #{hSalt}, length: #{hSalt.length}, pwdlength: #{hPwd.length}\n"
 
-password = node['ldap']['user_password']
+password = 'maximum!'
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
 salt = hSalt
