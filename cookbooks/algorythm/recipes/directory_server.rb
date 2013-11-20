@@ -21,13 +21,14 @@ print hPwd+"\n"
 hPwd = Base64.decode64(hPwd)
 print hPwd+"\n"
 hSalt = hPwd[20..hPwd.length]
-print "SALT: #{hSalt}"
+print "SALT: #{hSalt}\n"
 
 password = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
 salt = hSalt
-password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(salt+password)+salt).chomp!
+#password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(salt+password)+salt).chomp!
+password = '->   ' + Digest::SHA1.digest(salt+password)+'/'+salt.chomp!
 
 print password+"\n"
 
