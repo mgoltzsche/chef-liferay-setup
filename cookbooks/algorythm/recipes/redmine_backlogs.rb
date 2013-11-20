@@ -143,7 +143,7 @@ end
 template "#{redmineHome}/config/configuration.yml" do
   owner usr
   group usr
-  source "redmine.database.yml.erb"
+  source "redmine.configuration.yml.erb"
   mode 00400
   variables({
     :mailServerHost => mailServerHost,
