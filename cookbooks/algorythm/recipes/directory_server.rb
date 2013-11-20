@@ -15,9 +15,8 @@ userGivenName = node['ldap']['user_givenName']
 userPassword = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(8, '').collect { chars[rand(chars.size)] }.join('')
-print "#{salt.length}\n"
 userPassword = '{ssha}' + Base64.encode64(Digest::SHA1.digest(userPassword+salt)+salt).chomp!
-userPassword = Base64.encode64(userPassword)
+userPassword = Base64.encode64(userPassword).chomp!
 
 
 # --- Create instance if not exists ---
