@@ -37,7 +37,7 @@ default.admin.last.name=Goltzsche
 
 ### Company
 company.default.name=<%=@company_name%>
-company.default.web.id=<%=@domain%>
+company.default.web.id=<%=@hostname%>
 company.default.home.url=/web/guest/home
 company.default.locale=en_US
 company.default.time.zone=Europe/Berlin
@@ -63,8 +63,8 @@ terms.of.use.required=false
 system.site.roles=Developer,Manager,Redakteur
 
 ### Login
-login.email.from.name=<%=@domain%>
-login.email.from.address=no-reply@<%=@domain%>
+login.email.from.name=<%=@hostname%>
+login.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
 #passwords.encryption.algorithm=SSHA # not required
 #passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
