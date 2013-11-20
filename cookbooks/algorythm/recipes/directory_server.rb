@@ -12,12 +12,24 @@ userSN = node['ldap']['user_sn']
 userGivenName = node['ldap']['user_givenName']
 
 # --- SSHA hash password
+hPwd = "e3NzaGF9eGY2RkxXVzMvUExBNWlOOGl1MEpZbUlVV0dxb2MrSmwxUklxOXc9P
+ Q=="
+hPwd = Base64.decode64(hPwd)
+print hPwd+"\n"
+hPwd = hPwd[6..hPwd.length]
+print hPwd+"\n"
+hPwd = Base64.decode(hPwd)
+print hPwd+"\n"
+hSalt = hPwd[20..hPwd.length]
+print "SALT: #{hSalt}"
+
 password = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
-password = '{ssha}' + Digest::SHA1.digest(password+salt)+salt
+salt = hSalt
+password = '{ssha}' + Base64.encode64(Digest::SHA1.digest(salt+password)+salt).chomp!
 
-print password
+print password+"\n"
 
 # --- Create instance if not exists ---
 execute "Configure single instance" do
