@@ -20,8 +20,8 @@ hPwd = hPwd[6..hPwd.length]
 print hPwd+"\n"
 hPwd = Base64.decode64(hPwd)
 print hPwd+"\n"
-hSalt = hPwd[20..hPwd.length]
-print "SALT: #{hSalt}\n"
+hSalt = hPwd[-4, 4]
+print "SALT: #{hSalt}, length: #{hSalt.length}\n"
 
 password = node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
