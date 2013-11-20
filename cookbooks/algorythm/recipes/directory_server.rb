@@ -18,10 +18,10 @@ hPwd = Base64.decode64(hPwd)
 hPwd = hPwd[6..hPwd.length]
 print hPwd+"\n"
 hPwd = Base64.decode64(hPwd)
-hSalt = hPwd[20..hPwd.length]
+hSalt = hPwd[-8, 8]
 print "SALT: #{hSalt}, length: #{hSalt.length}, pwdlength: #{hPwd.length}\n"
 
-password = 'maximum!'
+password = 'maximum!'#node['ldap']['user_password']
 chars = ('a'..'z').to_a + ('0'..'9').to_a
 salt = Array.new(10, '').collect { chars[rand(chars.size)] }.join('')
 salt = hSalt
