@@ -103,24 +103,6 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passw
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing
-  notifies :run, "execute[Register system mail account]", :immediately
-end
-
-execute "Register system mail account" do
-  command <<-EOH
-echo "dn: cn=#{systemMailUser},ou=People,#{suffix}
-objectClass: simpleSecurityObject
-objectClass: top
-objectClass: mailRecipient
-cn: #{systemMailUser}
-mail: #{systemMailUser}@#{domain}
-mailForwardingAddress: #{userCN}@#{domain}
-userPassword:: #{systemMailPassword}
-" > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
-rm -f /tmp/admin_user.ldif
-  EOH
-  action :nothing
   notifies :restart, "service[dirsrv]", :immediately
 end
 

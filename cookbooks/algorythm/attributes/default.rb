@@ -15,8 +15,6 @@ default['ldap']['admin_cn'] = 'admin'
 default['ldap']['admin_sn'] = 'Goltzsche'
 default['ldap']['admin_givenName'] = 'Max'
 default['ldap']['admin_password'] = 'password'
-default['ldap']['system_mail_user'] = 'system'
-default['ldap']['system_mail_password'] = 'password'
 
 # Mail Server configuration
 default['mail_server']['hostname'] = 'localhost'
