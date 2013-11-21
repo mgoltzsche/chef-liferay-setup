@@ -48,7 +48,7 @@ default['liferay']['postgresql']['password'] = "liferay"
 # Sonatype Nexus installation
 default['nexus']['version'] = "2.6.4"
 default['nexus']['hostname'] = "nexus.#{default['liferay']['hostname']}"
-default['liferay']['home'] = "/var/opt/nexus"
+default['nexus']['home'] = "/var/opt/nexus"
 
 # Redmine Backlogs installation
 default['redmine']['install_directory'] = "/opt"
