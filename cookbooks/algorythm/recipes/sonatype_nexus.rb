@@ -50,7 +50,7 @@ execute "Deploy Sonatype Nexus" do
   user usr
   group usr
   command <<-EOH
-sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' WEB-INF/plexus.properties &&
+sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties &&
 zip -r #{nexusDeployWAR} #{nexusExtractDir}
   EOH
   not_if {File.exist?(nexusDir)}
