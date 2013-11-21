@@ -46,20 +46,13 @@ execute "Extract Sonatype Nexus" do
   not_if {File.exist?(nexusExtractDir)}
 end
 
-execute "Configure home directory and repack WAR" do
-  cwd nexusExtractDir
-  command <<-EOH
-sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' WEB-INF/plexus.properties &&
-rm -f /tmp/nexus.war &&
-zip -r /tmp/nexus.war .
-  EOH
-  not_if {File.exist?(nexusDir)}
-end
-
 execute "Deploy Sonatype Nexus" do
   user usr
   group usr
-  command "cp #{nexusExtractDir} #{nexusDeployWAR}"
+  command <<-EOH
+sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' WEB-INF/plexus.properties &&
+zip -r #{nexusDeployWAR} #{nexusExtractDir}
+  EOH
   not_if {File.exist?(nexusDir)}
 end
 
