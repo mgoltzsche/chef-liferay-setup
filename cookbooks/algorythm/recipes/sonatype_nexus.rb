@@ -3,10 +3,13 @@ downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
-nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
+nexusDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
+nexusDeployWAR = "#{node['liferay']['home_directory']}/deploy/nexus.war"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 hostname = node['nexus']['hostname']
+
+package 'zip'
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
@@ -26,23 +29,38 @@ directory "#{nexusHome}/conf" do
   mode 01755
 end
 
+template "#{nexusHome}/conf/nexus.xml" do
+  source "nexus.xml.erb"
+  owner usr
+  group usr
+  mode 00600
+  variables({
+    :hostname => hostname
+  })
+  action :create_if_missing
+end
+
 execute "Extract Sonatype Nexus" do
   cwd downloadDir
   command "mkdir #{nexusExtractDir} && unzip -qd /tmp/nexus-#{version} #{nexusWarFile}"
   not_if {File.exist?(nexusExtractDir)}
 end
 
+execute "Configure home directory and repack WAR" do
+  cwd nexusExtractDir
+  command <<-EOH
+sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' WEB-INF/plexus.properties &&
+rm -f /tmp/nexus.war &&
+zip -r /tmp/nexus.war .
+  EOH
+  not_if {File.exist?(nexusDir)}
+end
+
 execute "Deploy Sonatype Nexus" do
   user usr
   group usr
-  command "cp -R #{nexusExtractDir} #{nexusDeployDir}"
-  not_if {File.exist?(nexusDeployDir)}
-end
-
-execute "Configure home directory" do
-  user usr
-  group usr
-  command "sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusDeployDir}/WEB-INF/plexus.properties"
+  command "cp #{nexusExtractDir} #{nexusDeployWAR}"
+  not_if {File.exist?(nexusDir)}
 end
 
 # --- Configure nginx ---
