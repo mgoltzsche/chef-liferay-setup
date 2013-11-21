@@ -5,6 +5,7 @@ nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
 nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
 nexusHome = node['nexus']['home']
+nexusHomeEscaped = nexusHome.gsub!('/', '\\/')
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
@@ -38,20 +39,10 @@ execute "Deploy Sonatype Nexus" do
   not_if {File.exist?(nexusDeployDir)}
 end
 
-file "#{nexusDeployDir}/WEB-INF/plexus.properties" do
-  owner usr
+execute "Configure home directory" do
+  user usr
   group usr
-  mode 0644
-  content <<-EOH
-nexus-work=#{nexusHome}
-security-xml-file=${nexus-work}/conf/security.xml
-application-conf=${nexus-work}/conf
-
-runtime=${bundleBasedir}
-nexus-app=${runtime}
-
-pr.encryptor.publicKeyPath=/apr/public-key.txt
-  EOH
+  command "sed -i 's/^\s*nexus-work\s*=.*/#{nexusHomeEscaped}/' #{nexusDeployDir}/WEB-INF/plexus.properties"
 end
 
 # --- Configure nginx ---
