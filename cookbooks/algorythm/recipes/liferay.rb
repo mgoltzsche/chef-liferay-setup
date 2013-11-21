@@ -36,7 +36,6 @@ end
 # --- Download and install Liferay ---
 directory downloadDir do
   mode 00755
-  action :create
 end
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
@@ -139,8 +138,6 @@ directory "#{liferayHomeDir}/deploy" do
   owner usr
   group usr
   mode 01750
-  action :create
-  recursive true
 end
 
 template "#{liferayDir}/bin/setenv.sh" do
@@ -216,7 +213,6 @@ directory '/usr/share/nginx/cache' do
   owner 'www-data'
   group 'www-data'
   mode 00744
-  action :create
 end
 
 cookbook_file '/usr/share/nginx/www/index.html'

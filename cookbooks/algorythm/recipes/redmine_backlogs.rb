@@ -26,8 +26,7 @@ end
 
 # --- Download Redmine & Backlogs plugin ---
 directory downloadDir do
-  mode 00755
-  action :create
+  mode 01755
 end
 
 execute "Clone Redmine git repository" do
@@ -66,14 +65,12 @@ end
 
 directory "#{redmineDir}/public/plugin_assets" do
   mode 00755
-  action :create
 end
 
 directory "#{redmineHomeDir}/files" do
   owner usr
   group usr
-  mode 00744
-  action :create
+  mode 00755
 end
 
 link redmineDirLink do
@@ -202,7 +199,6 @@ end
 
 directory "/etc/thin" do
   mode 01755
-  action :create
 end
 
 template "/etc/thin/redmine" do
