@@ -30,6 +30,7 @@ virtual_uid_maps = static:5000
 virtual_gid_maps = static:5000
 
 # TLS parameters
+smtpd_use_tls = yes
 #smtpd_tls_wrappermode=yes # workaround for clients likek outlook to listen on port 465
 smtpd_tls_mandatory_protocols = SSLv3, TLSv1
 smtpd_tls_mandatory_ciphers = medium
