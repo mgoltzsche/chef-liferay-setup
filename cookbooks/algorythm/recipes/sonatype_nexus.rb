@@ -38,7 +38,10 @@ template nexusCfg do
   group usr
   mode 00600
   variables({
-    :hostname => hostname
+    :hostname => hostname,
+    :mailServerHost => mailServerHost,
+    :mailServerUser => mailServerUser,
+    :mailServerPassword => mailServerPassword
   })
   action :create_if_missing
 end
@@ -76,10 +79,7 @@ template "/etc/nginx/sites-available/#{hostname}" do
   mode 00700
   variables({
     :hostname => hostname,
-    :port => node['liferay']['https_port'],
-    :mailServerHost => mailServerHost,
-    :mailServerUser => mailServerUser,
-    :mailServerPassword => mailServerPassword
+    :port => node['liferay']['https_port']
   })
 end
 
