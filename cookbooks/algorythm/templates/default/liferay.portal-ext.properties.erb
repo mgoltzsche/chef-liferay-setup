@@ -1,15 +1,10 @@
 setup.wizard.enabled=false
 browser.launcher.url= # disable browser launcher
-default.regular.theme.id=classic
 liferay.home=<%=@liferay_home%>
+default.regular.theme.id=classic
 imagemagick.enabled=true
 
-### Webserver aware
-web.server.http.port=80
-web.server.https.port=443
-web.server.host=<%=@domain%>
-
-### Persistence
+### Database configuration
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
 jdbc.default.url=jdbc:hsqldb:${liferay.home}/data/hsql/lportal
 jdbc.default.username=sa
@@ -18,6 +13,11 @@ jdbc.default.password=
 #jdbc.default.url=jdbc:postgresql://localhost:<%=@postgres_port%>/<%=@postgres_database%>
 #jdbc.default.username=<%=@postgres_user%>
 #jdbc.default.password=<%=@postgres_password%>
+
+### Webserver aware
+web.server.http.port=80
+web.server.https.port=443
+web.server.host=<%=@domain%>
 
 ### Locale & timezone
 locales=en_US,de_DE

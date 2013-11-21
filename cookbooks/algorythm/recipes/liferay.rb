@@ -3,15 +3,17 @@ require 'uri'
 usr = node['liferay']['user']
 downloadDir = "/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
-liferayExtractionDir = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
+liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
+liferayExtractionDir = "/tmp/#{liferayFullName}"
 aprSourceArchive = File.basename(URI.parse(node['liferay']['apr_download_url']).path)
 aprSourceFolder = aprSourceArchive.gsub(/(.*?)\.tar\.bz2/, '\1')
 aprSourcePath = "#{downloadDir}/#{aprSourceFolder}"
 nativeConnectorSourceArchive = File.basename(URI.parse(node['liferay']['native_connectors_download_url']).path)
 nativeConnectorSourceFolder = nativeConnectorSourceArchive.gsub(/(.*?)\.tar\.gz/, '\1')
 nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
-liferayHome = "#{node['liferay']['install_directory']}/#{liferayExtractionDir}";
-liferayHomeLink = "#{node['liferay']['install_directory']}/liferay";
+liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
+liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
+liferayHomeDir = node['liferay']['home']
 dbname = node['liferay']['postgresql']['database']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
@@ -27,8 +29,8 @@ package 'libssl-dev'
 # --- Create Liferay system user ---
 user usr do
   comment 'Liferay User'
-  home "/home/#{usr}"
   shell '/bin/bash'
+  home liferayHomeDir
   supports :manage_home=>true
 end
 
@@ -45,38 +47,21 @@ end
 
 execute "Extract Liferay" do
   cwd downloadDir
-  user 'root'
-  group 'root'
-  command "unzip -qd #{node['liferay']['install_directory']} #{liferayZipFile}"
-  not_if {File.exist?(liferayHome)}
-  notifies :run, "execute[Create/Update symlinks and change owner]", :immediately
+  command "unzip -qd /tmp #{liferayZipFile}"
+  not_if {File.exist?(liferayDir) || File.exist?(liferayExtractionDir)}
 end
 
-execute "Create/Update symlinks and change owner" do
-  user 'root'
-  group 'root'
+execute "Copy Liferay to installation directory" do
   command <<-EOH
-rm -rf #{liferayHomeLink} &&
-ln -s #{liferayHome} #{liferayHomeLink} &&
-ln -s #{liferayHome}/$(ls #{liferayHome} | grep tomcat) #{liferayHome}/tomcat &&
-chown -R #{usr}:#{usr} #{liferayHome}
+cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{liferayDir} &&
+cd #{liferayDir}/bin &&
+ls | grep '\\.bat$' | xargs rm &&
+rm -rf #{liferayDir}/webapps/welome-theme &&
+chown -R #{usr}:#{usr} #{liferayDir} &&
+rm -rf #{liferayDirLink} &&
+ln -s #{liferayDir} #{liferayDirLink}
   EOH
-  action :nothing
-  notifies :run, "execute[Delete *.bat files]", :immediately
-end
-
-# --- Clean up Liferay installation ---
-execute "Delete *.bat files" do
-  cwd "#{liferayHomeLink}/tomcat/bin/"
-  user 'root'
-  group 'root'
-  command "ls | grep '\\.bat$' | xargs rm"
-  action :nothing
-end
-
-directory "#{liferayHomeLink}/tomcat/webapps/welcome-theme" do
-  recursive true
-  action :delete
+  not_if {File.exist?(liferayDir)}
 end
 
 # --- Create Liferay postgres user and database
@@ -133,6 +118,7 @@ execute "Compile APR source" do
 make &&
 make install
   EOH
+  not_if 'ls /usr/local/apr/lib | grep libapr-'
 end
 
 execute "Compile native connectors source" do
@@ -144,10 +130,11 @@ execute "Compile native connectors source" do
 make &&
 make install
   EOH
+  not_if 'ls /usr/local/apr/lib | grep libtcnative-'
 end
 
 # --- Configure Liferay tomcat ---
-directory "#{liferayHome}/deploy" do
+directory "#{liferayHomeDir}/deploy" do
   owner usr
   group usr
   mode 01750
@@ -155,7 +142,7 @@ directory "#{liferayHome}/deploy" do
   recursive true
 end
 
-template "#{liferayHome}/tomcat/bin/setenv.sh" do
+template "#{liferayDir}/bin/setenv.sh" do
   owner usr
   group usr
   source "liferay.tomcat.setenv.sh.erb"
@@ -165,7 +152,7 @@ template "#{liferayHome}/tomcat/bin/setenv.sh" do
   })
 end
 
-template "#{liferayHome}/tomcat/conf/server.xml" do
+template "#{liferayDir}/conf/server.xml" do
   owner usr
   group usr
   source "liferay.tomcat.server.xml.erb"
@@ -178,13 +165,13 @@ template "#{liferayHome}/tomcat/conf/server.xml" do
 end
 
 # --- Configure Liferay ---
-template "#{liferayHome}/portal-ext.properties" do
+template "#{liferayHomeDir}/portal-ext.properties" do
   owner usr
   group usr
   source "liferay.portal-ext.properties.erb"
   mode 00400
   variables({
-    :liferay_home => liferayHome,
+    :liferay_home => liferayHomeDir,
     :postgres_port => node['liferay']['postgresql']['port'],
     :postgres_database => node['liferay']['postgresql']['database'],
     :postgres_user => node['liferay']['postgresql']['user'],
@@ -209,9 +196,9 @@ template "/etc/init.d/liferay" do
   source "init.d.liferay.erb"
   mode 00755
   variables({
-    :liferay_home => liferayHomeLink,
-    :user => usr,
-    :group => usr
+    :liferayDir => liferayDirLink,
+    :liferayHomeDir => liferayHomeDir,
+    :user => usr
   })
 end
 
@@ -219,7 +206,7 @@ template "/etc/logrotate.d/liferay" do
   source "logrotate.d.liferay.erb"
   mode 00755
   variables({
-    :liferay_log_home => "#{liferayHomeLink}/tomcat/logs"
+    :liferay_log_home => "#{liferayDirLink}/logs"
   })
 end
 

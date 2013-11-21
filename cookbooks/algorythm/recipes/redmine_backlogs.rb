@@ -1,11 +1,12 @@
 hostname = node['redmine']['hostname']
 usr = node['redmine']['user']
 downloadDir = "/Downloads"
-redmineHome = "#{node['redmine']['install_directory']}/redmine-#{node['redmine']['version']}";
-redmineHomeLink = "#{node['redmine']['install_directory']}/redmine";
+redmineDir = "#{node['redmine']['install_directory']}/redmine-#{node['redmine']['version']}"
+redmineDirLink = "#{node['redmine']['install_directory']}/redmine"
+redmineHomeDir = node['redmine']['home']
 redmineVersion = node['redmine']['version']
 dbname = node['redmine']['postgresql']['database']
-backlogsHome = "#{redmineHome}/plugins/redmine_backlogs"
+backlogsDir = "#{redmineDir}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['admin_cn']
@@ -20,6 +21,7 @@ package 'git'
 user usr do
   comment 'Redmine User'
   shell '/bin/bash'
+  home redmineHomeDir
   supports :manage_home=>true
 end
 
@@ -47,9 +49,9 @@ execute "Checkout and copy Redmine to installation directory" do
   command <<-EOH
 git fetch --tags origin &&
 git checkout #{redmineVersion} &&
-cp -R #{downloadDir}/redmine #{redmineHome}
+cp -R #{downloadDir}/redmine #{redmineDir}
   EOH
-  not_if {File.exist?(redmineHome)}
+  not_if {File.exist?(redmineDir)}
 end
 
 execute "Checkout and copy Redmine Backlogs to plugins directory" do
@@ -57,55 +59,57 @@ execute "Checkout and copy Redmine Backlogs to plugins directory" do
   command <<-EOH
 git fetch --tags origin &&
 git checkout #{backlogsVersion} &&
-cp -R #{downloadDir}/redmine_backlogs #{backlogsHome}
+cp -R #{downloadDir}/redmine_backlogs #{backlogsDir}
   EOH
-  not_if {File.exist?(backlogsHome)}
+  not_if {File.exist?(backlogsDir)}
 end
 
-directory "#{redmineHome}/public/plugin_assets" do
+directory "#{redmineDir}/public/plugin_assets" do
   mode 00755
   action :create
 end
 
 execute "Create/Update symlink and change owner" do
   command <<-EOH
-rm -rf #{redmineHomeLink} &&
-ln -s #{redmineHome} #{redmineHomeLink} &&
-chown -R #{usr}:#{usr} #{redmineHome}
+rm -rf #{redmineDirLink} &&
+ln -s #{redmineDir} #{redmineDirLink} &&
+chown -R #{usr}:#{usr} #{redmineDir}
   EOH
 end
 
 # --- Install required gems ---
 execute "Install bundler" do
   command "gem install bundler"
+  not_if('ls $(/usr/local/rvm/bin/rvm gemdir)/bin | grep bundle')
 end
 
 execute "Install required gems" do
-  cwd redmineHome
+  cwd redmineDir
   command "bundle install --without development test"
 end
 
 execute "Install required Backlog plugin gems" do
-  cwd backlogsHome
+  cwd backlogsDir
   command "bundle install --without development test"
 end
 
 # --- Change file system permissions ---
-execute "Configure file system permissions" do
-  cwd redmineHome
+execute "Remove files directory and configure file system permissions" do
+  cwd redmineDir
   command <<-EOH
-chown -R #{usr}:#{usr} #{redmineHome} &&
+rm -rf files &&
+chown -R #{usr}:#{usr} #{redmineDir} &&
 chmod -R 755 files log tmp public/plugin_assets
   EOH
 end
 
 # --- Initially generate session store secret ---
 execute "Generate session store secret" do
-  cwd redmineHome
+  cwd redmineDir
   user usr
   group usr
   command "rake generate_secret_token"
-  not_if {File.exist?("#{redmineHome}/config/database.yml")}
+  not_if {File.exist?("#{redmineDir}/config/database.yml")}
 end
 
 # --- Create postgresql database + user ---
@@ -127,7 +131,7 @@ execute "Create database '#{dbname}'" do
 end
 
 # --- Configure Redmine database connection ---
-template "#{redmineHome}/config/database.yml" do
+template "#{redmineDir}/config/database.yml" do
   owner usr
   group usr
   source "redmine.database.yml.erb"
@@ -139,13 +143,14 @@ template "#{redmineHome}/config/database.yml" do
   })
 end
 
-# --- Configure Redmine SMPT connection ---
-template "#{redmineHome}/config/configuration.yml" do
+# --- Configure Redmine home dir & SMPT connection ---
+template "#{redmineDir}/config/configuration.yml" do
   owner usr
   group usr
   source "redmine.configuration.yml.erb"
   mode 00400
   variables({
+    :homeDir => redmineHomeDir,
     :mailServerHost => mailServerHost,
     :mailServerUser => mailServerUser,
     :mailServerPassword => mailServerPassword
@@ -154,14 +159,14 @@ end
 
 # --- Create/Migrate database structures ---
 execute "Create/Migrate database structure" do
-  cwd redmineHome
+  cwd redmineDir
   user usr
   group usr
   command "export RAILS_ENV=production; rake db:migrate"
 end
 
 execute "Insert default data" do
-  cwd redmineHome
+  cwd redmineDir
   user usr
   group usr
   command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
@@ -171,7 +176,7 @@ end
 execute "Install Redmine Backlogs plugin" do
   user usr
   group usr
-  cwd redmineHome
+  cwd redmineDir
   command <<-EOH
 export RAILS_ENV=production;
 rake tmp:cache:clear &&
@@ -204,7 +209,7 @@ template "/etc/thin/redmine" do
   group usr
   mode 00740
   variables({
-    :home => redmineHomeLink
+    :home => redmineDirLink
   })
 end
 
@@ -212,7 +217,7 @@ template "/etc/nginx/sites-available/#{hostname}" do
   source "nginx.redmine.vhost.erb"
   mode 00700
   variables({
-    :home => redmineHome,
+    :home => redmineDir,
     :hostname => hostname
   })
 end

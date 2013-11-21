@@ -17,12 +17,10 @@
 APP_NAME="Liferay"
 
 #Location of Liferay installation
-export LIFERAY_HOME=<%= @liferay_home %>
+export LIFERAY_HOME="<%=@liferayHomeDir%>"
 
-#unprivileged user that runs the daemon. The group/user should have been created separately,
-#using groupadd/useradd
-USER=<%= @user %>
-GROUP=<%= @group %>
+#unprivileged user that runs the daemon.
+USER=<%=@user%>
 
 ###This is end of the configurable section for most cases, other variable definitions follow :
 
@@ -33,9 +31,7 @@ if [ `id -u` -ne 0 ]; then
 fi
 
 #tomcat directory
-#detection of the tomcat directory within liferay
-TOMCAT_DIR=tomcat
-export CATALINA_HOME="$LIFERAY_HOME/$TOMCAT_DIR"
+export CATALINA_HOME="<%=@liferayDir%>"
 
 #location of pid file
 export CATALINA_PID=/var/run/liferay.pid
@@ -78,10 +74,6 @@ function start {
         #clear temp directory
         rm -rf "$CATALINA_HOME/temp/*" 2>/dev/null
         mkdir $CATALINA_HOME/temp 2>/dev/null
-
-        #fix user rights on liferay home dir
-        chown -R "$GROUP":"$USER" "$LIFERAY_HOME"
-        chmod -R ug=rwx "$LIFERAY_HOME"
 
         #ensure that pid file is writeable
         touch "$CATALINA_PID" 2>/dev/null

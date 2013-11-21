@@ -2,7 +2,7 @@ usr = node['liferay']['user']
 downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
-nexusDeployWarFile = "#{node['liferay']['install_directory']}/liferay/deploy/nexus.war"
+nexusDeployWarFile = "#{node['liferay']['home_directory']}/deploy/nexus.war"
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
@@ -15,7 +15,7 @@ execute "Deploy Sonatype Nexus" do
   user usr
   group usr
   command "cp #{nexusWarFile} #{nexusDeployWarFile}"
-  not_if {File.exist?("#{node['liferay']['install_directory']}/liferay/tomcat/webapps/nexus")}
+  not_if {File.exist?("#{node['liferay']['install_directory']}/liferay/webapps/nexus")}
 end
 
 link "/etc/nginx/sites-enabled/#{hostname}" do

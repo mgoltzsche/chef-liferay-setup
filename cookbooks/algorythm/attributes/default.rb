@@ -31,6 +31,7 @@ default['liferay']['download_url'] = "http://downloads.sourceforge.net/project/l
 default['liferay']['native_connectors_download_url'] = "http://apache.lehtivihrea.org//tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz"
 default['liferay']['apr_download_url'] = "http://mirror.synyx.de/apache/apr/apr-1.4.8.tar.bz2"
 default['liferay']['install_directory'] = "/opt"
+default['liferay']['home'] = "/var/opt/liferay"
 default['liferay']['user'] = "liferay"
 default['liferay']['java_opts'] = "-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m"
 default['liferay']['http_port'] = 8087
@@ -50,6 +51,7 @@ default['nexus']['hostname'] = "nexus.#{default['liferay']['hostname']}"
 
 # Redmine Backlogs installation
 default['redmine']['install_directory'] = "/opt"
+default['redmine']['home'] = "/var/opt/redmine"
 default['redmine']['user'] = "redmine"
 default['redmine']['version'] = "2.3.3"
 default['redmine']['backlogs_version'] = "v1.0.6"
