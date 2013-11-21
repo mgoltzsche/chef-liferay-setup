@@ -177,7 +177,7 @@ execute "Configure LDAP connection" do
   user 'postgres'
   command <<-EOH
 psql -d #{dbname} -c "DELETE FROM auth_sources WHERE name='#{ldapAuthSourceName}';" &&
-psql -d #{dbname} -c "INSERT INTO auth_sources VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
+psql -d #{dbname} -c "INSERT INTO auth_sources(type,name,host,port,account,account_password,base_dn,attr_login,attr_firstname,attr_lastname,attr_mail,onthefly_register,tls,filter,timeout) VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
   EOH
 end
 
