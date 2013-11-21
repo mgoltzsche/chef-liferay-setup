@@ -55,7 +55,8 @@ execute "Copy Liferay to installation directory" do
 cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{liferayDir} &&
 cd #{liferayDir}/bin &&
 ls | grep '\\.bat$' | xargs rm &&
-rm -rf #{liferayDir}/webapps/welome-theme &&
+cd #{liferayDir}/webapps &&
+rm -rf welcome-theme sync-web &&
 chown -R #{usr}:#{usr} #{liferayDir}
   EOH
   not_if {File.exist?(liferayDir)}
@@ -138,14 +139,14 @@ end
 directory "#{liferayHomeDir}/deploy" do
   owner usr
   group usr
-  mode 01750
+  mode 01755
 end
 
 template "#{liferayDir}/bin/setenv.sh" do
   owner usr
   group usr
   source "liferay.tomcat.setenv.sh.erb"
-  mode 01700
+  mode 00744
   variables({
     :java_opts => node['liferay']['java_opts']
   })
@@ -155,7 +156,7 @@ template "#{liferayDir}/conf/server.xml" do
   owner usr
   group usr
   source "liferay.tomcat.server.xml.erb"
-  mode 00700
+  mode 00644
   variables({
     :hostname => node['liferay']['hostname'],
     :http_port => node['liferay']['http_port'],
