@@ -11,7 +11,7 @@ backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['admin_cn']
 mailServerPassword = node['ldap']['admin_password']
-ldapAuthSourceName = 'Local LDAP Auth Source'
+ldapAuthSourceName = 'Local LDAP Server'
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
 ldapUser = node['ldap']['dirmanager']
@@ -173,11 +173,11 @@ execute "Insert default data" do
 end
 
 # --- Configure LDAP connection ---
-execute "Register new LDAP configuration" do
+execute "Configure LDAP connection" do
   user 'postgres'
   command <<-EOH
-psql -d #{dbname} -c "DELETE FROM auth_sources WHERE name='#{ldapAuthSourceName}';"
-psql -d #{dbname} -c "INSERT INTO auth_sources VALUES(1, 'AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
+psql -d #{dbname} -c "DELETE FROM auth_sources WHERE name='#{ldapAuthSourceName}';" &&
+psql -d #{dbname} -c "INSERT INTO auth_sources VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
   EOH
 end
 
