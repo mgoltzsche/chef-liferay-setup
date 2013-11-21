@@ -5,11 +5,20 @@
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
-    <queryString></queryString>
   </globalConnectionSettings>
+  <remoteProxySettings>
+    <httpProxySettings>
+      <proxyHostname><%=@hostname%></proxyHostname>
+      <proxyPort>80</proxyPort>
+    </httpProxySettings>
+    <httpsProxySettings>
+      <proxyHostname><%=@hostname%></proxyHostname>
+      <proxyPort>443</proxyPort>
+    </httpsProxySettings>
+  </remoteProxySettings>
   <restApi>
     <baseUrl>https://<%=@hostname%>/nexus</baseUrl>
-    <forceBaseUrl>true</forceBaseUrl>
+    <forceBaseUrl>false</forceBaseUrl>
     <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
