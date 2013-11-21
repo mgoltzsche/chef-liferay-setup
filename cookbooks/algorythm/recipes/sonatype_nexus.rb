@@ -22,36 +22,23 @@ directory nexusHome do
   mode 01755
 end
 
-directory "#{nexusHome}/conf" do
-  owner usr
-  group usr
-  mode 01755
-end
-
-template "#{nexusHome}/conf/nexus.xml" do
-  source "nexus.xml.erb"
-  owner usr
-  group usr
-  mode 00600
-  variables({
-    :hostname => hostname
-  })
-  action :create_if_missing
-end
-
 execute "Extract Sonatype Nexus" do
-  user usr
-  group usr
   cwd downloadDir
   command "mkdir #{nexusExtractDir} && unzip -qd /tmp/nexus-#{version} #{nexusWarFile}"
-  not_if {File.exist?(nexusExtractDir)}
+  not_if {File.exist?(nexusDir) || File.exist?(nexusExtractDir)}
+end
+
+execute "Configure home directory" do
+  command <<-EOH
+sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties
+  EOH
+  not_if {File.exist?(nexusDir)}
 end
 
 execute "Deploy Sonatype Nexus" do
   user usr
   group usr
   command <<-EOH
-sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties &&
 cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
