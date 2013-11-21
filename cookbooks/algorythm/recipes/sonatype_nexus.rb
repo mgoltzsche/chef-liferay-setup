@@ -2,7 +2,7 @@ usr = node['liferay']['user']
 downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
-nexusDeployWarFile = "#{node['liferay']['home_directory']}/deploy/nexus.war"
+nexusDeployWarFile = "#{node['liferay']['home']}/deploy/nexus.war"
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
