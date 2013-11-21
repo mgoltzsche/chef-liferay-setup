@@ -49,11 +49,30 @@ template nexusCfg do
   action :create_if_missing
 end
 
+execute "Configure baseUrl" do
+  command <<-EOH
+sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
+sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
+  EOH
+end
+
 template "#{nexusHome}/conf/security-configuration.xml" do
   source "nexus.security-configuration.xml.erb"
   owner usr
   group usr
   mode 00600
+  action :create_if_missing
+end
+
+file "#{nexusHome}/conf/logback.properties" do
+  owner usr
+  group usr
+  mode 00600
+  content <<-EOH
+root.level=ERROR
+appender.pattern=%4d{yyyy-MM-dd HH\:mm\:ss} %-5p [%thread] %X{userId} %c - %m%n
+appender.file=${nexus.log-config-dir}/../logs/nexus.log
+  EOH
   action :create_if_missing
 end
 
@@ -69,13 +88,6 @@ template "#{nexusHome}/conf/ldap.xml" do
     :user => ldapUser,
     :password => ldapPassword
   })
-end
-
-execute "Configure nexus baseUrl" do
-  command <<-EOH
-sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
-sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
-  EOH
 end
 
 execute "Extract Sonatype Nexus" do

@@ -184,7 +184,7 @@ end
 execute "Update LDAP auth source" do
   user 'postgres'
   command <<-EOH
-psql -d #{dbname} -c "UPDATE auth_sources SET host='#{ldapHost}',port='#{ldapPort}',account='cn=#{ldapUser}',account_password='#{ldapPassword}',base_dn='#{ldapSuffix}',attr_login='cn',attr_firstname='givenName',attr_lastname='sn',attr_mail='mail',onthefly_register='t',tls='f'  WHERE name='#{ldapAuthSourceName}';"
+psql -d #{dbname} -c "UPDATE auth_sources SET host='#{ldapHost}',port='#{ldapPort}',account='cn=#{ldapUser}',account_password='#{ldapPassword}',base_dn='#{ldapSuffix}',attr_login='cn',attr_firstname='givenName',attr_lastname='sn',attr_mail='mail',onthefly_register='t',tls='f' WHERE name='#{ldapAuthSourceName}';"
   EOH
 end
 
