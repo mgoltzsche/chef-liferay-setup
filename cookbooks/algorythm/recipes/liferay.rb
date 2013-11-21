@@ -57,11 +57,13 @@ cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{life
 cd #{liferayDir}/bin &&
 ls | grep '\\.bat$' | xargs rm &&
 rm -rf #{liferayDir}/webapps/welome-theme &&
-chown -R #{usr}:#{usr} #{liferayDir} &&
-rm -rf #{liferayDirLink} &&
-ln -s #{liferayDir} #{liferayDirLink}
+chown -R #{usr}:#{usr} #{liferayDir}
   EOH
   not_if {File.exist?(liferayDir)}
+end
+
+link liferayDirLink do
+  to liferayDir
 end
 
 # --- Create Liferay postgres user and database

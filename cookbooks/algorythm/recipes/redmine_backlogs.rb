@@ -49,7 +49,8 @@ execute "Checkout and copy Redmine to installation directory" do
   command <<-EOH
 git fetch --tags origin &&
 git checkout #{redmineVersion} &&
-cp -R #{downloadDir}/redmine #{redmineDir}
+cp -R #{downloadDir}/redmine #{redmineDir} &&
+rm -rf #{redmineDir}/files
   EOH
   not_if {File.exist?(redmineDir)}
 end
@@ -69,12 +70,15 @@ directory "#{redmineDir}/public/plugin_assets" do
   action :create
 end
 
-execute "Create/Update symlink and change owner" do
-  command <<-EOH
-rm -rf #{redmineDirLink} &&
-ln -s #{redmineDir} #{redmineDirLink} &&
-chown -R #{usr}:#{usr} #{redmineDir}
-  EOH
+directory "#{redmineHomeDir}/files" do
+  owner usr
+  group usr
+  mode 00744
+  action :create
+end
+
+link redmineDirLink do
+  to redmineDir
 end
 
 # --- Install required gems ---
@@ -94,12 +98,11 @@ execute "Install required Backlog plugin gems" do
 end
 
 # --- Change file system permissions ---
-execute "Remove files directory and configure file system permissions" do
+execute "Configure file system permissions" do
   cwd redmineDir
   command <<-EOH
-rm -rf files &&
 chown -R #{usr}:#{usr} #{redmineDir} &&
-chmod -R 755 files log tmp public/plugin_assets
+chmod -R 755 log tmp public/plugin_assets
   EOH
 end
 
