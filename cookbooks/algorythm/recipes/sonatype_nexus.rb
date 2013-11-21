@@ -73,12 +73,12 @@ template "#{nexusHome}/conf/ldap.xml" do
   })
 end
 
-#execute "Configure nexus baseUrl" do
-#  command <<-EOH
-#sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
-#sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
-#  EOH
-#end
+execute "Configure nexus baseUrl" do
+  command <<-EOH
+sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
+sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
+  EOH
+end
 
 execute "Extract Sonatype Nexus" do
   cwd downloadDir
