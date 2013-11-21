@@ -23,7 +23,6 @@ server {
 	include proxy_params;
 
 	location / {
-		rewrite ^(!nexus/)(.*)  /$2  break;
-		proxy_pass http://127.0.0.1:<%=@https_port%>/;
+		proxy_pass http://127.0.0.1:<%=@https_port%>/nexus/;
 	}
 }
