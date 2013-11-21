@@ -42,7 +42,7 @@ end
 execute "Configure home directory" do
   user usr
   group usr
-  command "sed -i 's/^\s*nexus-work\s*=.*/#{nexusHomeEscaped}/' #{nexusDeployDir}/WEB-INF/plexus.properties"
+  command "sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusDeployDir}/WEB-INF/plexus.properties"
 end
 
 # --- Configure nginx ---
