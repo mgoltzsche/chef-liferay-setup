@@ -31,6 +31,7 @@ user usr do
   comment 'Liferay User'
   shell '/bin/bash'
   home liferayHomeDir
+  supports :manage_home => true
 end
 
 # --- Download and install Liferay ---

@@ -18,6 +18,7 @@ user usr do
   home vmailDirectory
   uid 5000
   gid 5000
+  supports :manage_home => true
 end
 
 # --- Configure postfix ---
