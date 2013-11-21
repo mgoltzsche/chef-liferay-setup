@@ -6,6 +6,7 @@
 		"recipe[algorythm::postgresql]",
 		"recipe[algorythm::nginx]",
 		"recipe[algorythm::liferay]",
-		"recipe[algorythm::sonatype_nexus]"
+		"recipe[algorythm::sonatype_nexus]",
+                "recipe[algorythm::redmine_backlogs]"
 	]
 }
