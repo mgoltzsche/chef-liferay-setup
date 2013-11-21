@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo "backup redmine"
+
+BAK_DIR="$BACKUP_DIR/redmine/$BACKUP_DATE"
+REDMINE_HOME="<%=@home%>"
+REDMINE_DIR="<%=@dir%>"
+DB_CFG_FILE="$REDMINE_DIR/config/database.yml"
+DB_HOST=$(cat $DB_CFG_FILE | grep -Po "(?<=host:).*")
+DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:).*")
+DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:).*")
+export PGPASSWORD=$(cat $DB_CFG_FILE | grep -Po "(?<=password:\s).*")
+
+mkdir -p $BAK_DIR &&
+
+pg_dump -U $DB_USER -h $DB_HOST -Fc --file="$BAK_DIR/db.sqlc" $DB_NAME &&
+cp -R "$REDMINE_HOME" "$BAK_DIR/files" &&
+echo "               ...done"

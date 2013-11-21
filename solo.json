@@ -1,6 +1,7 @@
 {
 	"run_list": [
 		"recipe[algorythm::default]",
+		"recipe[algorythm::backup]",
 		"recipe[algorythm::directory_server]",
 		"recipe[algorythm::mail_server]",
 		"recipe[algorythm::postgresql]",

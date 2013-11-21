@@ -11,6 +11,12 @@ backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['admin_cn']
 mailServerPassword = node['ldap']['admin_password']
+ldapAuthSourceName = 'Local LDAP Auth Source'
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['port']
+ldapUser = node['ldap']['dirmanager']
+ldapPassword = node['ldap']['dirmanager_password']
+ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -166,6 +172,15 @@ execute "Insert default data" do
   command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
 end
 
+# --- Configure LDAP connection ---
+execute "Register new LDAP configuration" do
+  user 'postgres'
+  command <<-EOH
+psql -d #{dbname} -c "DELETE FROM auth_sources WHERE name='#{ldapAuthSourceName}';"
+psql -d #{dbname} -c "INSERT INTO auth_sources VALUES(1, 'AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
+  EOH
+end
+
 # --- Install Redmine backlogs plugin ---
 execute "Install Redmine Backlogs plugin" do
   user usr
@@ -181,6 +196,18 @@ rake redmine:backlogs:install \
 	corruptiontest=true \
 	labels=true
   EOH
+end
+
+# --- Configure backup ---
+template "#{node['backup']['install_directory']}/scripts/backup-redmine.sh" do
+  source "backup-redmine.sh.erb"
+  owner 'root'
+  group 'root'
+  mode 00700
+  variables({
+    :dir => redmineDir,
+    :homeDir => redmineHomeDir
+  })
 end
 
 # --- Configure thin application server to run Redmine behind nginx ---
@@ -233,13 +260,13 @@ end
 # Name: LDAP (local)
 # Host: localhost
 # Port: 389
-# Account: cn=manager
+# Account: cn=dirmanager
 # Password: ***
 # Base DN: dc=algorythm,dc=de
 # On-the-fly-Userimport: yes
-# Member name attribute: cn
-# first name attribute: givenName
-# name attribute: sn
+# Login attribute: cn
+# firstname attribute: givenName
+# lastname attribute: sn
 # email attribute: mail
 
 ## Backup like this (files + sql):
