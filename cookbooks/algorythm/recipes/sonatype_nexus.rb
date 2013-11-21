@@ -41,6 +41,8 @@ template "#{nexusHome}/conf/nexus.xml" do
 end
 
 execute "Extract Sonatype Nexus" do
+  user usr
+  group usr
   cwd downloadDir
   command "mkdir #{nexusExtractDir} && unzip -qd /tmp/nexus-#{version} #{nexusWarFile}"
   not_if {File.exist?(nexusExtractDir)}
