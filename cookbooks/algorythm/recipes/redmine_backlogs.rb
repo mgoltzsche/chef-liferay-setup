@@ -173,11 +173,18 @@ execute "Insert default data" do
 end
 
 # --- Configure LDAP connection ---
-execute "Configure LDAP connection" do
+execute "Add LDAP auth source" do
   user 'postgres'
   command <<-EOH
-psql -d #{dbname} -c "DELETE FROM auth_sources WHERE name='#{ldapAuthSourceName}';" &&
-psql -d #{dbname} -c "INSERT INTO auth_sources(type,name,host,port,account,account_password,base_dn,attr_login,attr_firstname,attr_lastname,attr_mail,onthefly_register,tls,filter,timeout) VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '#{ldapHost}', '#{ldapPort}', 'cn=#{ldapUser}', '#{ldapPassword}', '#{ldapSuffix}', 'cn', 'givenName', 'sn', 'mail', 't', 'f', '', 30);"
+psql -d #{dbname} -c "INSERT INTO auth_sources(type,name,filter,timeout) VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '', 30);"
+  EOH
+  not_if("psql -d #{dbname} -c \"SELECT name FROM auth_sources WHERE name='#{ldapAuthSourceName}';\" | grep '#{ldapAuthSourceName}'", :user => 'postgres')
+end
+
+execute "Update LDAP auth source" do
+  user 'postgres'
+  command <<-EOH
+psql -d #{dbname} -c "UPDATE auth_sources SET host='#{ldapHost}',port='#{ldapPort}',account='cn=#{ldapUser}',account_password='#{ldapPassword}',base_dn='#{ldapSuffix}',attr_login='cn',attr_firstname='givenName',attr_lastname='sn',attr_mail='mail',onthefly_register='t',tls='f'  WHERE name='#{ldapAuthSourceName}';"
   EOH
 end
 
