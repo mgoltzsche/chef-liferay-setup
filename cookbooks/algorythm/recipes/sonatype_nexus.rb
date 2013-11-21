@@ -6,6 +6,7 @@ nexusExtractDir = "/tmp/nexus-#{version}"
 nexusDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
+nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
 
 package 'zip'
@@ -28,7 +29,7 @@ directory "#{nexusHome}/conf" do
   mode 01755
 end
 
-template "#{nexusHome}/conf/nexus.xml" do
+template nexusCfg do
   source "nexus.xml.erb"
   owner usr
   group usr
@@ -39,6 +40,13 @@ template "#{nexusHome}/conf/nexus.xml" do
   action :create_if_missing
 end
 
+execute "Configure nexus baseUrl" do
+  command <<-EOH
+sed -i 's/<baseUrl>.*?<\/baseUrl>/<baseUrl>https:\/\/#{hostname}\/nexus<\/baseUrl>/g' #{nexusCfg} &&
+sed -i 's/<forceBaseUrl>.*?<\/forceBaseUrl>/<forceBaseUrl>true<\/forceBaseUrl>/g' #{nexusCfg}
+  EOH
+end
+
 execute "Extract Sonatype Nexus" do
   cwd downloadDir
   command "mkdir #{nexusExtractDir} && unzip -qd /tmp/nexus-#{version} #{nexusWarFile}"
@@ -46,9 +54,7 @@ execute "Extract Sonatype Nexus" do
 end
 
 execute "Configure home directory" do
-  command <<-EOH
-sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties
-  EOH
+  command "sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties"
   not_if {File.exist?(nexusDir)}
 end
 

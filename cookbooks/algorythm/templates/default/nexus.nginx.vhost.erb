@@ -6,7 +6,7 @@ server {
 	access_log /var/log/nginx/nexus-proxy-access;
 	error_log  /var/log/nginx/nexus-proxy-error;
 
-	rewrite ^ https://<%=@hostname%>$request_uri? permanent;
+	rewrite ^ https://<%=@hostname%>$request_uri permanent;
 }
 
 server {
@@ -22,8 +22,11 @@ server {
 
 	include proxy_params;
 
+	location /nexus {
+		proxy_pass http://127.0.0.1:<%=@https_port%>/nexus;
+	}
+
 	location / {
-		rewrite ^(!/nexus/)  /nexus/$request_uri?  break;
-		proxy_pass http://127.0.0.1:<%=@https_port%>/;
+		rewrite ^ /nexus$request_uri permanent;
 	}
 }
