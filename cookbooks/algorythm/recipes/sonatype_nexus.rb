@@ -5,7 +5,7 @@ nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
 nexusDeployDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
 nexusHome = node['nexus']['home']
-nexusHomeEscaped = nexusHome.gsub!('/', '\\/')
+nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 hostname = node['nexus']['hostname']
 
 # --- Download & deploy Nexus OSS ---
