@@ -17,8 +17,6 @@ mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['admin_cn']
 mailServerPassword = node['ldap']['admin_password']
 
-package 'zip'
-
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
   source "http://www.sonatype.org/downloads/nexus-#{version}.war"
