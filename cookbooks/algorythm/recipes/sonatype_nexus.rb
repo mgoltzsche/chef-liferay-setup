@@ -76,7 +76,7 @@ template "/etc/nginx/sites-available/#{hostname}" do
   mode 00700
   variables({
     :hostname => hostname,
-    :servletContainerPort => node['liferay']['https_port'],
+    :port => node['liferay']['https_port'],
     :mailServerHost => mailServerHost,
     :mailServerUser => mailServerUser,
     :mailServerPassword => mailServerPassword
