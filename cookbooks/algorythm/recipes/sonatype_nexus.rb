@@ -4,7 +4,6 @@ version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
 nexusDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
-nexusDeployWAR = "#{node['liferay']['home']}/deploy/nexus.war"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 hostname = node['nexus']['hostname']
@@ -36,7 +35,7 @@ execute "Deploy Sonatype Nexus" do
   group usr
   command <<-EOH
 sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties &&
-zip -r #{nexusDeployWAR} #{nexusExtractDir}
+cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
 end
