@@ -8,6 +8,9 @@ nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
+mailServerHost = node['mail_server']['hostname']
+mailServerUser = node['ldap']['admin_cn']
+mailServerPassword = node['ldap']['admin_password']
 
 package 'zip'
 
@@ -73,8 +76,10 @@ template "/etc/nginx/sites-available/#{hostname}" do
   mode 00700
   variables({
     :hostname => hostname,
-    :http_port => node['liferay']['http_port'],
-    :https_port => node['liferay']['https_port']
+    :servletContainerPort => node['liferay']['https_port'],
+    :mailServerHost => mailServerHost,
+    :mailServerUser => mailServerUser,
+    :mailServerPassword => mailServerPassword
   })
 end
 

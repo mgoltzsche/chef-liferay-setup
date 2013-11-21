@@ -313,11 +313,11 @@
     </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
-    <hostname>smtp-host</hostname>
+    <hostname><%=@mailServerHost%></hostname>
     <port>25</port>
-    <username>smtp-username</username>
-    <password>{lLBkgmGZdf4HAtmBoyecECiBoGIC74bWnwiT32118SU=}</password>
-    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+    <username><%=@mailServerUser%></username>
+    <password><%=@mailServerPassword%></password>
+    <systemEmailAddress><%=@mailServerUser%>@<%=@hostname%></systemEmailAddress>
   </smtpConfiguration>
   <errorReporting>
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
