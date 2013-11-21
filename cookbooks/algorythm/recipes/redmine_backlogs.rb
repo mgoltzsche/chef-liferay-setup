@@ -22,7 +22,6 @@ user usr do
   comment 'Redmine User'
   shell '/bin/bash'
   home redmineHomeDir
-  supports :manage_home=>true
 end
 
 # --- Download Redmine & Backlogs plugin ---

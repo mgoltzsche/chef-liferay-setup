@@ -15,19 +15,12 @@ ldapPassword = node['ldap']['dirmanager_password']
 user usr do
   comment 'postfix virtual mail user'
   shell '/bin/bash'
+  home vmailDirectory
   uid 5000
   gid 5000
-  supports :manage_home=>true
 end
 
 # --- Configure postfix ---
-directory vmailDirectory do
-  owner usr
-  group usr
-  mode 00744
-  action :create
-end
-
 directory '/etc/postfix/ldap' do
   owner 'root'
   group 'root'
