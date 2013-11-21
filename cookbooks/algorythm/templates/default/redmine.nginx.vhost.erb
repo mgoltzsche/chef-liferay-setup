@@ -1,0 +1,49 @@
+upstream thin_cluster { # simple load balancing
+	server unix:/tmp/thin.0.sock;
+	server unix:/tmp/thin.1.sock;
+	server unix:/tmp/thin.2.sock;
+	server unix:/tmp/thin.3.sock;
+}
+
+server {
+	listen 80;
+	server_name <%=@hostname%>;
+	root <%=@home%>/public;
+
+	access_log /var/log/nginx/redmine-proxy-access;
+	error_log  /var/log/nginx/redmine-proxy-error;
+
+	include proxy_params;
+
+	rewrite ^/login(.*)|^/my/account(.*)|^/my/password(.*)|^/admin(.*) https://$server_name$request_uri permanent;
+
+	location / {
+		try_files $uri/index.html $uri.html $uri @cluster;
+	}
+
+	location @cluster {
+		proxy_pass http://thin_cluster;
+	}
+}
+
+server {
+	listen 443 ssl;
+	server_name <%=@hostname%>;
+	root <%=@home%>/public;
+
+	access_log /var/log/nginx/redmine-proxy-access;
+	error_log  /var/log/nginx/redmine-proxy-error;
+
+	ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
+	ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+	include proxy_params;
+
+	location / {
+		try_files $uri/index.html $uri.html $uri @cluster;
+	}
+
+	location @cluster {
+		proxy_pass http://thin_cluster;
+	}
+}

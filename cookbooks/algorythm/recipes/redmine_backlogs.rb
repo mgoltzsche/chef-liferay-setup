@@ -68,12 +68,6 @@ directory "#{redmineDir}/public/plugin_assets" do
   mode 00755
 end
 
-directory "#{redmineHomeDir}/files" do
-  owner usr
-  group usr
-  mode 00755
-end
-
 link redmineDirLink do
   to redmineDir
 end
@@ -213,7 +207,7 @@ template "/etc/thin/redmine" do
 end
 
 template "/etc/nginx/sites-available/#{hostname}" do
-  source "nginx.redmine.vhost.erb"
+  source "redmine.nginx.vhost.erb"
   mode 00700
   variables({
     :home => redmineDir,
