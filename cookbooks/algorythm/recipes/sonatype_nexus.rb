@@ -8,6 +8,11 @@ nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['port']
+ldapUser = node['ldap']['dirmanager']
+ldapPassword = node['ldap']['dirmanager_password']
+ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 mailServerHost = node['mail_server']['hostname']
 mailServerUser = node['ldap']['admin_cn']
 mailServerPassword = node['ldap']['admin_password']
@@ -44,6 +49,28 @@ template nexusCfg do
     :mailServerPassword => mailServerPassword
   })
   action :create_if_missing
+end
+
+template "#{nexusHome}/conf/security-configuration.xml" do
+  source "nexus.security-configuration.xml.erb"
+  owner usr
+  group usr
+  mode 00600
+  action :create_if_missing
+end
+
+template "#{nexusHome}/conf/ldap.xml" do
+  source "nexus.ldap.xml.erb"
+  owner usr
+  group usr
+  mode 00600
+  variables({
+    :host => ldapHost,
+    :port => ldapPort,
+    :suffix => ldapSuffix,
+    :user => ldapUser,
+    :password => ldapPassword
+  })
 end
 
 execute "Configure nexus baseUrl" do

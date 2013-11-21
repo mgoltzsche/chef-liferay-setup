@@ -187,7 +187,7 @@ template "#{liferayHomeDir}/portal-ext.properties" do
     :ldapPort => ldapPort,
     :ldapSuffix => ldapSuffix,
     :ldapUser => ldapUser,
-    :ldapPassword => ldapPassword,
+    :ldapPassword => ldapPassword
   })
 end
 
