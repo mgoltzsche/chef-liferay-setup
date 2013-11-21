@@ -22,6 +22,23 @@ directory nexusHome do
   mode 01755
 end
 
+directory "#{nexusHome}/conf" do
+  owner usr
+  group usr
+  mode 01755
+end
+
+template "#{nexusHome}/conf/nexus.xml" do
+  source "nexus.xml.erb"
+  owner usr
+  group usr
+  mode 00600
+  variables({
+    :hostname => hostname
+  })
+  action :create_if_missing
+end
+
 execute "Extract Sonatype Nexus" do
   user usr
   group usr
