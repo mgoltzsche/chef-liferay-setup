@@ -45,8 +45,8 @@ end
 
 execute "Configure nexus baseUrl" do
   command <<-EOH
-sed -i 's/<baseUrl>.*?<\/baseUrl>/<baseUrl>https:\/\/#{hostname}\/nexus<\/baseUrl>/g' #{nexusCfg} &&
-sed -i 's/<forceBaseUrl>.*?<\/forceBaseUrl>/<forceBaseUrl>true<\/forceBaseUrl>/g' #{nexusCfg}
+sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
+sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
   EOH
 end
 
@@ -57,7 +57,7 @@ execute "Extract Sonatype Nexus" do
 end
 
 execute "Configure home directory" do
-  command "sed -i 's/^\s*nexus-work\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties"
+  command "sed -i 's/^\\s*nexus-work\\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties"
   not_if {File.exist?(nexusDir)}
 end
 
