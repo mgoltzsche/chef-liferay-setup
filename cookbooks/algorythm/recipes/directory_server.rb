@@ -103,7 +103,7 @@ ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passw
 rm -f /tmp/admin_user.ldif
   EOH
   action :nothing
-  #notifies :run, "execute[Register system mail account]", :immediately
+  notifies :run, "execute[Register system mail account]", :immediately
   notifies :restart, "service[dirsrv]", :immediately
 end
 
@@ -129,4 +129,12 @@ end
 service "dirsrv" do
   supports :restart => true
   action :nothing
+end
+
+# --- Install ldaputil ---
+template '/usr/bin/ldaputil' do
+  source 'ldaputil.erb'
+  owner 'root'
+  group 'root'
+  mode 00700
 end

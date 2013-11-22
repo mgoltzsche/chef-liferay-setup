@@ -1,0 +1,28 @@
+#!/bin/bash
+
+USER="dirmanager"
+PASS="password"
+BASE_DN="dc=dev,dc=algorythm,dc=de"
+DOMAIN="dev.algorythm.de"
+
+case "$1" in
+  addsystem)
+SYSTEM_NAME=$2
+ldapmodify -a -x -h localhost -p 389 -D cn=$USER -w "$PASS" -f < "
+dn: cn=system,ou=Special Users,$BASE_DN
+objectClass: glue
+objectClass: top
+objectClass: mailRecipient
+objectClass: simpleSecurityObject
+cn: system
+mail: no-reply@$SYSTEM.$DOMAIN
+userPassword:: e3NzaGE1MTJ9akxpY2FJMXkzZlpGS1RHamQ1SFlvcWN0TXNyQVpidFo2Tk5OY
+ zIvalNWa1RUYkZ0OFc3YzRLUFROWFlyTjhQNC9lZmN4MVAvUTJEdnBHNlRFS2I1NG1oL0F3MHB1
+ WUU2
+"
+        ;;
+  *)
+        echo "Usage: $0 {addsystem}" >&2
+        exit 3
+        ;;
+esac
