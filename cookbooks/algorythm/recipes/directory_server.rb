@@ -54,9 +54,8 @@ execute "Configure TCPv4 localhost listening" do
 echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
-nsslapd-listenhost: #{listenhost}" > /tmp/nsslapd-listenhost.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/nsslapd-listenhost.ldif &&
-rm -f /tmp/nsslapd-listenhost.ldif
+nsslapd-listenhost: #{listenhost}
+" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH
   action :nothing
   notifies :run, "execute[Register domain]", :immediately
@@ -76,9 +75,7 @@ objectClass: organizationalUnit
 objectClass: top
 ou: #{domain}
 associatedDomain: #{domain}
-" > /tmp/domain.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/domain.ldif &&
-rm -f /tmp/domain.ldif
+" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH
   action :nothing
   notifies :run, "execute[Register person]", :immediately
@@ -98,9 +95,7 @@ sn: #{userSN}
 givenName: #{userGivenName}
 mail: #{userCN}@#{domain}
 userPassword:: #{userPassword}
-" > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
-rm -f /tmp/admin_user.ldif
+" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH
   action :nothing
 #  notifies :run, "execute[Register system mail account]", :immediately
