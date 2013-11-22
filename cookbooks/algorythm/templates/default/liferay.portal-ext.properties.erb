@@ -23,7 +23,7 @@ web.server.host=<%=@hostname%>
 locales=en_US,de_DE
 locale.default.request=true
 locale.prepend.friendly.url.style=2
-time.zones=Europe/Berlin
+time.zones=<%=@timezone%>
 
 ### Admin
 admin.email.from.name=<%=@admin_name%>
@@ -40,7 +40,7 @@ company.default.name=<%=@company_name%>
 company.default.web.id=<%=@hostname%>
 company.default.home.url=/web/guest/home
 company.default.locale=en_US
-company.default.time.zone=Europe/Berlin
+company.default.time.zone=<%=@timezone%>
 company.login.prepopulate.domain=false
 company.settings.form.authentication=general,ldap,open-id
 company.settings.form.miscellaneous=display-settings,analytics
@@ -51,9 +51,9 @@ company.security.auth.requires.https=true
 company.security.strangers=false # do not allow user registration
 company.security.strangers.verify=true # verify strangers email address
 organizations.types=regular-organization
-user.timezone=Europe/Berlin
-user.country=US
-user.language=en
+user.timezone=<%=@timezone%>
+user.country=<%=@country%>
+user.language=<%=@language%>
 
 ### System Email address
 #login.email.from.name=<%=@hostname%>

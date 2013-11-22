@@ -48,6 +48,9 @@ default['liferay']['admin']['name'] = "Max Goltzsche"
 default['liferay']['postgresql']['database'] = "liferay"
 default['liferay']['postgresql']['user'] = default['liferay']['user']
 default['liferay']['postgresql']['password'] = "liferay"
+default['liferay']['timezone'] = "Europe/Berlin"
+default['liferay']['country'] = "DE"
+default['liferay']['language'] = "de"
 
 # Sonatype Nexus installation
 default['nexus']['version'] = "2.6.4"

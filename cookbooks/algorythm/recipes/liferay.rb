@@ -23,6 +23,9 @@ ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['admin_cn']
 adminPassword = node['ldap']['admin_password']
+timezone = node['liferay']['timezone']
+country = node['liferay']['country']
+language = node['liferay']['language']
 
 package 'libssl-dev'
 
@@ -172,6 +175,9 @@ template "#{liferayHomeDir}/portal-ext.properties" do
   mode 00400
   variables({
     :liferay_home => liferayHomeDir,
+    :timezone => timezone,
+    :country => country,
+    :language => language,
     :postgres_port => node['liferay']['postgresql']['port'],
     :postgres_database => node['liferay']['postgresql']['database'],
     :postgres_user => node['liferay']['postgresql']['user'],
