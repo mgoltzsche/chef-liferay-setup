@@ -20,6 +20,7 @@ web.server.https.port=443
 web.server.host=<%=@hostname%>
 
 ### Locale & timezone
+locales=en_US,de_DE
 locales.enabled=en_US,de_DE
 locale.default.request=true
 locale.prepend.friendly.url.style=2
@@ -76,6 +77,7 @@ system.site.roles=Developer,Manager,Redakteur
 #passwords.default.policy.lockout.duration=15
 
 ### Auth: LDAP (assuming Fedora DS)
+ldap.password.policy.enabled=true
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(mail=@email_address@))
