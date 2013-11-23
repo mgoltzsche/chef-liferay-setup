@@ -49,8 +49,8 @@ company.login.prepopulate.domain=false
 company.settings.form.authentication=general,ldap,open-id
 company.settings.form.miscellaneous=display-settings,analytics
 #image.default.company.logo=com/liferay/portal/dependencies/company_logo.png
-#company.encryption.algorithm=HmacSHA256
-#company.encryption.key.size=256
+company.encryption.key.size=384
+company.security.auth.type=screenName
 company.security.auth.requires.https=true
 company.security.strangers=false # do not allow user registration
 company.security.strangers.verify=true # verify strangers email address
@@ -74,18 +74,17 @@ users.reminder.queries.enabled=false
 users.reminder.queries.custom.question.enabled=false
 terms.of.use.required=false
 system.site.roles=Developer,Manager,Redakteur
+field.editable.domains[screenName]=administrator
 
-### Login
-passwords.default.policy.change.required=false
-#passwords.encryption.algorithm=SSHA # not required
-#passwords.default.policy.lockout=true # TODO: include in lifesystem
+### Login: TODO: include in life env
+#passwords.default.policy.lockout=true
 #passwords.default.policy.lockout.duration=15
 
 ### Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
 ldap.auth.required=false
 ldap.auth.password.encryption.algorithm=SSHA
-ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(mail=@email_address@))
+ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(cn=@screen_name@))
 
 ldap.base.provider.url=ldap://<%=@ldapHost%>:<%=@ldapPort%>
 ldap.base.dn=<%=@ldapSuffix%>
@@ -100,13 +99,13 @@ ldap.group.mappings=groupName=cn\ndescription=description\nuser=uniqueMember
 
 ldap.import.enabled=true
 ldap.import.on.startup=true
-ldap.import.interval=10 # Minutes
+ldap.import.interval=20
 ldap.import.method=group
 ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)
 
-ldap.export.enabled=true # true doesn't work due to Nullpointerexception
+ldap.export.enabled=true
 ldap.export.group.enabled=true
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
