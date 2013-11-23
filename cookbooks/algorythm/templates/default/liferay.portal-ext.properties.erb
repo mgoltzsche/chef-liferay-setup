@@ -3,6 +3,7 @@ setup.wizard.enabled=false
 browser.launcher.url= # disable browser launcher
 liferay.home=<%=@liferay_home%>
 default.regular.theme.id=classic
+theme.shortcut.icon=<%=@liferay_home%>/logo.ico
 portlet.css.enabled=false
 imagemagick.enabled=true
 dl.file.max.size=52428800
@@ -48,7 +49,7 @@ company.default.time.zone=<%=@timezone%>
 company.login.prepopulate.domain=false
 company.settings.form.authentication=general,ldap,open-id
 company.settings.form.miscellaneous=display-settings,analytics
-image.default.company.logo=<%=@liferay_home%>/logo.png
+#image.default.company.logo=com/liferay/portal/dependencies/company_logo.png
 company.encryption.key.size=256
 company.security.auth.type=screenName
 company.security.auth.requires.https=true
@@ -74,7 +75,7 @@ users.reminder.queries.enabled=false
 users.reminder.queries.custom.question.enabled=false
 terms.of.use.required=false
 system.site.roles=Developer,Manager,Redakteur
-field.editable.user.types=administrator
+field.editable.user.types[screenName]=administrator
 
 ### Login: TODO: include in life env
 #passwords.default.policy.lockout=true

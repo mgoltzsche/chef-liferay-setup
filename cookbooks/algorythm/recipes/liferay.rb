@@ -68,9 +68,9 @@ end
 cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
   action :create_if_missing
 end
-cookbook_file "#{liferayHomeDir}/logo.png" do
-  action :create_if_missing
-end
+#cookbook_file "#{liferayHomeDir}/default_logo.png" do
+#  action :create_if_missing
+#end
 
 link liferayDirLink do
   to liferayDir
