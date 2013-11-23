@@ -1,8 +1,11 @@
+### General
 setup.wizard.enabled=false
 browser.launcher.url= # disable browser launcher
 liferay.home=<%=@liferay_home%>
 default.regular.theme.id=classic
+portlet.css.enabled=false
 imagemagick.enabled=true
+dl.file.max.size=52428800
 
 ### Database configuration
 jdbc.default.driverClassName=org.hsqldb.jdbcDriver
@@ -75,12 +78,13 @@ system.site.roles=Developer,Manager,Redakteur
 ### Login
 passwords.default.policy.change.required=false
 #passwords.encryption.algorithm=SSHA # not required
-#passwords.default.policy.lockout=true
+#passwords.default.policy.lockout=true # TODO: include in lifesystem
 #passwords.default.policy.lockout.duration=15
 
 ### Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
 ldap.auth.required=false
+ldap.auth.password.encryption.algorithm=SSHA
 ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(mail=@email_address@))
 
 ldap.base.provider.url=ldap://<%=@ldapHost%>:<%=@ldapPort%>
@@ -91,7 +95,7 @@ ldap.users.dn=ou=People,<%=@ldapSuffix%>
 ldap.groups.dn=ou=Groups,<%=@ldapSuffix%>
 
 ldap.user.impl=com.liferay.portal.security.ldap.LDAPUser
-ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title\ngroup=groupMembership
+ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title
 ldap.group.mappings=groupName=cn\ndescription=description\nuser=uniqueMember
 
 ldap.import.enabled=true
@@ -102,7 +106,7 @@ ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)
 ldap.import.group.search.filter=(objectClass=groupOfUniqueNames)
 
-ldap.export.enabled=false # true doesn't work due to Nullpointerexception
+ldap.export.enabled=true # true doesn't work due to Nullpointerexception
 ldap.export.group.enabled=true
 ldap.user.default.object.classes=top,person,inetOrgPerson,organizationalPerson
 ldap.group.default.object.classes=top,groupOfUniqueNames
