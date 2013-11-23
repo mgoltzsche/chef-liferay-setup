@@ -65,9 +65,7 @@ chown -R #{usr}:#{usr} #{liferayDir}
   not_if {File.exist?(liferayDir)}
 end
 
-cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
-  action :create_if_missing
-end
+cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/_unstyled/images/favicon.ico"
 #cookbook_file "#{liferayHomeDir}/default_logo.png" do
 #  action :create_if_missing
 #end
