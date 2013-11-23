@@ -243,6 +243,14 @@ template "/etc/nginx/sites-available/default" do
   })
 end
 
+print <<-EOH
+###############################################################################
+# Please login as administrator, go to the LDAP configuration dialog and      #
+# test your connection (and enable export manually).                          #
+# Afterwards LDAP users can login.                                            #
+###############################################################################
+EOH
+
 # --- Restart nginx ---
 service 'nginx' do
   action :restart
