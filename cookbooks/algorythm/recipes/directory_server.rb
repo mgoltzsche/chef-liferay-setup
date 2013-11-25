@@ -1,4 +1,4 @@
-include 
+include Chef::Algorythm::Util
 
 package '389-ds-base'
 package 'ldap-utils'
