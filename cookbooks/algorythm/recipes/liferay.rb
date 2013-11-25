@@ -21,7 +21,7 @@ ldapPort = node['ldap']['port']
 ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 ldapUser = node['liferay']['ldap']['user']
 ldapPassword = node['liferay']['ldap']['password']
-ldapPasswordHashed = ldapPassword
+ldapPasswordHashed = hashedLdapPassword(ldapPassword)
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['admin_cn']
 adminPassword = node['ldap']['admin_password']

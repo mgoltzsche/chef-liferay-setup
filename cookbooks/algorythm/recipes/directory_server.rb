@@ -12,7 +12,7 @@ userSN = node['ldap']['admin_sn']
 userGivenName = node['ldap']['admin_givenName']
 
 # --- SSHA hash password ---
-userPassword = sshaPassword(node['ldap']['admin_password'])
+userPassword = hashedLdapPassword(node['ldap']['admin_password'])
 
 
 # --- Create instance if not exists ---
