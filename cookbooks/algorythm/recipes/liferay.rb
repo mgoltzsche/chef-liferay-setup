@@ -20,6 +20,7 @@ ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
 ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
 ldapUser = node['liferay']['ldap']['user']
+ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
 ldapPasswordHashed = hashedLdapPassword(ldapPassword)
 mailServerHost = node['mail_server']['hostname']
@@ -41,9 +42,9 @@ user usr do
 end
 
 # --- Create Liferay LDAP user ---
-execute "Register system mail account" do
+execute "Register Liferay LDAP account" do
   command <<-EOH
-echo "dn: cn=#{ldapUser},ou=People,#{ldapSuffix}
+echo "dn: #{ldapUserDN}
 objectClass: glue
 objectClass: simpleSecurityObject
 objectClass: top
@@ -52,10 +53,9 @@ cn: #{ldapUser}
 mail: #{ldapUser}@#{hostname}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" > /tmp/liferay_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']} < /tmp/liferay_user.ldif &&
-rm -f /tmp/admin_user.ldif
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
   EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
 end
 
 # --- Download and install Liferay ---
