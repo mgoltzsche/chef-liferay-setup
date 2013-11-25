@@ -1,4 +1,4 @@
-require 'password_hasher'
+include 
 
 package '389-ds-base'
 package 'ldap-utils'
