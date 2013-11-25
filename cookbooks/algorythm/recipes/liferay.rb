@@ -1,5 +1,6 @@
 require 'uri'
 
+hostname = node['liferay']['hostname']
 usr = node['liferay']['user']
 downloadDir = "/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
@@ -17,12 +18,14 @@ liferayHomeDir = node['liferay']['home']
 dbname = node['liferay']['postgresql']['database']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapUser = node['ldap']['dirmanager']
-ldapPassword = node['ldap']['dirmanager_password']
 ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapUser = node['liferay']['ldap']['user']
+ldapPassword = node['liferay']['ldap']['password']
+ldapPasswordHashed = ldapPassword
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['admin_cn']
 adminPassword = node['ldap']['admin_password']
+adminEmail = "#{admin}@#{hostname}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
@@ -36,6 +39,24 @@ user usr do
   home liferayHomeDir
   supports :manage_home => true
 end
+
+# --- Create Liferay LDAP user ---
+execute "Register system mail account" do
+  command <<-EOH
+echo "dn: cn=#{ldapUser},ou=People,#{ldapSuffix}
+objectClass: glue
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: mailRecipient
+cn: #{ldapUser}
+mail: #{ldapUser}@#{hostname}
+mailForwardingAddress: #{adminEmail}
+userPassword:: #{ldapPasswordHashed}
+" > /tmp/admin_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
+rm -f /tmp/admin_user.ldif
+  EOH
+#end
 
 # --- Download and install Liferay ---
 directory downloadDir do
@@ -166,7 +187,7 @@ template "#{liferayDir}/conf/server.xml" do
   source "liferay.tomcat.server.xml.erb"
   mode 00644
   variables({
-    :hostname => node['liferay']['hostname'],
+    :hostname => hostname,
     :http_port => node['liferay']['http_port'],
     :https_port => node['liferay']['https_port']
   })
@@ -188,12 +209,12 @@ template "#{liferayHomeDir}/portal-ext.properties" do
     :postgres_user => node['liferay']['postgresql']['user'],
     :postgres_password => node['liferay']['postgresql']['password'],
     :company_name => node['liferay']['company_default_name'],
-    :hostname => node['liferay']['hostname'],
-    :admin_name => node['liferay']['admin']['name'],
-    :admin_email => "#{admin}@#{node['liferay']['hostname']}",
+    :hostname => hostname,
+    :admin_full_name => node['liferay']['admin']['name'],
+    :admin_screen_name => admin,
+    :admin_email => adminEmail,
     :admin_password => adminPassword,
     :mailServerHost => mailServerHost,
-    :mailServerUser => admin,
     :ldapHost => ldapHost,
     :ldapPort => ldapPort,
     :ldapSuffix => ldapSuffix,
@@ -235,7 +256,7 @@ template "/etc/nginx/sites-available/default" do
   source "liferay.nginx.vhost.erb"
   mode 00700
   variables({
-    :hostname => node['liferay']['hostname'],
+    :hostname => hostname,
     :http_port => node['liferay']['http_port'],
     :https_port => node['liferay']['https_port']
   })

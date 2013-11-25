@@ -30,11 +30,11 @@ locale.prepend.friendly.url.style=2
 time.zones=<%=@timezone%>
 
 ### Admin
-admin.email.from.name=<%=@admin_name%>
+admin.email.from.name=<%=@admin_full_name%>
 admin.email.from.address=<%=@admin_email%>
-default.admin.screen.name=admin
+default.admin.screen.name=<%=@admin_screen_name%>
 default.admin.password=<%=@admin_password%>
-default.admin.email.address.prefix=<%=@mailServerUser%>
+default.admin.email.address.prefix=<%=@admin_screen_name%>
 default.admin.first.name=Max
 default.admin.middle.name=
 default.admin.last.name=Goltzsche
@@ -61,11 +61,11 @@ user.language=<%=@language%>
 
 ### System Email address
 #login.email.from.name=<%=@hostname%>
-#login.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+#login.email.from.address=<%=@ldapUser%>@<%=@hostname%>
 #sites.email.from.name=<%=@hostname%>
-#sites.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+#sites.email.from.address=<%=@ldapUser%>@<%=@hostname%>
 #wiki.email.from.name=<%=@hostname%>
-#wiki.email.from.address=<%=@mailServerUser%>@<%=@hostname%>
+#wiki.email.from.address=<%=@ldapUser%>@<%=@hostname%>
 
 ### Users
 users.last.name.required=true
@@ -122,5 +122,5 @@ mail.session.mail.pop3.password=
 mail.session.mail.smtp.auth=true
 mail.session.mail.smtp.host=<%=@mailServerHost%>
 mail.session.mail.smtp.port=25
-mail.session.mail.smtp.user=<%=@mailServerUser%>
-mail.session.mail.smtp.password=<%=@admin_password%>
+mail.session.mail.smtp.user=<%=@ldapUser%>
+mail.session.mail.smtp.password=<%=@ldapPassword%>

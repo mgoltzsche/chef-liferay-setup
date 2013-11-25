@@ -43,11 +43,13 @@ default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
 default['liferay']['hostname'] = default['ldap']['domain']
-default['liferay']['company_default_name'] = "algorythm"
-default['liferay']['admin']['name'] = "Max Goltzsche"
 default['liferay']['postgresql']['database'] = "liferay"
 default['liferay']['postgresql']['user'] = default['liferay']['user']
 default['liferay']['postgresql']['password'] = "liferay"
+default['liferay']['ldap']['user'] = default['liferay']['user']
+default['liferay']['ldap']['password'] = "password"
+default['liferay']['company_default_name'] = "algorythm"
+default['liferay']['admin']['name'] = "Max Goltzsche"
 default['liferay']['timezone'] = "Europe/Berlin"
 default['liferay']['country'] = "DE"
 default['liferay']['language'] = "de"
