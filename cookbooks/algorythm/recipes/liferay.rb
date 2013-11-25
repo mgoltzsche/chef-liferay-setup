@@ -52,8 +52,8 @@ cn: #{ldapUser}
 mail: #{ldapUser}@#{hostname}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" > /tmp/admin_user.ldif &&
-ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
+" > /tmp/liferay_user.ldif &&
+ldapmodify -a -x -h localhost -p 389 -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']} < /tmp/liferay_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
 end
