@@ -56,7 +56,7 @@ userPassword:: #{ldapPasswordHashed}
 ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
 rm -f /tmp/admin_user.ldif
   EOH
-#end
+end
 
 # --- Download and install Liferay ---
 directory downloadDir do
