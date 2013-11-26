@@ -2,7 +2,7 @@
 <ldapConfiguration>
   <connectionInfo>
     <searchBase><%=@suffix%></searchBase>
-    <systemUsername><%=@user%></systemUsername>
+    <systemUsername>cn=<%=@user%>,ou=Special Users,<%=@suffix%></systemUsername>
     <systemPassword>CJDvCaOYnuWbfCpFlD9SgZM=</systemPassword><!--password-->
     <authScheme>simple</authScheme>
     <protocol>ldap</protocol>
