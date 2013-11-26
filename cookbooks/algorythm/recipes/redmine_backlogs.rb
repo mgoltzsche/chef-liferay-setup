@@ -20,6 +20,7 @@ ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['redmine']['system_mail_prefix']
 adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
+systemEmail = "#{systemMailPrefix}@#{hostname}"
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -43,7 +44,7 @@ objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
-mail: #{systemMailPrefix}@#{hostname}
+mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
@@ -207,9 +208,16 @@ execute "Insert default data" do
 end
 
 # --- Configure mail_from setting ---
+execute "Create mail_from setting" do
+  user 'postgres'
+  command "psql -d #{dbname} -c \"INSERT INTO settings(name) VALUES('mail_from');\""
+  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from';\" | grep mail_from", :user => 'postgres')
+end
+
 execute "Set mail_from" do
   user 'postgres'
-  command "psql -d #{dbname} -c \"UPDATE settings SET value='#{systemMailPrefix}@#{hostname}' WHERE name='mail_from';\""
+  command "psql -d #{dbname} -c \"UPDATE settings SET value='' WHERE name='mail_from';\""
+  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from' AND value='';\" | grep mail_from", :user => 'postgres')
 end
 
 # --- Configure LDAP connection ---
