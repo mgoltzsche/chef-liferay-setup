@@ -24,6 +24,7 @@ ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 systemMailPrefix = node['liferay']['system_mail_prefix']
+systemEmail = "#{systemMailPrefix}@#{hostname}"
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['admin_cn']
 adminPassword = node['ldap']['admin_password']
@@ -51,7 +52,7 @@ objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
-mail: #{systemMailPrefix}@#{hostname}
+mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
@@ -215,6 +216,7 @@ template "#{liferayHomeDir}/portal-ext.properties" do
     :admin_screen_name => admin,
     :admin_email => adminEmail,
     :admin_password => adminPassword,
+    :system_email => systemEmail,
     :mailServerHost => mailServerHost,
     :ldapHost => ldapHost,
     :ldapPort => ldapPort,
