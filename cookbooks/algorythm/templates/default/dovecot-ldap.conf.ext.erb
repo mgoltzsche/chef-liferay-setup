@@ -1,13 +1,10 @@
 hosts = <%=@host%>:<%=@port%>
-dn = cn=<%=@user%>
+dn = cn=<%=@user%>,ou=Special Users,<%=@suffix%>
 dnpass = <%=@password%>
 tls = no
 auth_bind = yes
-auth_bind_userdn = cn=%u,ou=People,<%=@suffix%>
-base = ou=People,<%=@suffix%>
-user_attrs = 
-user_filter = (&(objectClass=mailRecipient)(cn=%u))
-pass_attrs = uid=cn,userPassword=userPassword
-default_pass_scheme = SSHA
+base = <%=@suffix%>
+pass_attrs = cn=user
+pass_filter = (&(objectClass=mailRecipient)(cn=%u))
 scope = subtree
 ldap_version = 3

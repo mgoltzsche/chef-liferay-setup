@@ -7,18 +7,38 @@ usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
-ldapUser = node['ldap']['dirmanager']
-ldapPassword = node['ldap']['dirmanager_password']
+ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapUser = node['mail_server']['ldap']['user']
+ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
+ldapPassword = node['mail_server']['ldap']['password']
+ldapPasswordHashed = ldapPassword(ldapPassword)
 
-# --- Create postfix virtual mail user ---
+# --- Create virtual mail user ---
 user usr do
-  comment 'postfix virtual mail user'
+  comment 'Virtual mail user'
   shell '/bin/bash'
   home vmailDirectory
   uid 5000
   gid 5000
   supports :manage_home => true
+end
+
+# --- Create LDAP mail user ---
+execute "Register LDAP mail account" do
+  command <<-EOH
+echo "dn: #{ldapUserDN}
+objectClass: posixAccount
+objectClass: simpleSecurityObject
+objectClass: top
+cn: #{ldapUser}
+uid: #{ldapUser}
+uidNumber: 5000
+gidNumber: 5000
+homeDirectory: /var/vmail
+userPassword:: #{ldapPasswordHashed}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+  EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
 end
 
 # --- Configure postfix ---
@@ -160,6 +180,10 @@ template "/etc/dovecot/dovecot-ldap.conf.ext" do
     :user => ldapUser,
     :password => ldapPassword
   })
+end
+
+link "/etc/dovecot/dovecot-ldap-userdb.conf.ext" do
+  to "/etc/dovecot/dovecot-ldap.conf.ext"
 end
 
 # --- Restart postfix & dovecot ---

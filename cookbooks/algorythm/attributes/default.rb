@@ -24,6 +24,8 @@ default['ldap']['admin_password'] = 'password'
 default['mail_server']['hostname'] = 'localhost'
 default['mail_server']['vmail_user'] = 'vmail'
 default['mail_server']['vmail_directory'] = '/var/vmail'
+default['mail_server']['ldap']['user'] = default['mail_server']['vmail_user']
+default['mail_server']['ldap']['password'] = "password"
 
 # Postgresql installation
 default['postgresql']['address'] = "localhost"

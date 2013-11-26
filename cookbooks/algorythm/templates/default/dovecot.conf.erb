@@ -27,14 +27,14 @@ service auth {
   }
 }
 
-userdb {
+passdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap.conf.ext
 }
 
-passdb {
+userdb {
   driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
+  args = /etc/dovecot/dovecot-ldap-userdb.conf.ext
 }
 
 service imap-login {
