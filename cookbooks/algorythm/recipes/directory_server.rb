@@ -51,6 +51,18 @@ nsslapd-listenhost: #{listenhost}
 " | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH
   action :nothing
+  notifies :run, "execute[Disable anonymous binds]", :immediately
+end
+
+execute "Disable anonymous binds" do
+  command <<-EOH
+echo "dn: cn=config
+changetype: modify
+replace: nsslapd-allow-anonymous-access
+nsslapd-allow-anonymous-access: off
+" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
+  EOH
+  action :nothing
   notifies :run, "execute[Register domain]", :immediately
 end
 
@@ -91,27 +103,8 @@ userPassword:: #{userPassword}
 " | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH
   action :nothing
-#  notifies :run, "execute[Register system mail account]", :immediately
   notifies :restart, "service[dirsrv]", :immediately
 end
-
-#execute "Register system mail account" do
-#  command <<-EOH
-#echo "dn: cn=#{systemMailUser},ou=People,#{suffix}
-#objectClass: simpleSecurityObject
-#objectClass: top
-#objectClass: mailRecipient
-#cn: #{systemMailUser}
-#mail: #{systemMailUser}@#{domain}
-#mailForwardingAddress: #{userCN}@#{domain}
-#userPassword:: #{systemMailPassword}
-#" > /tmp/admin_user.ldif &&
-#ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd} -f /tmp/admin_user.ldif &&
-#rm -f /tmp/admin_user.ldif
-#  EOH
-#  action :nothing
-#  notifies :restart, "service[dirsrv]", :immediately
-#end
 
 # --- Restart dirsrv ---
 service "dirsrv" do

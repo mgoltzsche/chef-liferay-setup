@@ -19,6 +19,7 @@ ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
 adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
 mailServerHost = node['mail_server']['hostname']
+systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
@@ -47,7 +48,8 @@ template nexusCfg do
     :hostname => hostname,
     :mailServerHost => mailServerHost,
     :mailServerUser => ldapUser,
-    :mailServerPassword => ldapPassword
+    :mailServerPassword => ldapPassword,
+    :systemEmailAddress => systemEmailAddress
   })
   action :create_if_missing
 end
@@ -122,7 +124,7 @@ objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
-mail: #{systemMailPrefix}@#{hostname}
+mail: #{systemEmailAddress}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
