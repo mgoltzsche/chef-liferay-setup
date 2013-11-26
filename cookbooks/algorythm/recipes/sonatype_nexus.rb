@@ -10,10 +10,10 @@ nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
+ldapSuffix = ldapSuffix(node['ldap']['domain'])
 ldapUser = node['nexus']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['nexus']['ldap']['password']
-ldapSuffix = ldapSuffix(node['ldap']['domain'])
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
 mailServerHost = node['mail_server']['hostname']
