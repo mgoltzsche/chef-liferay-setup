@@ -16,8 +16,8 @@ ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['nexus']['ldap']['password']
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
-mailServerHost = node['mail_server']['hostname']
 adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
+mailServerHost = node['mail_server']['hostname']
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
@@ -45,8 +45,8 @@ template nexusCfg do
   variables({
     :hostname => hostname,
     :mailServerHost => mailServerHost,
-    :mailServerUser => mailServerUser,
-    :mailServerPassword => mailServerPassword
+    :mailServerUser => ldapUser,
+    :mailServerPassword => ldapPassword
   })
   action :create_if_missing
 end
