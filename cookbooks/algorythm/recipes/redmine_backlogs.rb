@@ -216,8 +216,8 @@ end
 
 execute "Set mail_from" do
   user 'postgres'
-  command "psql -d #{dbname} -c \"UPDATE settings SET value='' WHERE name='mail_from';\""
-  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from' AND value='';\" | grep mail_from", :user => 'postgres')
+  command "psql -d #{dbname} -c \"UPDATE settings SET value='#{systemEmail}' WHERE name='mail_from';\""
+  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from' AND value='#{systemEmail}';\" | grep mail_from", :user => 'postgres')
 end
 
 # --- Configure LDAP connection ---
