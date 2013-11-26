@@ -47,7 +47,7 @@ end
 execute "Register Liferay LDAP account" do
   command <<-EOH
 echo "dn: #{ldapUserDN}
-objectClass: glue
+objectClass: javaContainer
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient

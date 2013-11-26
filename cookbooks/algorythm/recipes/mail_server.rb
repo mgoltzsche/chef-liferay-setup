@@ -27,14 +27,11 @@ end
 execute "Register LDAP mail account" do
   command <<-EOH
 echo "dn: #{ldapUserDN}
-objectClass: posixAccount
+objectClass: applicationProcess
 objectClass: simpleSecurityObject
 objectClass: top
 cn: #{ldapUser}
-uid: #{ldapUser}
-uidNumber: 5000
-gidNumber: 5000
-homeDirectory: /var/vmail
+description: Mail server
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
   EOH

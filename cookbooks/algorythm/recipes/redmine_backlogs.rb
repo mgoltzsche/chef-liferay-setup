@@ -39,11 +39,12 @@ end
 execute "Register Redmine LDAP account" do
   command <<-EOH
 echo "dn: #{ldapUserDN}
-objectClass: glue
+objectClass: applicationProcess
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
+description: Redmine Project Management System
 mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
