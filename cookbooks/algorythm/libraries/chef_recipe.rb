@@ -2,6 +2,7 @@ class Chef
   class Recipe
     def ldapSuffix(domain)
       domain.map{|dc| "dc=#{dc}"}.join(',')
+    end
     def ldapPassword(password)
       chars = ('a'..'z').to_a + ('0'..'9').to_a
       salt = Array.new(8, '').collect { chars[rand(chars.size)] }.join('')
