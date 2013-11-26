@@ -9,14 +9,16 @@ dbname = node['redmine']['postgresql']['database']
 backlogsDir = "#{redmineDir}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
-mailServerUser = node['ldap']['admin_cn']
-mailServerPassword = node['ldap']['admin_password']
 ldapAuthSourceName = 'Local LDAP Server'
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapUser = node['ldap']['dirmanager']
-ldapPassword = node['ldap']['dirmanager_password']
-ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapUser = node['redmine']['ldap']['user']
+ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
+ldapPassword = node['redmine']['ldap']['password']
+ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
+systemMailPrefix = node['redmine']['system_mail_prefix']
+adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -29,6 +31,37 @@ user usr do
   shell '/bin/bash'
   home redmineHomeDir
   supports :manage_home => true
+end
+
+# --- Create Redmine LDAP user ---
+execute "Register Redmine LDAP account" do
+  command <<-EOH
+echo "dn: #{ldapUserDN}
+objectClass: glue
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: mailRecipient
+cn: #{ldapUser}
+mail: #{systemMailPrefix}@#{hostname}
+mailForwardingAddress: #{adminEmail}
+userPassword:: #{ldapPasswordHashed}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+  EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
+end
+
+# --- Register Redmine hostname in LDAP ---
+execute "Register Redmine hostname in LDAP" do
+  command <<-EOH
+echo "dn: #{ldapDomainDN}
+objectClass: top
+objectClass: organizationalUnit
+objectClass: domainRelatedObject
+ou: #{hostname}
+associatedDomain: #{hostname}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+  EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapDomainDN}'"
 end
 
 # --- Download Redmine & Backlogs plugin ---
@@ -152,8 +185,8 @@ template "#{redmineDir}/config/configuration.yml" do
   variables({
     :homeDir => redmineHomeDir,
     :mailServerHost => mailServerHost,
-    :mailServerUser => mailServerUser,
-    :mailServerPassword => mailServerPassword
+    :mailServerUser => ldapUser,
+    :mailServerPassword => ldapPassword
   })
 end
 
@@ -170,6 +203,12 @@ execute "Insert default data" do
   user usr
   group usr
   command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
+end
+
+# --- Configure mail_from setting ---
+execute "Set mail_from" do
+  user 'postgres'
+  command "psql -d #{dbname} -c \"UPDATE settings SET value='#{systemMailPrefix}@#{hostname}' WHERE name='mail_from';\""
 end
 
 # --- Configure LDAP connection ---

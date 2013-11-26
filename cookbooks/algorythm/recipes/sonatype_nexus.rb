@@ -10,12 +10,14 @@ nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapUser = node['ldap']['dirmanager']
-ldapPassword = node['ldap']['dirmanager_password']
-ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapUser = node['nexus']['ldap']['user']
+ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
+ldapPassword = node['nexus']['ldap']['password']
+ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
+systemMailPrefix = node['nexus']['system_mail_prefix']
 mailServerHost = node['mail_server']['hostname']
-mailServerUser = node['ldap']['admin_cn']
-mailServerPassword = node['ldap']['admin_password']
+adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
@@ -108,6 +110,37 @@ execute "Deploy Sonatype Nexus" do
 cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
+end
+
+# --- Register Nexus LDAP user ---
+execute "Register Nexus LDAP account" do
+  command <<-EOH
+echo "dn: #{ldapUserDN}
+objectClass: glue
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: mailRecipient
+cn: #{ldapUser}
+mail: #{systemMailPrefix}@#{hostname}
+mailForwardingAddress: #{adminEmail}
+userPassword:: #{ldapPasswordHashed}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+  EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
+end
+
+# --- Register Nexus hostname in LDAP ---
+execute "Register Nexus hostname in LDAP" do
+  command <<-EOH
+echo "dn: #{ldapDomainDN}
+objectClass: top
+objectClass: organizationalUnit
+objectClass: domainRelatedObject
+ou: #{hostname}
+associatedDomain: #{hostname}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+  EOH
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapDomainDN}'"
 end
 
 # --- Configure nginx ---

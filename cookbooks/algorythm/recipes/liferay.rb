@@ -18,15 +18,16 @@ liferayHomeDir = node['liferay']['home']
 dbname = node['liferay']['postgresql']['database']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapSuffix = node['ldap']['domain'].split('.').map{|dc| "dc=#{dc}"}.join(',')
+ldapSuffix = ldapSuffix(node['ldap']['domain'])
 ldapUser = node['liferay']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
-ldapPasswordHashed = hashedLdapPassword(ldapPassword)
+ldapPasswordHashed = ldapPassword(ldapPassword)
+systemMailPrefix = node['liferay']['system_mail_prefix']
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['admin_cn']
 adminPassword = node['ldap']['admin_password']
-adminEmail = "#{admin}@#{hostname}"
+adminEmail = "#{admin}@#{node['ldap']['domain']}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
@@ -50,7 +51,7 @@ objectClass: simpleSecurityObject
 objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
-mail: #{ldapUser}@#{hostname}
+mail: #{systemMailPrefix}@#{hostname}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}

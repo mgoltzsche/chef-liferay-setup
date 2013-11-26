@@ -4,7 +4,7 @@ package 'ldap-utils'
 listenhost = node['ldap']['listenhost']
 port = node['ldap']['port']
 domain = node['ldap']['domain']
-suffix = domain.split('.').map{|dc| "dc=#{dc}"}.join(',')
+suffix = ldapSuffix(domain)
 dirmanager = node['ldap']['dirmanager']
 dirmanager_passwd = node['ldap']['dirmanager_password']
 userCN = node['ldap']['admin_cn']
@@ -12,7 +12,7 @@ userSN = node['ldap']['admin_sn']
 userGivenName = node['ldap']['admin_givenName']
 
 # --- SSHA hash password ---
-userPassword = hashedLdapPassword(node['ldap']['admin_password'])
+userPassword = ldapPassword(node['ldap']['admin_password'])
 
 
 # --- Create instance if not exists ---
