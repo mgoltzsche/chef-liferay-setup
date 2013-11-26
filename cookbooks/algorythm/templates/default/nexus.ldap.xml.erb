@@ -15,7 +15,7 @@
     <groupBaseDn>ou=Groups</groupBaseDn>
     <groupIdAttribute>cn</groupIdAttribute>
     <groupMemberAttribute>uniqueMember</groupMemberAttribute>
-    <groupMemberFormat>cn=${username}</groupMemberFormat>
+    <groupMemberFormat>cn=${username},ou=People,<%=@suffix%></groupMemberFormat>
     <groupObjectClass>groupOfUniqueNames</groupObjectClass>
     <userIdAttribute>cn</userIdAttribute>
     <userObjectClass>inetOrgPerson</userObjectClass>

@@ -107,7 +107,7 @@ ldap.auth.search.filter=(&(objectClass=inetOrgPerson)(cn=@screen_name@))
 
 ldap.base.provider.url=ldap://<%=@ldapHost%>:<%=@ldapPort%>
 ldap.base.dn=<%=@ldapSuffix%>
-ldap.security.principal=cn=<%=@ldapUser%>
+ldap.security.principal=cn=<%=@ldapUser%>,ou=Special Users,<%=@ldapSuffix%>
 ldap.security.credentials=<%=@ldapPassword%>
 ldap.users.dn=ou=People,<%=@ldapSuffix%>
 ldap.groups.dn=ou=Groups,<%=@ldapSuffix%>
