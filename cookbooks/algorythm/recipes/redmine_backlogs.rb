@@ -208,17 +208,27 @@ execute "Insert default data" do
   command "export RAILS_ENV=production; export REDMINE_LANG=en; rake redmine:load_default_data"
 end
 
-# --- Configure mail_from setting ---
-execute "Create mail_from setting" do
-  user 'postgres'
-  command "psql -d #{dbname} -c \"INSERT INTO settings(name) VALUES('mail_from');\""
-  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from';\" | grep mail_from", :user => 'postgres')
-end
+# --- Configure settings ---
+settings = {
+  'host_name'     => hostname,
+  'mail_from'     => systemEmail,
+  'emails_footer' => "You have received this notification because you have either subscribed to it, or are involved in it.\\r\\nTo change your notification preferences, please click here: https://#{hostname}/my/account"
+}
 
-execute "Set mail_from" do
-  user 'postgres'
-  command "psql -d #{dbname} -c \"UPDATE settings SET value='#{systemEmail}' WHERE name='mail_from';\""
-  not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='mail_from' AND value='#{systemEmail}';\" | grep mail_from", :user => 'postgres')
+settings.each do |key|
+  value = settings[key]
+
+  execute "Create #{key} setting" do
+    user 'postgres'
+    command "psql -d #{dbname} -c \"INSERT INTO settings(name) VALUES('#{key}');\""
+    not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='#{key}';\" | grep '#{key}'", :user => 'postgres')
+  end
+
+  execute "Set #{key} setting" do
+    user 'postgres'
+    command "psql -d #{dbname} -c \"UPDATE settings SET value='#{value}' WHERE name='#{key}';\""
+    not_if("psql -d #{dbname} -c \"SELECT name FROM settings WHERE name='#{key}' AND value='#{value}';\" | grep '#{key}'", :user => 'postgres')
+  end
 end
 
 # --- Configure LDAP connection ---
