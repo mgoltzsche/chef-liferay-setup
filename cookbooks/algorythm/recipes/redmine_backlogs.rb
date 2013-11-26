@@ -16,6 +16,7 @@ ldapSuffix = ldapSuffix(node['ldap']['domain'])
 ldapUser = node['redmine']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['redmine']['ldap']['password']
+ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['redmine']['system_mail_prefix']
 adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
