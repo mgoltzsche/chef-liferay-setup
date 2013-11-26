@@ -215,7 +215,7 @@ settings = {
   'emails_footer' => "You have received this notification because you have either subscribed to it, or are involved in it.\\r\\nTo change your notification preferences, please click here: https://#{hostname}/my/account"
 }
 
-settings.each do |key|
+settings.keys.each do |key|
   value = settings[key]
 
   execute "Create #{key} setting" do
