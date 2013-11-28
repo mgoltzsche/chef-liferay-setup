@@ -148,31 +148,20 @@ associatedDomain: #{hostname}
   not_if "ldapsearch #{ldapModifyParams} -b '#{ldapDomainDN}'"
 end
 
-# --- Register Nexus LDAP groups ---
-execute "Register Nexus admin group in LDAP" do
-  command <<-EOH
-echo "dn: cn=nx-admin,ou=groups,#{ldapSuffix}
+# --- Register Nexus roles as LDAP groups ---
+['nx-admin', 'nx-deployment'].each do |role|
+  execute "Register Nexus role '#{role}' in LDAP" do
+    command <<-EOH
+echo "dn: cn=#{role},ou=groups,#{ldapSuffix}
 objectClass: top
 objectClass: groupOfUniqueNames
-cn: nx-admin
+cn: #{role}
 ou: groups
 uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
 " | ldapmodify #{ldapModifyParams}
-  EOH
-  not_if "ldapsearch #{ldapModifyParams} -b 'cn=nx-admin,ou=groups,#{ldapSuffix}'"
-end
-
-execute "Register Nexus developer group in LDAP" do
-  command <<-EOH
-echo "dn: cn=nx-deployment,ou=groups,#{ldapSuffix}
-objectClass: top
-objectClass: groupOfUniqueNames
-cn: nx-admin
-ou: groups
-uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
-" | ldapmodify #{ldapModifyParams}
-  EOH
-  not_if "ldapsearch #{ldapModifyParams} -b 'cn=nx-deployment,ou=groups,#{ldapSuffix}'"
+    EOH
+    not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{role},ou=groups,#{ldapSuffix}'"
+  end
 end
 
 # --- Configure nginx ---

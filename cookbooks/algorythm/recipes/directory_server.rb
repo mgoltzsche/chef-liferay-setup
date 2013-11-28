@@ -64,18 +64,24 @@ nsslapd-allow-anonymous-access: off
 " | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
-  notifies :run, "execute[Register domain]", :immediately
+  notifies :restart, "service[dirsrv]"
 end
 
 # --- Add initial data to instance ---
-execute "Register domain" do
+execute "Register domain unit" do
   command <<-EOH
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
 objectClass: top
 ou: Domains
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
+end
 
-dn: ou=#{domain},ou=Domains,#{suffix}
+execute "Register domain" do
+  command <<-EOH
+echo "dn: ou=#{domain},ou=Domains,#{suffix}
 objectClass: domainRelatedObject
 objectClass: organizationalUnit
 objectClass: top
@@ -83,11 +89,10 @@ ou: #{domain}
 associatedDomain: #{domain}
 " | ldapmodify #{ldapModifyParams}
   EOH
-  action :nothing
-  notifies :run, "execute[Register person]", :immediately
+  not_if "ldapsearch #{ldapModifyParams} -b 'ou=#{domain},ou=Domains,#{suffix}'"
 end
 
-execute "Register person" do
+execute "Register admin person" do
   command <<-EOH
 echo "dn: cn=#{adminCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject
@@ -103,8 +108,7 @@ mail: #{adminCN}@#{domain}
 userPassword:: #{userPassword}
 " | ldapmodify #{ldapModifyParams}
   EOH
-  action :nothing
-  notifies :restart, "service[dirsrv]", :immediately
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
 end
 
 # --- Restart dirsrv ---
