@@ -4,6 +4,8 @@ dnpass = <%=@password%>
 tls = no
 auth_bind = yes
 base = <%=@suffix%>
+user_attrs = 
+user_filter = (&(objectClass=mailRecipient)(cn=%u))
 pass_attrs = cn=user
 pass_filter = (&(objectClass=mailRecipient)(cn=%u))
 scope = subtree
