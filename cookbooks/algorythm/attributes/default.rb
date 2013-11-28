@@ -58,7 +58,7 @@ default['liferay']['country'] = "DE"
 default['liferay']['language'] = "de"
 
 # Sonatype Nexus installation
-default['nexus']['version'] = "2.6.4"
+default['nexus']['version'] = "2.7.0-04"
 default['nexus']['hostname'] = "nexus.#{default['liferay']['hostname']}"
 default['nexus']['home'] = "/var/opt/nexus"
 default['nexus']['ldap']['user'] = 'nexus'

@@ -157,6 +157,7 @@ objectClass: top
 objectClass: groupOfUniqueNames
 cn: #{role}
 ou: groups
+description: Nexus role
 uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
 " | ldapmodify #{ldapModifyParams} -a
     EOH
