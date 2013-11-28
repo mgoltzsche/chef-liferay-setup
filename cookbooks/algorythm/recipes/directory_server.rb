@@ -74,7 +74,7 @@ echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
 objectClass: top
 ou: Domains
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
 end
@@ -87,7 +87,7 @@ objectClass: organizationalUnit
 objectClass: top
 ou: #{domain}
 associatedDomain: #{domain}
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b 'ou=#{domain},ou=Domains,#{suffix}'"
 end
@@ -106,7 +106,7 @@ sn: #{adminSN}
 givenName: #{adminGivenName}
 mail: #{adminCN}@#{domain}
 userPassword:: #{userPassword}
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
 end

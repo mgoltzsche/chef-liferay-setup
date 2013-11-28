@@ -52,7 +52,7 @@ description: Redmine Project Management System
 mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end
@@ -66,7 +66,7 @@ objectClass: organizationalUnit
 objectClass: domainRelatedObject
 ou: #{hostname}
 associatedDomain: #{hostname}
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b '#{ldapDomainDN}'"
 end

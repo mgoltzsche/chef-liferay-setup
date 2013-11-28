@@ -34,7 +34,7 @@ objectClass: top
 cn: #{ldapUser}
 description: Mail server
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify #{ldapModifyParams}
+" | ldapmodify #{ldapModifyParams} -a
   EOH
   not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end

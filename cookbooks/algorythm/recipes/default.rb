@@ -27,12 +27,15 @@ end
 # --- Set host name ---
 file '/etc/hostname' do
   content "#{hostname}\n"
+  notifies :restart, 'service[hostname]'
 end
 
 file '/etc/hosts' do
   content "127.0.0.1 localhost #{hostname} #{hostname}.#{domainname} #{domainname}\n"
+  notifies :restart, 'service[hostname]'
 end
 
 service 'hostname' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end
