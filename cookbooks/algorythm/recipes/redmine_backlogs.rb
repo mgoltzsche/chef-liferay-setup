@@ -252,7 +252,7 @@ end
 execute "Update admin user" do
   user 'postgres'
   command "psql -d #{dbname} -c \"UPDATE users SET login='#{adminCN}',mail='#{adminEmail}',firstname='#{adminFirstname}',lastname='#{adminLastname}',auth_source_id=(SELECT id FROM auth_sources WHERE name='#{ldapAuthSourceName}'),hashed_password='',salt=NULL WHERE login='admin';\""
-  not_if("psql -d #{dbname} -c \"SELECT login FROM users WHERE login='#{adminCN}';\" | grep '#{adminCN}'", :user => 'postgres')
+  not_if("psql -d #{dbname} -c \"SELECT login FROM users WHERE login='#{adminCN}' AND auth_source_id IS NOT NULL;\" | grep '#{adminCN}'", :user => 'postgres')
 end
 
 # --- Install Redmine backlogs plugin ---
