@@ -129,9 +129,9 @@ cn: #{ldapUser}
 mail: #{systemEmailAddress}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{dirmanager}" -w #{dirmanagerPassword}
+" | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{dirmanager}' -w #{dirmanagerPassword} -b '#{ldapUserDN}'"
+  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end
 
 # --- Register Nexus hostname in LDAP ---
