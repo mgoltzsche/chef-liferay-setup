@@ -7,9 +7,9 @@ domain = node['ldap']['domain']
 suffix = ldapSuffix(domain)
 dirmanager = node['ldap']['dirmanager']
 dirmanager_passwd = node['ldap']['dirmanager_password']
-userCN = node['ldap']['admin_cn']
-userSN = node['ldap']['admin_sn']
-userGivenName = node['ldap']['admin_givenName']
+adminCN = node['ldap']['admin_cn']
+adminSN = node['ldap']['admin_sn']
+adminGivenName = node['ldap']['admin_givenName']
 
 # --- SSHA hash password ---
 userPassword = ldapPassword(node['ldap']['admin_password'])
@@ -88,17 +88,17 @@ end
 
 execute "Register person" do
   command <<-EOH
-echo "dn: cn=#{userCN},ou=People,#{suffix}
+echo "dn: cn=#{adminCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 objectClass: mailRecipient
-cn: #{userCN}
-sn: #{userSN}
-givenName: #{userGivenName}
-mail: #{userCN}@#{domain}
+cn: #{adminCN}
+sn: #{adminSN}
+givenName: #{adminGivenName}
+mail: #{adminCN}@#{domain}
 userPassword:: #{userPassword}
 " | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
   EOH

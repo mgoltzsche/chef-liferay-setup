@@ -19,7 +19,10 @@ ldapPassword = node['redmine']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['redmine']['system_mail_prefix']
-adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
+adminCN = node['ldap']['admin_cn']
+adminLastname = node['ldap']['admin_sn']
+adminFirstname = node['ldap']['admin_givenName']
+adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
 
 package 'libpq-dev'
@@ -234,9 +237,7 @@ end
 # --- Configure LDAP connection ---
 execute "Add LDAP auth source" do
   user 'postgres'
-  command <<-EOH
-psql -d #{dbname} -c "INSERT INTO auth_sources(type,name,filter,timeout) VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '', 30);"
-  EOH
+  command "psql -d #{dbname} -c \"INSERT INTO auth_sources(type,name,filter,timeout) VALUES('AuthSourceLdap', '#{ldapAuthSourceName}', '', 30);\""
   not_if("psql -d #{dbname} -c \"SELECT name FROM auth_sources WHERE name='#{ldapAuthSourceName}';\" | grep '#{ldapAuthSourceName}'", :user => 'postgres')
 end
 
@@ -245,6 +246,13 @@ execute "Update LDAP auth source" do
   command <<-EOH
 psql -d #{dbname} -c "UPDATE auth_sources SET host='#{ldapHost}',port='#{ldapPort}',account='cn=#{ldapUser},ou=Special Users,#{ldapSuffix}',account_password='#{ldapPassword}',base_dn='#{ldapSuffix}',attr_login='cn',attr_firstname='givenName',attr_lastname='sn',attr_mail='mail',onthefly_register='t',tls='f' WHERE name='#{ldapAuthSourceName}';"
   EOH
+end
+
+# --- Update default Redmine admin account ---
+execute "Update admin user" do
+  user 'postgres'
+  command "psql -d #{dbname} -c \"UPDATE users SET login='#{adminCN}',mail='#{adminEmail}',firstname='#{adminFirstname}',lastname='#{adminLastname}',auth_source_id=(SELECT id FROM auth_sources WHERE name='#{ldapAuthSourceName}'),hashed_password='',salt=NULL WHERE login='admin';\""
+  not_if("psql -d #{dbname} -c \"SELECT login FROM users WHERE login='admin';\" | grep 'admin'", :user => 'postgres')
 end
 
 # --- Install Redmine backlogs plugin ---
