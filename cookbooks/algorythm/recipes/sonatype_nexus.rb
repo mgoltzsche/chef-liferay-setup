@@ -32,20 +32,20 @@ end
 directory nexusHome do
   owner usr
   group usr
-  mode 01755
+  mode 0755
 end
 
 directory "#{nexusHome}/conf" do
   owner usr
   group usr
-  mode 01755
+  mode 0755
 end
 
 template nexusCfg do
   source "nexus.xml.erb"
   owner usr
   group usr
-  mode 00600
+  mode 0600
   variables({
     :hostname => hostname,
     :mailServerHost => mailServerHost,
@@ -67,14 +67,14 @@ template "#{nexusHome}/conf/security-configuration.xml" do
   source "nexus.security-configuration.xml.erb"
   owner usr
   group usr
-  mode 00600
+  mode 0600
   action :create_if_missing
 end
 
 file "#{nexusHome}/conf/logback.properties" do
   owner usr
   group usr
-  mode 00600
+  mode 0600
   content <<-EOH
 root.level=ERROR
 appender.pattern=%4d{yyyy-MM-dd HH\:mm\:ss} %-5p [%thread] %X{userId} %c - %m%n
@@ -87,7 +87,7 @@ template "#{nexusHome}/conf/ldap.xml" do
   source "nexus.ldap.xml.erb"
   owner usr
   group usr
-  mode 00600
+  mode 0600
   variables({
     :host => ldapHost,
     :port => ldapPort,

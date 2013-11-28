@@ -52,6 +52,7 @@ template "/etc/postfix/master.cf" do
   owner 'root'
   group 'root'
   mode 0644
+  notifies :restart, 'service[postfix]'
 end
 
 template "/etc/postfix/dynamicmaps.cf" do
@@ -59,6 +60,7 @@ template "/etc/postfix/dynamicmaps.cf" do
   owner 'root'
   group 'root'
   mode 0644
+  notifies :restart, 'service[postfix]'
 end
 
 template "/etc/postfix/main.cf" do
@@ -70,6 +72,7 @@ template "/etc/postfix/main.cf" do
     :machineFQN => machineFQN,
     :vmail_directory => vmailDirectory
   })
+  notifies :restart, 'service[postfix]'
 end
 
 template "/etc/postfix/ldap/virtual_domains.cf" do
@@ -84,6 +87,7 @@ template "/etc/postfix/ldap/virtual_domains.cf" do
     :user => ldapUser,
     :password => ldapPassword
   })
+  notifies :restart, 'service[postfix]'
 end
 
 template "/etc/postfix/ldap/virtual_aliases.cf" do
@@ -99,6 +103,7 @@ template "/etc/postfix/ldap/virtual_aliases.cf" do
     :password => ldapPassword,
     :result_attribute => 'mailForwardingAddress'
   })
+  notifies :restart, 'service[postfix]'
 end
 
 template '/etc/postfix/ldap/virtual_mailboxes.cf' do
@@ -114,6 +119,7 @@ template '/etc/postfix/ldap/virtual_mailboxes.cf' do
     :password => ldapPassword,
     :result_attribute => "cn\nresult_filter = %s/"
   })
+  notifies :restart, 'service[postfix]'
 end
 
 template '/etc/postfix/ldap/virtual_senders.cf' do
@@ -129,6 +135,7 @@ template '/etc/postfix/ldap/virtual_senders.cf' do
     :password => ldapPassword,
     :result_attribute => 'cn'
   })
+  notifies :restart, 'service[postfix]'
 end
 
 file '/etc/aliases' do
@@ -147,6 +154,7 @@ execute 'newaliases' do
   group 'root'
   command 'newaliases'
   action :nothing
+  notifies :restart, 'service[postfix]'
 end
 
 # --- Configure mail-stack-delivery ---
@@ -164,6 +172,7 @@ template '/etc/dovecot/dovecot.conf' do
     :vmail_directory => vmailDirectory,
     :vmail_user => usr
   })
+  notifies :restart, 'service[dovecot]'
 end
 
 template '/etc/dovecot/dovecot-ldap.conf.ext' do
@@ -178,17 +187,21 @@ template '/etc/dovecot/dovecot-ldap.conf.ext' do
     :user => ldapUser,
     :password => ldapPassword
   })
+  notifies :restart, 'service[dovecot]'
 end
 
 link '/etc/dovecot/dovecot-ldap-userdb.conf.ext' do
   to '/etc/dovecot/dovecot-ldap.conf.ext'
+  notifies :restart, 'service[dovecot]'
 end
 
 # --- Restart postfix & dovecot ---
 service 'postfix' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end
 
 service 'dovecot' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end

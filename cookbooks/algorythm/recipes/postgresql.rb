@@ -26,9 +26,11 @@ template "/etc/postgresql/#{version}/main/postgresql.conf" do
     :address => node['postgresql']['address'],
     :port => node['postgresql']['port']
   })
+  notifies :restart, 'service[postgresql]'
 end
 
 # --- (Re)start postgresql ---
 service 'postgresql' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end

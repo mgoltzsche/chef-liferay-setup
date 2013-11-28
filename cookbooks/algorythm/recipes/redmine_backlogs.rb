@@ -73,7 +73,7 @@ end
 
 # --- Download Redmine & Backlogs plugin ---
 directory downloadDir do
-  mode 01755
+  mode 0755
 end
 
 execute "Clone Redmine git repository" do
@@ -110,9 +110,7 @@ cp -R #{downloadDir}/redmine_backlogs #{backlogsDir}
   not_if {File.exist?(backlogsDir)}
 end
 
-directory "#{redmineDir}/public/plugin_assets" do
-  mode 00755
-end
+directory "#{redmineDir}/public/plugin_assets"
 
 link redmineDirLink do
   to redmineDir
@@ -175,7 +173,7 @@ template "#{redmineDir}/config/database.yml" do
   owner usr
   group usr
   source "redmine.database.yml.erb"
-  mode 00400
+  mode 0400
   variables({
     :database => dbname,
     :user => node['redmine']['postgresql']['user'],
@@ -188,7 +186,7 @@ template "#{redmineDir}/config/configuration.yml" do
   owner usr
   group usr
   source "redmine.configuration.yml.erb"
-  mode 00400
+  mode 0400
   variables({
     :homeDir => redmineHomeDir,
     :mailServerHost => mailServerHost,
@@ -278,7 +276,7 @@ template "#{node['backup']['install_directory']}/scripts/backup-redmine.sh" do
   source "backup-redmine.sh.erb"
   owner 'root'
   group 'root'
-  mode 00700
+  mode 0700
   variables({
     :dir => redmineDir,
     :homeDir => redmineHomeDir
@@ -288,21 +286,21 @@ end
 # --- Configure thin application server to run Redmine behind nginx ---
 template "/etc/init.d/thin" do
   source "init.d.thin.erb"
-  mode 00750
+  mode 0750
   variables({
     :user => usr
   })
 end
 
 directory "/etc/thin" do
-  mode 01755
+  mode 0755
 end
 
 template "/etc/thin/redmine" do
   source "redmine.thin.config.erb"
   user 'root'
   group usr
-  mode 00740
+  mode 0740
   variables({
     :home => redmineDirLink
   })
@@ -310,7 +308,7 @@ end
 
 template "/etc/nginx/sites-available/#{hostname}" do
   source "redmine.nginx.vhost.erb"
-  mode 00700
+  mode 0700
   variables({
     :home => redmineDir,
     :hostname => hostname

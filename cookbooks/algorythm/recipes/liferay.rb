@@ -63,7 +63,7 @@ end
 
 # --- Download and install Liferay ---
 directory downloadDir do
-  mode 00755
+  mode 0755
 end
 
 remote_file "#{downloadDir}/#{liferayZipFile}" do
