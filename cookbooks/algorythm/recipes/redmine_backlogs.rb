@@ -24,6 +24,7 @@ adminLastname = node['ldap']['admin_sn']
 adminFirstname = node['ldap']['admin_givenName']
 adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 package 'libpq-dev'
 package 'libmagick-dev'
@@ -51,9 +52,9 @@ description: Redmine Project Management System
 mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+" | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
+  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end
 
 # --- Register Redmine hostname in LDAP ---
@@ -65,9 +66,9 @@ objectClass: organizationalUnit
 objectClass: domainRelatedObject
 ou: #{hostname}
 associatedDomain: #{hostname}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+" | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapDomainDN}'"
+  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapDomainDN}'"
 end
 
 # --- Download Redmine & Backlogs plugin ---

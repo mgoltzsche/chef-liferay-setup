@@ -17,9 +17,11 @@ ldapPassword = node['nexus']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
-adminEmail = "#{node['ldap']['admin_cn']}@#{node['ldap']['domain']}"
+adminCN = node['ldap']['admin_cn']
+adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
 mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
@@ -127,9 +129,9 @@ cn: #{ldapUser}
 mail: #{systemEmailAddress}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{dirmanager}" -w #{dirmanagerPassword}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
+  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{dirmanager}' -w #{dirmanagerPassword} -b '#{ldapUserDN}'"
 end
 
 # --- Register Nexus hostname in LDAP ---
@@ -141,9 +143,36 @@ objectClass: organizationalUnit
 objectClass: domainRelatedObject
 ou: #{hostname}
 associatedDomain: #{hostname}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+" | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapDomainDN}'"
+  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapDomainDN}'"
+end
+
+# --- Register Nexus LDAP groups ---
+execute "Register Nexus admin group in LDAP" do
+  command <<-EOH
+echo "dn: cn=nx-admin,ou=groups,#{ldapSuffix}
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: nx-admin
+ou: groups
+uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=nx-admin,ou=groups,#{ldapSuffix}'"
+end
+
+execute "Register Nexus developer group in LDAP" do
+  command <<-EOH
+echo "dn: cn=nx-deployment,ou=groups,#{ldapSuffix}
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: nx-admin
+ou: groups
+uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=nx-deployment,ou=groups,#{ldapSuffix}'"
 end
 
 # --- Configure nginx ---

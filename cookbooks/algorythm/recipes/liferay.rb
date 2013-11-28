@@ -32,6 +32,7 @@ adminEmail = "#{admin}@#{node['ldap']['domain']}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 package 'libssl-dev'
 
@@ -55,9 +56,9 @@ cn: #{ldapUser}
 mail: #{systemEmail}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
-" | ldapmodify -a -x -h #{ldapHost} -p #{ldapPort} -D cn="#{node['ldap']['dirmanager']}" -w #{node['ldap']['dirmanager_password']}
+" | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']} -b '#{ldapUserDN}'"
+  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end
 
 # --- Download and install Liferay ---

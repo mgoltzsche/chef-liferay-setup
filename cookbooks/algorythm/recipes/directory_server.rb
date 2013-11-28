@@ -6,10 +6,11 @@ port = node['ldap']['port']
 domain = node['ldap']['domain']
 suffix = ldapSuffix(domain)
 dirmanager = node['ldap']['dirmanager']
-dirmanager_passwd = node['ldap']['dirmanager_password']
+dirmanager_password = node['ldap']['dirmanager_password']
 adminCN = node['ldap']['admin_cn']
 adminSN = node['ldap']['admin_sn']
 adminGivenName = node['ldap']['admin_givenName']
+ldapModifyParams = "-x -h localhost -p 389 -D cn='#{dirmanager}' -w #{dirmanager_password}"
 
 # --- SSHA hash password ---
 userPassword = ldapPassword(node['ldap']['admin_password'])
@@ -32,7 +33,7 @@ ServerIdentifier= #{node['hostname']}
 ServerPort= #{port}
 Suffix= #{suffix}
 RootDN= cn=#{dirmanager}
-RootDNPwd= #{dirmanager_passwd}
+RootDNPwd= #{dirmanager_password}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
@@ -48,7 +49,7 @@ echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
 nsslapd-listenhost: #{listenhost}
-" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
+" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
   notifies :run, "execute[Disable anonymous binds]", :immediately
@@ -60,7 +61,7 @@ echo "dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
-" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
+" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
   notifies :run, "execute[Register domain]", :immediately
@@ -80,7 +81,7 @@ objectClass: organizationalUnit
 objectClass: top
 ou: #{domain}
 associatedDomain: #{domain}
-" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
+" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
   notifies :run, "execute[Register person]", :immediately
@@ -100,7 +101,7 @@ sn: #{adminSN}
 givenName: #{adminGivenName}
 mail: #{adminCN}@#{domain}
 userPassword:: #{userPassword}
-" | ldapmodify -a -x -h localhost -p 389 -D cn="#{dirmanager}" -w #{dirmanager_passwd}
+" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
   notifies :restart, "service[dirsrv]", :immediately
@@ -110,12 +111,4 @@ end
 service "dirsrv" do
   supports :restart => true
   action :nothing
-end
-
-# --- Install ldaputil ---
-template '/usr/bin/ldaputil' do
-  source 'ldaputil.erb'
-  owner 'root'
-  group 'root'
-  mode 00700
 end
