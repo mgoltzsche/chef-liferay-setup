@@ -62,7 +62,7 @@ execute "Configure baseUrl" do
 sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg} &&
 sed -i 's/<forceBaseUrl>.*?<\\/forceBaseUrl>/<forceBaseUrl>true<\\/forceBaseUrl>/g' #{nexusCfg}
   EOH
-  not_if "cat #{nexusCfg} | grep '<baseUrl>https://#{hostname}/nexus</baseUrl>' && cat #{nexusCfg} | grep '<forceBaseUrl>https://#{hostname}/nexus</forceBaseUrl>'"
+  not_if "cat #{nexusCfg} | grep '<baseUrl>https://#{hostname}/nexus</baseUrl>' && cat #{nexusCfg} | grep '<forceBaseUrl>true</forceBaseUrl>'"
 end
 
 template "#{nexusHome}/conf/security-configuration.xml" do
