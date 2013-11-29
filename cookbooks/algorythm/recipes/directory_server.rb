@@ -1,6 +1,7 @@
 package '389-ds-base'
 package 'ldap-utils'
 
+serverId = node['hostname']
 listenhost = node['ldap']['listenhost']
 port = node['ldap']['port']
 domain = node['ldap']['domain']
@@ -29,7 +30,7 @@ ConfigDirectoryAdminPwd= thepassword
 AdminDomain= #{node['domainname']}
 
 [slapd]
-ServerIdentifier= #{node['hostname']}
+ServerIdentifier= #{serverId}
 ServerPort= #{port}
 Suffix= #{suffix}
 RootDN= cn=#{dirmanager}
@@ -39,32 +40,32 @@ ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
   EOH
-  not_if {File.exist?("/etc/dirsrv/slapd-#{node['hostname']}")}
-  notifies :run, 'execute[Configure TCPv4 localhost listening]', :immediately
+  not_if {File.exist?("/etc/dirsrv/slapd-#{serverId}")}
+  notifies :run, 'execute[Configure instance]', :immediately
 end
 
-execute "Configure TCPv4 localhost listening" do
+execute 'Configure instance' do
   command <<-EOH
 echo "dn: cn=config
 changetype: modify
 replace: nsslapd-listenhost
 nsslapd-listenhost: #{listenhost}
-" | ldapmodify #{ldapModifyParams}
-  EOH
-  action :nothing
-  notifies :run, 'execute[Disable anonymous binds]', :immediately
-end
 
-execute 'Disable anonymous binds' do
-  command <<-EOH
-echo "dn: cn=config
+dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
-" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
-  notifies :restart, 'service[dirsrv]'
+end
+
+execute "Remove default groups" do
+  command <<-EOH
+echo "dn: ou=Groups,#{suffix}
+changetype: delete
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'ou=Groups,#{suffix}'"
 end
 
 # --- Add initial data to instance ---
