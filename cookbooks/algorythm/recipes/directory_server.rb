@@ -55,6 +55,7 @@ dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
+" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
   notifies :run, 'execute[Remove default groups]', :immediately
