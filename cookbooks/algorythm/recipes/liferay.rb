@@ -182,6 +182,7 @@ template "#{liferayDir}/bin/setenv.sh" do
   variables({
     :java_opts => node['liferay']['java_opts']
   })
+  notifies :restart, 'service[liferay]'
 end
 
 template "#{liferayDir}/conf/server.xml" do
@@ -194,13 +195,14 @@ template "#{liferayDir}/conf/server.xml" do
     :http_port => node['liferay']['http_port'],
     :https_port => node['liferay']['https_port']
   })
+  notifies :restart, 'service[liferay]'
 end
 
 # --- Configure Liferay ---
 template "#{liferayHomeDir}/portal-ext.properties" do
   owner 'root'
   group usr
-  source "liferay.portal-ext.properties.erb"
+  source 'liferay.portal-ext.properties.erb'
   mode 0640
   variables({
     :liferay_home => liferayHomeDir,
@@ -225,6 +227,7 @@ template "#{liferayHomeDir}/portal-ext.properties" do
     :ldapUser => ldapUser,
     :ldapPassword => ldapPassword
   })
+  notifies :restart, 'service[liferay]'
 end
 
 # --- Register Liferay as service ---
@@ -283,5 +286,6 @@ end
 
 # --- (Re)start Liferay ---
 service 'liferay' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end
