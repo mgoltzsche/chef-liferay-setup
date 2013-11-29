@@ -55,10 +55,16 @@ dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
+  EOH
+  action :nothing
+  notifies :run, 'execute[Remove default groups]', :immediately
+end
 
-dn: ou=Groups,#{suffix}
-changetype: delete
-" | ldapmodify #{ldapModifyParams}
+execute "Remove default groups" do
+  command <<-EOH
+for groupDN in $(ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,dc=dev,dc=algorythm,dc=de' '(cn=*)' | grep -P '^dn:\s' | cut -d' ' -f 2); do
+  echo "dn: $groupDN\nchangetype: delete" | ldapmodify #{ldapModifyParams}
+done
   EOH
   action :nothing
 end
