@@ -281,14 +281,6 @@ template '/etc/nginx/sites-available/default' do
   notifies :restart, 'service[nginx]'
 end
 
-print <<-EOH
-###############################################################################
-# Please login as administrator, go to the LDAP configuration dialog and      #
-# test your connection (and enable export manually).                          #
-# Afterwards LDAP users can login.                                            #
-###############################################################################
-EOH
-
 # --- Restart nginx ---
 service 'nginx' do
   supports :restart => true
@@ -299,4 +291,16 @@ end
 service 'liferay' do
   supports :restart => true
   action :nothing
+end
+
+# --- show LDAP connection hint ---
+log "ldap-hint" do
+  message <<-EOH
+###############################################################################
+# Please login to Liferay as administrator after the installation,            #
+# go to the LDAP configuration dialog and test your connection                #
+# (and enable export manually).                                               #
+# Afterwards LDAP users can login.                                            #
+###############################################################################
+  EOH
 end
