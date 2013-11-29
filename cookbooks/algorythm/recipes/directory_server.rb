@@ -64,7 +64,7 @@ nsslapd-allow-anonymous-access: off
 " | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
-  notifies :restart, 'service[dirsrv]', :immediately
+  notifies :restart, 'service[dirsrv]'
 end
 
 # --- Add initial data to instance ---
