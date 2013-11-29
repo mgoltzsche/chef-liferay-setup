@@ -69,7 +69,7 @@ default['nexus']['system_mail_prefix'] = 'no-reply'
 default['redmine']['install_directory'] = "/opt"
 default['redmine']['home'] = "/var/opt/redmine"
 default['redmine']['user'] = "redmine"
-default['redmine']['version'] = "2.4.1"
+default['redmine']['version'] = "2.3.3"
 default['redmine']['backlogs_version'] = "v1.0.6"
 
 # Redmine Backlogs configuration
