@@ -56,7 +56,7 @@ function stop {
 	echo "* Stopping $APP_NAME"
 
 	if [ ! -f $CATALINA_PID ] || [ ! -s $CATALINA_PID ]; then
-		echo "  ...failed: Missing or empty pid file $CATALINA_PID!" 2>&1
+		echo "  ...failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
 		return 1
 	fi
 
