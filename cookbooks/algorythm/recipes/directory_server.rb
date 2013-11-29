@@ -55,17 +55,12 @@ dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
-  EOH
-  action :nothing
-end
 
-execute "Remove default groups" do
-  command <<-EOH
-echo "dn: ou=Groups,#{suffix}
+dn: ou=Groups,#{suffix}
 changetype: delete
 " | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch #{ldapModifyParams} -b 'ou=Groups,#{suffix}'"
+  action :nothing
 end
 
 # --- Add initial data to instance ---
