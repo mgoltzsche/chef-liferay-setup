@@ -63,7 +63,7 @@ end
 
 execute "Remove default groups" do
   command <<-EOH
-for groupDN in $(ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,dc=dev,dc=algorythm,dc=de' '(cn=*)' | grep -P '^dn:\s' | cut -d' ' -f 2); do
+ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,dc=dev,dc=algorythm,dc=de' '(cn=*)' | grep -P '^dn:\s' | while read -r groupDN; do
   echo "dn: $groupDN\nchangetype: delete" | ldapmodify #{ldapModifyParams}
 done
   EOH
