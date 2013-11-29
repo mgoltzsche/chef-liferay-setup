@@ -108,6 +108,7 @@ template "#{nexusHome}/conf/ldap.xml" do
     :user => ldapUser,
     :password => ldapPassword
   })
+  notifies :restart, 'service[liferay]'
 end
 
 execute "Extract Sonatype Nexus" do
@@ -128,6 +129,7 @@ execute "Deploy Sonatype Nexus" do
 cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
+  notifies :restart, 'service[liferay]'
 end
 
 # --- Register Nexus LDAP user ---
@@ -197,6 +199,12 @@ end
 
 # --- Restart nginx ---
 service 'nginx' do
+  supports :restart => true
+  action :nothing
+end
+
+# --- (Re)start Liferay ---
+service 'liferay' do
   supports :restart => true
   action :nothing
 end

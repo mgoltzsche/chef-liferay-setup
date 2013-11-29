@@ -13,11 +13,30 @@
   </users>
   <roles>
     <role>
+      <id>anonymous-custom</id>
+      <name>Anonymous Role</name>
+      <description>Anonymous role for Nexus (without 'User Forgot Password' privilege)</description>
+      <privileges>
+        <privilege>1</privilege>
+        <privilege>58</privilege>
+        <privilege>70</privilege>
+        <privilege>54</privilege>
+        <privilege>74</privilege>
+      </privileges>
+      <roles>
+        <role>ui-search</role>
+        <role>ui-healthcheck-read</role>
+        <role>ui-repo-browser</role>
+      </roles>
+    </role>
+    <role>
       <id>developer-snapshots</id>
       <name>Developer - Snapshots</name>
       <description>Allows snapshot deployment</description>
+      <roles>
+        <role>anonymous-custom</role>
+      </roles>
       <privileges>
-        <privilege>1</privilege>
         <privilege>2</privilege>
         <privilege>repository-all</privilege>
         <privilege>T9</privilege>
@@ -91,7 +110,7 @@
       <userId>anonymous</userId>
       <source>default</source>
       <roles>
-        <role>anonymous</role>
+        <role>anonymous-custom</role>
         <role>repository-any-read</role>
       </roles>
     </userRoleMapping>
