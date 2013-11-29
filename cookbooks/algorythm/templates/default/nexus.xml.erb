@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.5.0</version>
-  <nexusVersion>2.6.4-02</nexusVersion>
+  <version>2.7.0</version>
+  <nexusVersion>2.7.0-04</nexusVersion>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
   </globalConnectionSettings>
+  <remoteProxySettings />
   <restApi>
     <baseUrl>https://<%=@hostname%>/nexus</baseUrl>
     <forceBaseUrl>true</forceBaseUrl>
@@ -189,25 +190,6 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>central-m1</id>
-      <name>Central M1 shadow</name>
-      <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
-      <providerHint>m2-m1-shadow</providerHint>
-      <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheTTL>15</notFoundCacheTTL>
-      <userManaged>true</userManaged>
-      <exposed>true</exposed>
-      <browseable>true</browseable>
-      <writePolicy>READ_ONLY</writePolicy>
-      <localStorage>
-        <provider>file</provider>
-      </localStorage>
-      <externalConfiguration>
-        <masterRepositoryId>central</masterRepositoryId>
-        <syncAtStartup>false</syncAtStartup>
-      </externalConfiguration>
-    </repository>
-    <repository>
       <id>public</id>
       <name>Public Repositories</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
@@ -318,9 +300,11 @@
     <password><%=@mailServerPassword%></password>
     <systemEmailAddress><%=@systemEmailAddress%></systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
-  <notification />
+  <notification>
+    <notificationTargets>
+      <notificationTarget>
+        <targetId>autoBlockTarget</targetId>
+      </notificationTarget>
+    </notificationTargets>
+  </notification>
 </nexusConfiguration>

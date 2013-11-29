@@ -149,7 +149,7 @@ associatedDomain: #{hostname}
 end
 
 # --- Register Nexus roles as LDAP groups ---
-['nx-admin', 'nx-deployment'].each do |role|
+['nx-admin', 'developer-snapshots', 'developer-releases'].each do |role|
   execute "Register Nexus role '#{role}' in LDAP" do
     command <<-EOH
 echo "dn: cn=#{role},ou=groups,#{ldapSuffix}

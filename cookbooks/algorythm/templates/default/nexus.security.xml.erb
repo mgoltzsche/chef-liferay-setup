@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
+  <version>2.0.5</version>
+  <users>
+    <user>
+      <id>anonymous</id>
+      <firstName>Nexus</firstName>
+      <lastName>Anonymous User</lastName>
+      <password>$shiro1$SHA-512$1024$uuwHazbkZ0r5ltrr1f+EJQ==$sldMDKe8/3EA6FrPkaKd94ThWVNzgsC3emfzv3hvwR2D0/uZtn6mqVV98gfV5ryy7vOjmPQSPY+glvl2BDwWPQ==</password>
+      <status>active</status>
+      <email>changeme2@yourcompany.com</email>
+    </user>
+  </users>
+  <roles>
+    <role>
+      <id>developer-snapshots</id>
+      <name>Developer - Snapshots</name>
+      <description>Allows snapshot deployment</description>
+      <privileges>
+        <privilege>1</privilege>
+        <privilege>2</privilege>
+        <privilege>repository-all</privilege>
+        <privilege>T9</privilege>
+        <privilege>deploy-snapshots</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>developer-releases</id>
+      <name>Developer - Releases</name>
+      <description>Allows snapshot deployment</description>
+      <roles>
+        <role>developer-snapshots</role>
+      </roles>
+      <privileges>
+        <privilege>deploy-releases</privilege>
+      </privileges>
+    </role>
+  </roles>
+  <privileges>
+    <privilege>
+      <id>deploy-snapshots</id>
+      <name>Deploy Snapshots</name>
+      <description>Allows snapshot deployment</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>create,read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>snapshots</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>1</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>deploy-releases</id>
+      <name>Deploy Releases</name>
+      <description>Allows release deployment</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>create,read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>releases</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>1</value>
+        </property>
+      </properties>
+    </privilege>
+  </privileges>
+  <userRoleMappings>
+    <userRoleMapping>
+      <userId>anonymous</userId>
+      <source>default</source>
+      <roles>
+        <role>anonymous</role>
+        <role>repository-any-read</role>
+      </roles>
+    </userRoleMapping>
+  </userRoleMappings>
+</security>
