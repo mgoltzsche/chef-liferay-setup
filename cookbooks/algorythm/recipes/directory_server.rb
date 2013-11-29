@@ -40,7 +40,7 @@ setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
   EOH
   not_if {File.exist?("/etc/dirsrv/slapd-#{node['hostname']}")}
-  notifies :run, "execute[Configure TCPv4 localhost listening]", :immediately
+  notifies :run, 'execute[Configure TCPv4 localhost listening]', :immediately
 end
 
 execute "Configure TCPv4 localhost listening" do
@@ -52,10 +52,10 @@ nsslapd-listenhost: #{listenhost}
 " | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
-  notifies :run, "execute[Disable anonymous binds]", :immediately
+  notifies :run, 'execute[Disable anonymous binds]', :immediately
 end
 
-execute "Disable anonymous binds" do
+execute 'Disable anonymous binds' do
   command <<-EOH
 echo "dn: cn=config
 changetype: modify
@@ -64,11 +64,11 @@ nsslapd-allow-anonymous-access: off
 " | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
-  notifies :restart, "service[dirsrv]"
+  notifies :restart, 'service[dirsrv]', :immediately
 end
 
 # --- Add initial data to instance ---
-execute "Register domain unit" do
+execute 'Register domain unit' do
   command <<-EOH
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
@@ -79,7 +79,7 @@ ou: Domains
   not_if "ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
 end
 
-execute "Register domain" do
+execute 'Register domain' do
   command <<-EOH
 echo "dn: ou=#{domain},ou=Domains,#{suffix}
 objectClass: domainRelatedObject

@@ -76,6 +76,7 @@ template "#{nexusHome}/conf/security.xml" do
   owner usr
   group usr
   mode 0600
+  action :create_if_missing
 end
 
 file "#{nexusHome}/conf/logback.properties" do
@@ -173,20 +174,23 @@ uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
 end
 
 # --- Configure nginx ---
-template "/etc/nginx/sites-available/#{hostname}" do
-  source "nexus.nginx.vhost.erb"
+template '/etc/nginx/sites-available/#{hostname}' do
+  source 'nexus.nginx.vhost.erb'
   mode 00700
   variables({
     :hostname => hostname,
     :port => node['liferay']['https_port']
   })
+  notifies :restart, 'service[nginx]'
 end
 
-link "/etc/nginx/sites-enabled/#{hostname}" do
-  to "/etc/nginx/sites-available/#{hostname}"
+link '/etc/nginx/sites-enabled/#{hostname}' do
+  to '/etc/nginx/sites-available/#{hostname}'
+  notifies :restart, 'service[nginx]'
 end
 
 # --- Restart nginx ---
-service "nginx" do
-  action :restart
+service 'nginx' do
+  supports :restart => true
+  action :nothing
 end

@@ -264,6 +264,7 @@ template '/etc/nginx/sites-available/default' do
     :http_port => node['liferay']['http_port'],
     :https_port => node['liferay']['https_port']
   })
+  notifies :restart, 'service[nginx]'
 end
 
 print <<-EOH
@@ -276,10 +277,11 @@ EOH
 
 # --- Restart nginx ---
 service 'nginx' do
-  action :restart
+  supports :restart => true
+  action :nothing
 end
 
 # --- (Re)start Liferay ---
-service "liferay" do
+service 'liferay' do
   action :restart
 end
