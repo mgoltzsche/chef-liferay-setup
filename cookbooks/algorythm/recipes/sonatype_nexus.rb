@@ -174,7 +174,7 @@ uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
 end
 
 # --- Configure nginx ---
-template '/etc/nginx/sites-available/#{hostname}' do
+template "/etc/nginx/sites-available/#{hostname}" do
   source 'nexus.nginx.vhost.erb'
   mode 00700
   variables({
@@ -184,8 +184,8 @@ template '/etc/nginx/sites-available/#{hostname}' do
   notifies :restart, 'service[nginx]'
 end
 
-link '/etc/nginx/sites-enabled/#{hostname}' do
-  to '/etc/nginx/sites-available/#{hostname}'
+link "/etc/nginx/sites-enabled/#{hostname}" do
+  to "/etc/nginx/sites-available/#{hostname}"
   notifies :restart, 'service[nginx]'
 end
 

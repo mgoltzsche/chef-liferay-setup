@@ -306,7 +306,7 @@ template '/etc/thin/redmine' do
   })
 end
 
-template '/etc/nginx/sites-available/#{hostname}' do
+template "/etc/nginx/sites-available/#{hostname}" do
   source 'redmine.nginx.vhost.erb'
   mode 0700
   variables({
@@ -316,8 +316,8 @@ template '/etc/nginx/sites-available/#{hostname}' do
   notifies :restart, 'service[nginx]'
 end
 
-link '/etc/nginx/sites-enabled/#{hostname}' do
-  to '/etc/nginx/sites-available/#{hostname}'
+link "/etc/nginx/sites-enabled/#{hostname}" do
+  to "/etc/nginx/sites-available/#{hostname}"
   notifies :restart, 'service[nginx]'
 end
 
