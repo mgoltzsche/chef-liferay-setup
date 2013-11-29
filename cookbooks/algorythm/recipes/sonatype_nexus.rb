@@ -21,6 +21,7 @@ adminCN = node['ldap']['admin_cn']
 adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
 mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
+anonymousEmailAddress = "anonymous@#{hostname}"
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 # --- Download & deploy Nexus OSS ---
@@ -69,6 +70,7 @@ template "#{nexusHome}/conf/security-configuration.xml" do
   owner usr
   group usr
   mode 0600
+  action :create_if_missing
 end
 
 template "#{nexusHome}/conf/security.xml" do
@@ -76,6 +78,9 @@ template "#{nexusHome}/conf/security.xml" do
   owner usr
   group usr
   mode 0600
+  variables({
+    :anonymousEmailAddress => anonymousEmailAddress
+  })
   action :create_if_missing
 end
 
@@ -135,6 +140,7 @@ objectClass: top
 objectClass: mailRecipient
 cn: #{ldapUser}
 mail: #{systemEmailAddress}
+mailAlternateAddress: #{anonymousEmailAddress}
 mailForwardingAddress: #{adminEmail}
 userPassword:: #{ldapPasswordHashed}
 " | ldapmodify #{ldapModifyParams} -a

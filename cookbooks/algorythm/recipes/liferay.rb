@@ -293,14 +293,11 @@ service 'liferay' do
   action :nothing
 end
 
-# --- show LDAP connection hint ---
-log "ldap-hint" do
-  message <<-EOH
+print <<-EOH
 ###############################################################################
 # Please login to Liferay as administrator after the installation,            #
 # go to the LDAP configuration dialog and test your connection                #
 # (and enable export manually).                                               #
-# Afterwards LDAP users can login.                                            #
+# Afterwards LDAP users can login (and user data is exported).                #
 ###############################################################################
-  EOH
-end
+EOH
