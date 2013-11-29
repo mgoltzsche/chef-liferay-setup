@@ -45,17 +45,17 @@ default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
 default['liferay']['hostname'] = default['ldap']['domain']
-default['liferay']['postgresql']['database'] = "liferay"
+default['liferay']['postgresql']['database'] = 'liferay'
 default['liferay']['postgresql']['user'] = default['liferay']['user']
-default['liferay']['postgresql']['password'] = "liferay"
+default['liferay']['postgresql']['password'] = 'liferay'
 default['liferay']['ldap']['user'] = default['liferay']['user']
-default['liferay']['ldap']['password'] = "password"
+default['liferay']['ldap']['password'] = 'password'
 default['liferay']['system_mail_prefix'] = 'no-reply'
-default['liferay']['company_default_name'] = "algorythm"
-default['liferay']['admin']['name'] = "Max Goltzsche"
-default['liferay']['timezone'] = "Europe/Berlin"
-default['liferay']['country'] = "DE"
-default['liferay']['language'] = "de"
+default['liferay']['company_default_name'] = 'algorythm'
+default['liferay']['admin']['name'] = 'Max Goltzsche'
+default['liferay']['timezone'] = 'Europe/Berlin'
+default['liferay']['country'] = 'DE'
+default['liferay']['language'] = 'de'
 
 # Sonatype Nexus installation
 default['nexus']['version'] = "2.7.0-04"
@@ -69,7 +69,7 @@ default['nexus']['system_mail_prefix'] = 'no-reply'
 default['redmine']['install_directory'] = "/opt"
 default['redmine']['home'] = "/var/opt/redmine"
 default['redmine']['user'] = "redmine"
-default['redmine']['version'] = "2.3.3"
+default['redmine']['version'] = "2.4.1"
 default['redmine']['backlogs_version'] = "v1.0.6"
 
 # Redmine Backlogs configuration
