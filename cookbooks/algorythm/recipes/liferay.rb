@@ -61,6 +61,17 @@ userPassword:: #{ldapPasswordHashed}
   not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 end
 
+execute "Grant Directory Administrator privileges to Liferay LDAP account" do
+  command <<-EOH
+echo "dn: cn=Directory Administrators,#{ldapSuffix}
+changetype: modify
+add: uniqueMember
+uniqueMember: #{ldapUserDN}
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})'"
+end
+
 # --- Download and install Liferay ---
 directory downloadDir do
   mode 0755
