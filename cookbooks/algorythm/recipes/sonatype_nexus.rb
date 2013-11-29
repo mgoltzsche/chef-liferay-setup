@@ -69,7 +69,13 @@ template "#{nexusHome}/conf/security-configuration.xml" do
   owner usr
   group usr
   mode 0600
-  action :create_if_missing
+end
+
+template "#{nexusHome}/conf/security.xml" do
+  source "nexus.security.xml.erb"
+  owner usr
+  group usr
+  mode 0600
 end
 
 file "#{nexusHome}/conf/logback.properties" do

@@ -175,20 +175,20 @@ directory "#{liferayHomeDir}/deploy" do
 end
 
 template "#{liferayDir}/bin/setenv.sh" do
-  owner usr
+  owner 'root'
   group usr
   source "liferay.tomcat.setenv.sh.erb"
-  mode 00744
+  mode 0754
   variables({
     :java_opts => node['liferay']['java_opts']
   })
 end
 
 template "#{liferayDir}/conf/server.xml" do
-  owner usr
+  owner 'root'
   group usr
   source "liferay.tomcat.server.xml.erb"
-  mode 00644
+  mode 0644
   variables({
     :hostname => hostname,
     :http_port => node['liferay']['http_port'],
@@ -198,10 +198,10 @@ end
 
 # --- Configure Liferay ---
 template "#{liferayHomeDir}/portal-ext.properties" do
-  owner usr
+  owner 'root'
   group usr
   source "liferay.portal-ext.properties.erb"
-  mode 00400
+  mode 0640
   variables({
     :liferay_home => liferayHomeDir,
     :timezone => timezone,
@@ -230,7 +230,7 @@ end
 # --- Register Liferay as service ---
 template "/etc/init.d/liferay" do
   source "init.d.liferay.erb"
-  mode 00755
+  mode 0755
   variables({
     :liferayDir => liferayDirLink,
     :liferayHomeDir => liferayHomeDir,
@@ -240,7 +240,7 @@ end
 
 template "/etc/logrotate.d/liferay" do
   source "logrotate.d.liferay.erb"
-  mode 00755
+  mode 0755
   variables({
     :liferay_log_home => "#{liferayDirLink}/logs"
   })
@@ -250,15 +250,15 @@ end
 directory '/usr/share/nginx/cache' do
   owner 'www-data'
   group 'www-data'
-  mode 00744
+  mode 0744
 end
 
 cookbook_file '/usr/share/nginx/www/index.html'
 cookbook_file '/usr/share/nginx/www/50x.html'
 
-template "/etc/nginx/sites-available/default" do
-  source "liferay.nginx.vhost.erb"
-  mode 00700
+template '/etc/nginx/sites-available/default' do
+  source 'liferay.nginx.vhost.erb'
+  mode 0744
   variables({
     :hostname => hostname,
     :http_port => node['liferay']['http_port'],
