@@ -94,6 +94,7 @@ cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{life
 cd #{liferayDir}/bin &&
 ls | grep '\\.bat$' | xargs rm &&
 cd #{liferayDir}/webapps &&
+mkdir -p ROOT/WEB-INF/classes/de/algorythm
 rm -rf welcome-theme sync-web &&
 chown -R #{usr}:#{usr} #{liferayDir}
   EOH
@@ -104,6 +105,12 @@ directory "#{liferayHomeDir}/deploy" do
   owner usr
   group usr
   mode 00755
+end
+
+cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
+  owner usr
+  group usr
+  action :create_if_missing
 end
 
 cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
