@@ -100,7 +100,15 @@ chown -R #{usr}:#{usr} #{liferayDir}
   not_if {File.exist?(liferayDir)}
 end
 
-cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war"
+directory "#{liferayHomeDir}/deploy" do
+  owner usr
+  group usr
+  mode 00755
+end
+
+cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" dp
+  not_if {File.exists?("#{liferayDir}/webapps/algorythm-theme")}
+end
 
 link liferayDirLink do
   to liferayDir
@@ -176,12 +184,6 @@ make install
 end
 
 # --- Configure Liferay tomcat ---
-directory "#{liferayHomeDir}/deploy" do
-  owner usr
-  group usr
-  mode 01755
-end
-
 template "#{liferayDir}/bin/setenv.sh" do
   owner 'root'
   group usr
