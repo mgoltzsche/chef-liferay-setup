@@ -107,6 +107,8 @@ directory "#{liferayHomeDir}/deploy" do
 end
 
 cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
+  owner usr
+  group usr
   not_if {File.exist?("#{liferayDir}/webapps/algorythm-theme")}
 end
 
