@@ -107,7 +107,7 @@ directory "#{liferayHomeDir}/deploy" do
 end
 
 cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" dp
-  not_if {File.exists?("#{liferayDir}/webapps/algorythm-theme")}
+  not_if {File.exist?("#{liferayDir}/webapps/algorythm-theme")}
 end
 
 link liferayDirLink do
