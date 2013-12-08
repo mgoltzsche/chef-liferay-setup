@@ -106,7 +106,7 @@ directory "#{liferayHomeDir}/deploy" do
   mode 00755
 end
 
-cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" dp
+cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
   not_if {File.exist?("#{liferayDir}/webapps/algorythm-theme")}
 end
 
