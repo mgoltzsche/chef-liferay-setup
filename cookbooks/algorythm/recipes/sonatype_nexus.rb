@@ -122,7 +122,7 @@ execute "Configure home directory" do
   not_if {File.exist?(nexusDir)}
 end
 
-['nexus-outreach-plugin', 'nexus-yum-repository-plugin', 'nexus-lvo-plugin', 'nexus-wonderland-plugin'].each do |plugin|
+['nexus-outreach-plugin', 'nexus-yum-repository-plugin', 'nexus-atlas-plugin', 'nexus-lvo-plugin', 'nexus-wonderland-plugin'].each do |plugin|
   execute "Remove superfluous #{plugin}" do
     cwd "#{nexusExtractDir}/WEB-INF/plugin-repository"
     command "rm -rf $(ls | grep #{plugin})"
