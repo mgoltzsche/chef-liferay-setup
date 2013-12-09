@@ -113,6 +113,12 @@ cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png"
   action :create_if_missing
 end
 
+cookbook_file "#{liferayHomeDir}/deploy/contact-form.war" do
+  owner usr
+  group usr
+  not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
+end
+
 cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
   owner usr
   group usr
