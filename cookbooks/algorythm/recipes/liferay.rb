@@ -69,7 +69,7 @@ add: uniqueMember
 uniqueMember: #{ldapUserDN}
 " | ldapmodify #{ldapModifyParams}
   EOH
-  not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})'"
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})' | grep -P '^# numEntries: [\\d]+$'"
 end
 
 # --- Download and install Liferay ---

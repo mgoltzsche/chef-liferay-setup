@@ -68,6 +68,16 @@ ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,d
 done
   EOH
   action :nothing
+  notifies :run, 'execute[Remove dirmanager Directory Administrators group membership]', :immediately
+end
+
+execute "Remove dirmanager Directory Administrators group membership" do # to avoid exception in external systems because dirmanager user does not exist in directory
+  command <<-EOH
+  echo "dn: cn=Directory Administrators,#{suffix}
+changetype: modify
+delete: uniqueMember" | ldapmodify #{ldapModifyParams}
+  EOH
+  action :nothing
 end
 
 # --- Add initial data to instance ---
