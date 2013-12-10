@@ -1,0 +1,17 @@
+#!/bin/bash
+
+$scriptFile=$($1 | cut -d'/' -f 2)
+$scriptName=${scriptFile%.*}
+
+echo "backup $scriptName"
+
+sh "$BACKUP_INSTALL_DIR/scripts/$scriptFile"
+
+$status=$?
+
+if [ $status = 0 ]; then
+	echo '  ...done'
+else
+	echo '  ...failed' 2>&1
+	exit 2
+fi

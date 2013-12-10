@@ -9,6 +9,7 @@ export BACKUP_INSTALL_DIR='<%=@installDir%>'
 export BACKUP_DIR='<%=@backupDir%>'
 export BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
 
-find "$BACKUP_INSTALL_DIR/scripts" -name '*.sh' \( -exec sh {} \; -o -print \)
+cd "$BACKUP_INSTALL_DIR/scripts"
+find . -name '*.sh' \( -exec sh {} \; -o -print \)
 
 
