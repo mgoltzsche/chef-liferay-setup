@@ -17,7 +17,8 @@ case "$ACTION" in
 			echo "already exists"
 		else
 			mkdir -p "$BAK" &&
-			chmod 700 "$BACKUP_DIR/redmine" &&
+			chown root:postgres "$BACKUP_DIR/redmine" &&
+			chmod 750 "$BACKUP_DIR/redmine" &&
 			pg_dump -h localhost -U "$USER" -Fc --file="$BAK/db.sqlc" "$DB_NAME" &&
 			cp -R "$REDMINE_HOME" "$BAK/files"
 		fi
