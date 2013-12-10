@@ -5,7 +5,7 @@ default['max_open_files'] = 4096 # Should be > 1024
 default['tcp_timeout'] = 600 # Should be lower to free worker threads earlier
 
 # backup
-default['backup']['install_directory'] = '/usr/share/backup-script'
+default['backup']['install_directory'] = '/opt/backup-scripts'
 default['backup']['backup_directory'] = '/var/backups'
 
 # LDAP configuration

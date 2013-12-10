@@ -1,9 +1,14 @@
 #!/bin/bash
 
-export BACKUP_INSTALL_DIR=<%=@installDir%>
-export BACKUP_DIR=<%=@backupDir%>
-export BACKUP_DATE=$(date +"%y-%m-%d_%H-%M")
+if [ $(id -u) != '0' ]; then
+	echo 'You need root privileges to run this script'
+	exit 1
+fi
 
-find $BACKUP_INSTALL_DIR/scripts -name '*.sh' \( -exec sh "$PWD"/{} \; -o -print \)
+export BACKUP_INSTALL_DIR='<%=@installDir%>'
+export BACKUP_DIR='<%=@backupDir%>'
+export BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
+
+find "$BACKUP_INSTALL_DIR/scripts" -name '*.sh' \( -exec sh {} \; -o -print \)
 
 

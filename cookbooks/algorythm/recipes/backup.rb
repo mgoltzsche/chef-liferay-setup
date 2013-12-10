@@ -1,6 +1,8 @@
-executable = "#{node['backup']['install_directory']}/backup.sh"
+installDir = node['backup']['install_directory']
 
-directory "#{node['backup']['install_directory']}/scripts" do
+executable = "#{installDir}/backup.sh"
+
+directory "#{installDir}/scripts" do
   owner 'root'
   group 'root'
   mode 00755
@@ -11,7 +13,7 @@ template executable do
   source "backup.sh.erb"
   owner 'root'
   group 'root'
-  mode 00700
+  mode 00755
   variables({
     :installDir => node['backup']['install_directory'],
     :backupDir => node['backup']['backup_directory']

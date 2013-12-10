@@ -3,7 +3,7 @@
 echo "backup redmine"
 
 BAK_DIR="$BACKUP_DIR/redmine/$BACKUP_DATE"
-REDMINE_HOME="<%=@home%>"
+REDMINE_HOME="<%=@homeDir%>"
 REDMINE_DIR="<%=@dir%>"
 DB_CFG_FILE="$REDMINE_DIR/config/database.yml"
 DB_HOST=$(cat $DB_CFG_FILE | grep -Po "(?<=host:).*")
