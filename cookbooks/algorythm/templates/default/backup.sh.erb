@@ -30,6 +30,7 @@ esac
 
 ACTION="$1"
 BACKUP_INSTALL_DIR=$(dirname $(readlink -f "$0"))
+scriptError=0
 
 if [ -z "$BACKUP_DIR" ]; then
 	export BACKUP_DIR='<%=@backupDir%>'
@@ -40,7 +41,8 @@ echo "$ACTION_LABEL $BACKUP_DIR/*/$BACKUP_ID"
 
 
 for scriptFile in $(ls "$BACKUP_INSTALL_DIR/scripts" | grep -P "\.sh"); do
-	scriptName=${scriptFile%.*}
+	scriptName=${scriptFile#backup-}
+	scriptName=${scriptFile%.sh}
 
 	echo "* $ACTION_LABEL $scriptName ..."
 
