@@ -34,15 +34,15 @@ case "$ACTION" in
 			exit 3
 		fi
 
-		service thin stop &&
+		service thin stop >> /dev/null
 		su postgres -c "dropdb \"$DB_NAME\"" &&
 		rm -rf "$REDMINE_HOME/files" &&
 		su postgres -c "createdb \"$DB_NAME\" -O \"$USER\" -E UTF8 -T template0" &&
-		su postgres -c "psql \"$USER\" < \"$BAK/db.sqlc\"" &&
+		su postgres -c " \"$DB_NAME\" < \"$BAK/db.sqlc\"" &&
 		cp -R "$BAK/files" "$REDMINE_HOME/files" &&
 		chown -R "$USER:$USER" "$REDMINE_HOME/files" &&
-		su "$USER" -c "PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
-		service thin start
+		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
+		service thin start >> /dev/null
 	;;
 	*)
 		echo "Usage: $SCRIPT_NAME {backup|restore ID}"
