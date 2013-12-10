@@ -205,7 +205,7 @@ template "#{liferayDir}/bin/setenv.sh" do
   source "liferay.tomcat.setenv.sh.erb"
   mode 0754
   variables({
-    :java_opts => node['liferay']['java_opts']
+    :catalina_opts => node['liferay']['catalina_opts']
   })
   notifies :restart, 'service[liferay]'
 end

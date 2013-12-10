@@ -1,2 +1,2 @@
 export LD_LIBRARY_PATH='$LD_LIBRARY_PATH:/usr/local/apr/lib'
-export JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF8 -Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false -Duser.timezone=Europe/Berlin <%=@java_opts%>"
+export CATALINA_OPTS="$CATALINA_OPTS -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false -Duser.timezone=Europe/Berlin <%=@catalina_opts%>"

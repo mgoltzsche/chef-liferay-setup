@@ -39,7 +39,7 @@ default['liferay']['apr_download_url'] = "http://mirror.synyx.de/apache/apr/apr-
 default['liferay']['install_directory'] = "/opt"
 default['liferay']['home'] = "/var/opt/liferay"
 default['liferay']['user'] = "liferay"
-default['liferay']['java_opts'] = "-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m"
+default['liferay']['catalina_opts'] = "-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m"
 default['liferay']['http_port'] = 8087
 default['liferay']['https_port'] = 8089
 
