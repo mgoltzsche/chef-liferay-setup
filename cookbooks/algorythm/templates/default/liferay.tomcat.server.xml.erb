@@ -72,14 +72,12 @@
                connectionTimeout="20000"
                redirectPort="443"
                URIEncoding="UTF-8"
-               proxyName="<%=@hostname%>"
                proxyPort="80"
                />
     <!-- Proxied HTTPS Connector -->
     <Connector address="127.0.0.1" port="<%=@https_port%>" protocol="HTTP/1.1"
                connectionTimeout="20000"
 	       URIEncoding="UTF-8"
-               proxyName="<%=@hostname%>"
                proxyPort="443"
                scheme="https"
                secure="true"

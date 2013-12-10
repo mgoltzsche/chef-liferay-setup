@@ -80,6 +80,14 @@ http {
         ssl_ciphers               RC4:HIGH:!aNULL:!MD5;
 	ssl_prefer_server_ciphers on;
 
+	##
+	# Language mapping
+	##
+	map $http_accept_language $lang {
+        	default en;
+        	~de de;
+	}
+
         ##
         # Virtual Host Configs
         ##
