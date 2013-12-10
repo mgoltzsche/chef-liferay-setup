@@ -2,14 +2,38 @@
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script'
-	exit 1
+	exit 2
 fi
 
-export BACKUP_INSTALL_DIR='<%=@installDir%>'
+export BACKUP_INSTALL_DIR="$(dirname $(readlink -f $0))"
 export BACKUP_DIR='<%=@backupDir%>'
 export BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
 
-cd "$BACKUP_INSTALL_DIR/scripts"
-find . -name '*.sh' \( -exec sh {} \; -o -print \)
+echo "BACKUP_DIR:   $BACKUP_DIR
+BACKUP_DATE:  $BACKUP_DATE"
 
+scriptError=0
 
+ls "$BACKUP_INSTALL_DIR/scripts" | grep -P "\.sh" | while read -r scriptFile; do
+	scriptName=${scriptFile%.*}
+
+	echo "* backing up $scriptName ..."
+
+	sh "$BACKUP_INSTALL_DIR/scripts/$scriptFile" $1
+	status=$?
+
+	if [ $status = '0' ]; then
+		echo "  ... $scriptName backup done"
+	else
+		scriptError=1
+		echo "  ... $scriptName backup failed" 2>&1
+	fi
+done
+
+if [ $scriptError = '0' ]; then
+	echo "Finished successfully"
+else
+	echo "Finished with error(s)"
+fi
+
+exit $scriptError
