@@ -2,31 +2,58 @@
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script'
-	exit 2
+	exit 1
 fi
 
-export BACKUP_INSTALL_DIR="$(dirname $(readlink -f $0))"
-export BACKUP_DIR='<%=@backupDir%>'
-export BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
+function showUsageAndExit {
+	echo "Usage: $0 {backup|restore ID}"
+	exit 2
+}
 
-echo "BACKUP_DIR:   $BACKUP_DIR
-BACKUP_DATE:  $BACKUP_DATE"
+case "$1" in
+	backup)
+		ACTION_LABEL="Restoring"
+		BACKUP_ID=$(date +'%y-%m-%d_%H-%M')
+	;;
+	restore)
+		if [[ -z "$2" ]]; then
+			showUsageAndExit
+		fi
 
+		ACTION_LABEL="Backing up"
+		BACKUP_ID="$2"
+	;;
+	*)
+		showUsageAndExit
+	;;
+esac
+
+ACTION="$1"
+BACKUP_INSTALL_DIR=$(dirname $(readlink -f "$0"))
 scriptError=0
+
+if [[ -z "$BACKUP_DIR" ]]; then
+	export BACKUP_DIR='<%=@backupDir%>'
+fi
+
+echo "BACKUP_DIR:  $BACKUP_DIR
+BACKUP_ID: $BACKUP_ID"
+
+
 
 ls "$BACKUP_INSTALL_DIR/scripts" | grep -P "\.sh" | while read -r scriptFile; do
 	scriptName=${scriptFile%.*}
 
-	echo "* backing up $scriptName ..."
+	echo "* $ACTION_LABEL $scriptName ..."
 
-	sh "$BACKUP_INSTALL_DIR/scripts/$scriptFile" $1
+	sh "$BACKUP_INSTALL_DIR/scripts/$scriptFile" $1 "$BACKUP_ID"
 	status=$?
 
 	if [ $status = '0' ]; then
-		echo "  ... $scriptName backup done"
+		echo "  ... finished"
 	else
-		scriptError=1
-		echo "  ... $scriptName backup failed" 2>&1
+		scriptError=3
+		echo "  ... $scriptName $1 failed" 2>&1
 	fi
 done
 
