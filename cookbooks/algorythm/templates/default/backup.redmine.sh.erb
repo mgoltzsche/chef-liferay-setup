@@ -1,16 +1,59 @@
 #!/bin/bash
 
-BAK_DIR="$BACKUP_DIR/redmine/$BACKUP_DATE"
+SCRIPT_NAME="$0"
+ACTION="$1"
+BACKUP_ID="$2"
+BAK="$BACKUP_DIR/redmine/$BACKUP_ID"
 REDMINE_HOME="<%=@homeDir%>"
 REDMINE_DIR="<%=@dir%>"
 DB_CFG_FILE="$REDMINE_DIR/config/database.yml"
 DB_HOST=$(cat $DB_CFG_FILE | grep -Po "(?<=host:).*")
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:).*")
-DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:).*")
+USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:).*")
 export PGPASSWORD=$(cat $DB_CFG_FILE | grep -Po "(?<=password:\s).*")
 
-mkdir -p $BAK_DIR &&
-chmod 700 "$BACKUP_DIR/redmine" &&
+function showUsageAndExit {
+	echo "Usage: $SCRIPT_NAME {backup|restore ID}"
+	exit 2
+}
 
-pg_dump -U $DB_USER -h $DB_HOST -Fc --file="$BAK_DIR/db.sqlc" $DB_NAME &&
-cp -R "$REDMINE_HOME" "$BAK_DIR/files"
+function backup {
+	if [ -d "$BAK" ]; then
+		echo "already exists"
+	else
+		mkdir -p "$BAK" &&
+		chmod 700 "$BACKUP_DIR/redmine" &&
+		pg_dump -h "$DB_HOST" -U "$USER" -Fc --file="$BAK/db.sqlc" "$DB_NAME" &&
+		cp -R "$REDMINE_HOME" "$BAK/files"
+	fi
+}
+
+function restore {
+	if [[ -z "$BACKUP_ID" ]]; then
+		showUsageAndExit
+	fi
+
+	if [ ! -d "$BAK" ]; then
+		echo "Cannot restore because $BAK does not exist" 2>&1
+		exit 3
+	fi
+
+	service thin stop &&
+	su postgres -c "dropdb \"$DB_NAME\"" &&
+	rm -rf "$REDMINE_HOME/files" &&
+	createdb "$DB_NAME" -h "$DB_HOST" -O "$USER" -E UTF8 -T template0 &&
+	su postgres -c "psql $USER < \"$BAK/db.sqlc\"" &&
+	cp -R "$BAK/files" "$REDMINE_HOME/files" &&
+	chown -R "$USER:$USER" "$REDMINE_HOME/files" &&
+	su "$USER" -c "PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
+	service thin start
+}
+
+case "$ACTION" in
+	backup|restore)
+		$ACTION
+	;;
+	*)
+		showUsageAndExit
+	;;
+esac

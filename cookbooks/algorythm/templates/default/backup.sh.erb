@@ -12,7 +12,7 @@ function showUsageAndExit {
 
 case "$1" in
 	backup)
-		ACTION_LABEL="Restoring"
+		ACTION_LABEL="Backing up"
 		BACKUP_ID=$(date +'%y-%m-%d_%H-%M')
 	;;
 	restore)
@@ -20,7 +20,7 @@ case "$1" in
 			showUsageAndExit
 		fi
 
-		ACTION_LABEL="Backing up"
+		ACTION_LABEL="Restoring"
 		BACKUP_ID="$2"
 	;;
 	*)
@@ -36,8 +36,7 @@ if [[ -z "$BACKUP_DIR" ]]; then
 	export BACKUP_DIR='<%=@backupDir%>'
 fi
 
-echo "BACKUP_DIR:  $BACKUP_DIR
-BACKUP_ID: $BACKUP_ID"
+echo "$ACTION_LABEL $BACKUP_DIR/*/$BACKUP_ID"
 
 
 
@@ -53,7 +52,7 @@ ls "$BACKUP_INSTALL_DIR/scripts" | grep -P "\.sh" | while read -r scriptFile; do
 		echo "  ... finished"
 	else
 		scriptError=3
-		echo "  ... $scriptName $1 failed" 2>&1
+		echo "  ... $scriptName $ACTION failed" 2>&1
 	fi
 done
 
