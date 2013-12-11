@@ -51,9 +51,9 @@ function list {
 function cleanDirectory {
 	CLEAN_DIR="$1"
 	MAX_COUNT=$2
-	ls "$CLEAN_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
+	cd "$CLEAN_DIR"
+	ls | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
 		echo "  * remove $ARCHIVE_DATE"
-		cd $CLEAN_DIR
 		ls | grep $ARCHIVE_DATE | xargs rm
 	done
 }
@@ -185,9 +185,9 @@ function runBackup {
 				chmod 600 "$BACKUP_DIR/$ARCHIVE"
 			done
 
-			echo "* clean backups" >> "$LOG_FILE"
+			echo "* remove old backups" >> "$LOG_FILE"
 			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS >> "$LOG_FILE"
-			echo "* clean logs" >> "$LOG_FILE"
+			echo "* remove old logs" >> "$LOG_FILE"
 			cleanDirectory "$LOG_DIR" $MAX_LOGS >> "$LOG_FILE"
 		fi
 
