@@ -52,7 +52,7 @@ if [ -d $TMP_DIR ]; then
 	exit 4
 fi
 
-mkdir $TMP_DIR
+mkdir -p $TMP_DIR
 mkdir -p $BACKUP_DIR
 
 function toBackupType {
@@ -130,8 +130,8 @@ function runBackupTask {
 echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
 
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
-	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
+	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 	echo "  - $BACKUP_TYPE"
 
 	runBackupTask "$SCRIPT_FILE" >> "$LOG_DIR/$BACKUP_TASK_ID.log" &
@@ -140,9 +140,12 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
 done
 wait
 
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
+for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
-	echo "### $ACTION_LABEL $BACKUP_TYPE ###" >> "$LOG_FILE"
+	echo '###' >> "$LOG_FILE"
+	echo "# $ACTION_LABEL $BACKUP_TYPE ###" >> "$LOG_FILE"
+	echo '###' >> "$LOG_FILE"
 	cat "$LOG_DIR/$BACKUP_TASK_ID.log"    >> "$LOG_FILE"
 	rm -rf "$LOG_DIR/$BACKUP_TASK_ID.log"
 
@@ -160,5 +163,5 @@ if $SCRIPT_ERROR; then
 	exit 3
 else
 	echo "Finished successfully"
-	echo "Run 'backup restore $BACKUP_DATE' to restore your backup"
+	echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 fi
