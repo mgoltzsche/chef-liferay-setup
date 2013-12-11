@@ -68,7 +68,7 @@ function runBackupTask {
 
 	if [ $ACTION = 'dump' ]; then
 		if [ -f "$BACKUP_ARCHIVE" ]; then
-			echo "* WARNING: $BACKUP_ARCHIVE already exists and will be overwritten"
+			printf "* WARNING: $BACKUP_ARCHIVE\n           already exists and will be overwritten\n"
 		fi
 
 		mkdir $CUR_TMP_DIR
@@ -221,8 +221,8 @@ case "$ACTION" in
 		BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
-			sleep 5
+			printf "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten\n           Cancel script execution now if that is not what you want!\n"
+			sleep 7
 		fi
 
 		runBackup
