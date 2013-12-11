@@ -67,6 +67,10 @@ function runBackupTask {
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
 	if [ $ACTION = 'dump' ]; then
+		if [ -f "$BACKUP_ARCHIVE" ]; then
+			echo "* WARNING: $BACKUP_ARCHIVE already exists and will be overwritten"
+		fi
+
 		mkdir $CUR_TMP_DIR
 		chmod 777 $CUR_TMP_DIR
 	else
@@ -126,7 +130,7 @@ function runBackup {
 	LOG_FILE=$TMP_LOG_FILE_NAME
 
 	if [ -d "$TMP_DIR" ]; then
-		echo "Temp directory $TMP_DIR is in use" 2>&1
+		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
 		exit 4
 	fi
 
@@ -184,6 +188,7 @@ function runBackup {
 
 	if [ $EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
+			# Copy compressed backups to $BACKUP_DIR
 			echo "* copy compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
@@ -216,8 +221,8 @@ case "$ACTION" in
 		BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			echo "Backup date $BACKUP_DATE already exists" 2>&1
-			exit 5
+			echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
+			sleep 5
 		fi
 
 		runBackup
