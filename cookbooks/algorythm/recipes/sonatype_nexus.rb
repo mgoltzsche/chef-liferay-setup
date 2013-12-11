@@ -189,6 +189,18 @@ uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
   end
 end
 
+# --- Configure backup ---
+template "#{node['backup']['install_directory']}/tasks/backup-nexus.sh" do
+  source 'backup-nexus.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0700
+  variables({
+    :home => nexusHome,
+    :user => usr
+  })
+end
+
 # --- Configure nginx ---
 template "/etc/nginx/sites-available/#{hostname}" do
   source 'nexus.nginx.vhost.erb'

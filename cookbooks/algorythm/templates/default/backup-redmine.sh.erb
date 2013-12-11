@@ -4,24 +4,24 @@
 # Must be run as root                               #
 #####################################################
 
-if [ -z "$REDMINE_DIR" ]; then
-	REDMINE_DIR="<%=@dir%>"
+if [ -z "$REDMINE_INSTALLATION" ]; then
+	REDMINE_INSTALLATION='<%=@dir%>'
 fi
 if [ -z "$REDMINE_HOME" ]; then
-	REDMINE_HOME="<%=@homeDir%>"
+	REDMINE_HOME='<%=@homeDir%>'
 fi
 
 SCRIPT_NAME="$0"
 ACTION="$1"
 BAK="$2"
 
-DB_CFG_FILE="$REDMINE_DIR/config/database.yml"
+DB_CFG_FILE="$REDMINE_INSTALLATION/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
 
 if [ -z "$BAK" ]; then
 	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
-	exit 2
+	exit 1
 fi
 
 case "$ACTION" in
@@ -35,14 +35,14 @@ case "$ACTION" in
 		backup-pg    restore "$DB_NAME" "$BAK/db.sql" "$USER" &&
 		backup-files restore "$REDMINE_HOME/files" "$BAK/files" "$USER" &&
 		echo '* migrate database' &&
-		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
+		su "$USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
 		echo '* reconfigure backlogs plugin' &&
-		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake redmine:backlogs:install" &&
+		su "$USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake redmine:backlogs:install" &&
 		echo '* start thin' &&
 		service thin start >> /dev/null
 	;;
 	*)
 		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
-		exit 2
+		exit 1
 	;;
 esac
