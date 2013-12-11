@@ -221,7 +221,7 @@ case "$ACTION" in
 		BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			if [ $2 = 'force' ]; then
+			if [ "$2" = 'force' ]; then
 				echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 			else
 				echo "failed: Backup date $BACKUP_DATE already exists"
