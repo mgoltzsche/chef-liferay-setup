@@ -30,10 +30,15 @@ case "$ACTION" in
 		backup-files dump "$REDMINE_HOME/files" "$BAK/files"
 	;;
 	restore)
+		echo '* stop thin'
 		service thin stop >> /dev/null
 		backup-pg    restore "$DB_NAME" "$BAK/db.sql" "$USER" &&
 		backup-files restore "$REDMINE_HOME/files" "$BAK/files" "$USER" &&
-		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
+		echo '* migrate database' &&
+		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
+		echo '* reconfigure backlogs plugin' &&
+		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake redmine:backlogs:install" &&
+		echo '* start thin' &&
 		service thin start >> /dev/null
 	;;
 	*)

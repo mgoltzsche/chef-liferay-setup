@@ -178,9 +178,11 @@ function runBackup {
 		rm -rf "$PARTIAL_LOG_FILE"
 	done
 
+	echo '' >> "$LOG_FILE"
+
 	if [ $BACKUP_EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
-			printf "\ncopy compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
+			echo "* copy compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
