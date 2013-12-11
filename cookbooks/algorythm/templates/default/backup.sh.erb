@@ -1,6 +1,6 @@
 #!/bin/bash
 ###################################
-# Usage: backup {dump|restore ID} #
+# Usage: backup {dump|restore DATE} #
 # Must be run as root             #
 ###################################
 
@@ -24,7 +24,7 @@ function showUsageAndExit {
 case "$ACTION" in
 	dump)
 		ACTION_LABEL="Backing up"
-		BACKUP_ID=$(date +'%y-%m-%d_%H-%M')
+		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
 	;;
 	restore)
 		if [[ -z "$2" ]]; then
@@ -32,33 +32,34 @@ case "$ACTION" in
 		fi
 
 		ACTION_LABEL="Restoring"
-		BACKUP_ID="$2"
+		BACKUP_DATE="$2"
 	;;
 	*)
 		showUsageAndExit
 	;;
 esac
 
+TIMESTAMP=$(date +%s)
 BACKUP_INSTALL_DIR=$(dirname $(readlink -f "$0"))
+LOG_DIR="$BACKUP_INSTALL_DIR/log"
 PATH="$PATH:$BACKUP_INSTALL_DIR/bin"
-TMP_DIR="/tmp/$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)"
-SCRIPT_ERROR=0
+TMP_DIR="/tmp/backup-$BACKUP_DATE"
+SCRIPT_ERROR=false
 
 function runBackupTask {
 	SCRIPT_FILE="$1"
-	TASK_NAME=${SCRIPT_FILE#backup-}
-	TASK_NAME=${TASK_NAME%.sh}
+	TASK_NAME="$2"
 
 	echo "* $ACTION_LABEL $TASK_NAME ..."
 
-	TASK_BACKUP_DIR="$BACKUP_DIR/$TASK_NAME"
-	BACKUP_ARCHIVE="$TASK_BACKUP_DIR/$BACKUP_ID.tar.bz2"
+	BACKUP_ID="$TASK_NAME-$BACKUP_DATE"
+	BACKUP_ARCHIVE="$BACKUP_DIR/$BACKUP_ID.tar.bz2"
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_ID"
-	mkdir -p $TASK_BACKUP_DIR
 
 	if [ $ACTION = 'dump' ]; then
 		if [ -f $BACKUP_ARCHIVE ]; then
 			echo "  ... failed: $BACKUP_ARCHIVE already exists" 2>&1
+			SCRIPT_ERROR=true
 			return 1
 		fi
 
@@ -67,6 +68,7 @@ function runBackupTask {
 	else
 		if [ ! -f $BACKUP_ARCHIVE ]; then
 			echo "  ... failed: $BACKUP_ARCHIVE does not exist" 2>&1
+			SCRIPT_ERROR=true
 			return 1
 		fi
 
@@ -76,6 +78,7 @@ function runBackupTask {
 
 		if [ $STATUS != '0' ]; then
 			echo "  ... failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR" 2>&1
+			SCRIPT_ERROR=true
 			return 1
 		fi
 	fi
@@ -89,8 +92,11 @@ function runBackupTask {
 			tar cjf $BACKUP_ARCHIVE $BACKUP_ID
 			STATUS=$?
 
-			if [ $STATUS != '0' ]; then
+			if [ $STATUS = '0' ]; then
+				chmod 600 $BACKUP_ARCHIVE
+			else
 				echo "  ... failed: Couldn't compress and save backup to $BACKUP_ARCHIVE" 2>&1
+				SCRIPT_ERROR=true
 				return 1
 			fi
 		fi
@@ -99,31 +105,30 @@ function runBackupTask {
 		return 0
 	else
 		echo "  ... $scriptName $ACTION failed" 2>&1
+		SCRIPT_ERROR=true
 		return 1
 	fi
 }
 
 echo "$ACTION_LABEL $BACKUP_DIR/*/$BACKUP_ID"
 
+mkdir -p $BACKUP_DIR
 mkdir $TMP_DIR
 
 for SCRIPT_FILE in $(ls "$BACKUP_INSTALL_DIR/tasks" | grep -P "\.sh"); do
-	runBackupTask "$SCRIPT_FILE"
-	STATUS=$?
-
-	if [ $STATUS != '0' ]; then
-		SCRIPT_ERROR=3
-	fi
-
+	TASK_NAME=${SCRIPT_FILE#backup-}
+	TASK_NAME=${TASK_NAME%.sh}
+	LOG_NAME=
+	runBackupTask "$SCRIPT_FILE" "$TASK_NAME" >>  &
 	rm -rf $TMP_DIR/$BACKUP_ID
 done
+wait
 
 rm -rf $TMP_DIR
 
-if [ $SCRIPT_ERROR = '0' ]; then
-	echo "Finished successfully"
-else
+if $SCRIPT_ERROR; then
 	echo "Finished with error(s)"
+	exit 3
+else
+	echo "Finished successfully"
 fi
-
-exit $SCRIPT_ERROR

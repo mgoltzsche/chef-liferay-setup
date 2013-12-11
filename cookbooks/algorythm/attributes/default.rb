@@ -6,7 +6,7 @@ default['tcp_timeout'] = 600 # Should be lower to free worker threads earlier
 
 # backup
 default['backup']['install_directory'] = '/opt/backup-scripts'
-default['backup']['backup_directory'] = '/var/backups'
+default['backup']['backup_directory'] = '/var/backups/managed'
 
 # LDAP configuration
 default['ldap']['listenhost'] = '0.0.0.0'

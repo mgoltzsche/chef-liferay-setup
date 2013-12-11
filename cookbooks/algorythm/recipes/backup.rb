@@ -4,35 +4,41 @@ executable = "#{installDir}/backup.sh"
 directory "#{installDir}/bin" do
   owner 'root'
   group 'root'
-  mode 00755
+  mode 0755
   recursive true
+end
+
+directory "#{installDir}/log" do
+  owner 'root'
+  group 'root'
+  mode 0700
 end
 
 directory "#{installDir}/tasks" do
   owner 'root'
   group 'root'
-  mode 00755
+  mode 0755
 end
 
 template "#{installDir}/backup-pg.sh" do
   source 'backup-pg.sh.erb'
   owner 'root'
   group 'root'
-  mode 00755
+  mode 0755
 end
 
 template "#{installDir}/backup-files.sh" do
   source 'backup-files.sh.erb'
   owner 'root'
   group 'root'
-  mode 00755
+  mode 0755
 end
 
 template executable do
   source 'backup.sh.erb'
   owner 'root'
   group 'root'
-  mode 00755
+  mode 0755
   variables({
     :backupDir => node['backup']['backup_directory']
   })
