@@ -220,8 +220,8 @@ case "$ACTION" in
 		ls "$BACKUP_DIR" | grep -P '\.tar\.bz2$' | toBackupDates | uniq | sort -r | while read -r ARCHIVE_DATE; do
 			echo "$ARCHIVE_DATE"
 			for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
-				echo "  * ${ARCHIVE%$ARCHIVE_DATE.tar.bz2}"
-			end
+				echo "  * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}"
+			done
 		done
 	;;
 	*)
