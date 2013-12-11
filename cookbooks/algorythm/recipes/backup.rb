@@ -47,9 +47,9 @@ link "#{installDir}/bin/backup" do
 end
 
 link "#{installDir}/bin/backup-pg" do
-  to "#{installDir}/scripts/backup-pg.sh"
+  to "#{installDir}/backup-pg.sh"
 end
 
 link "#{installDir}/bin/backup-files" do
-  to "#{installDir}/scripts/backup-files.sh"
+  to "#{installDir}/backup-files.sh"
 end
