@@ -47,12 +47,12 @@ LOG_FILE="$LOG_DIR/$BACKUP_ID.log"
 TMP_DIR="/tmp/$BACKUP_ID"
 SCRIPT_ERROR=false
 
-if [ -d $TMP_DIR ]; then
+if [ -d "$TMP_DIR" ] || [ -f "$LOG_FILE" ]; then
 	echo "Temp directory $TMP_DIR is in use" 2>&1
 	exit 4
 fi
 
-mkdir -p $TMP_DIR
+mkdir $TMP_DIR
 mkdir -p $BACKUP_DIR
 
 function toBackupType {
@@ -76,28 +76,25 @@ function runBackupTask {
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
 	if [ $ACTION = 'dump' ]; then
-		if [ -f $BACKUP_ARCHIVE ]; then
-			echo "-> failed: $BACKUP_ARCHIVE already exists"
-			SCRIPT_ERROR=true
+		if [ -f "$BACKUP_ARCHIVE" ]; then
+			echo "failed: $BACKUP_ARCHIVE already exists"
 			return 1
 		fi
 
 		mkdir $CUR_TMP_DIR
 		chmod 777 $CUR_TMP_DIR
 	else
-		if [ ! -f $BACKUP_ARCHIVE ]; then
-			echo "-> failed: $BACKUP_ARCHIVE does not exist"
-			SCRIPT_ERROR=true
+		if [ ! -f "$BACKUP_ARCHIVE" ]; then
+			echo "failed: $BACKUP_ARCHIVE does not exist"
 			return 1
 		fi
 
 		cd $TMP_DIR
-		tar xjf $BACKUP_ARCHIVE
+		tar xjf "$BACKUP_ARCHIVE"
 		STATUS=$?
 
 		if [ $STATUS != '0' ]; then
-			echo "-> failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
-			SCRIPT_ERROR=true
+			echo "failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
 			return 1
 		fi
 	fi
@@ -108,40 +105,53 @@ function runBackupTask {
 	if [ $STATUS = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
 			cd $TMP_DIR
-			tar cjf $BACKUP_ARCHIVE $BACKUP_TASK_ID
+			tar cjf "$BACKUP_ARCHIVE" $BACKUP_TASK_ID
 			STATUS=$?
 
 			if [ $STATUS = '0' ]; then
 				chmod 600 $BACKUP_ARCHIVE
 			else
-				echo "-> failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
-				SCRIPT_ERROR=true
+				echo "failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
 				return 1
 			fi
 		fi
 
-		echo "-> done"
+		echo "done"
 		return 0
 	else
-		echo "-> failed"
-		SCRIPT_ERROR=true
+		echo "failed"
 		return 1
 	fi
 }
 
+
+
 echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
 
+# Run backup tasks parallel
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
-	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
-	echo "  - $BACKUP_TYPE"
+        BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
+        BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+        echo "  - $BACKUP_TYPE"
 
-	runBackupTask "$SCRIPT_FILE" >> "$LOG_DIR/$BACKUP_TASK_ID.log" &
+        runBackupTask "$SCRIPT_FILE" >> "$LOG_DIR/$BACKUP_TASK_ID.log" &
+        declare "${BACKUP_TYPE}_PID=$!"
 
-	rm -rf $TMP_DIR/$BACKUP_TASK_ID
+        rm -rf $TMP_DIR/$BACKUP_TASK_ID
 done
-wait
 
+# Wait for tasks to terminate and collect exit codes
+for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
+        PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
+        wait ${!PID_VAR}
+        TASK_EXIT_CODE=$?
+
+        if [ $TASK_EXIT_CODE != '0' ]; then
+                SCRIPT_ERROR=true
+        fi
+done
+
+# Merge logs
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
@@ -150,20 +160,17 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
 	echo '###' >> "$LOG_FILE"
 	cat "$LOG_DIR/$BACKUP_TASK_ID.log"    >> "$LOG_FILE"
 	rm -rf "$LOG_DIR/$BACKUP_TASK_ID.log"
-
-	if $SCRIPT_ERROR; then
-		echo "=> Finished with error(s)" >> "$LOG_FILE"
-	else
-		echo "=> Finished successfully"  >> "$LOG_FILE"
-	fi
 done
 
 rm -rf $TMP_DIR
 
+
 if $SCRIPT_ERROR; then
+	echo "Finished with error(s)" >> "$LOG_FILE"
 	echo "Finished with error(s) (see log file $LOG_FILE)"
 	exit 3
 else
+	echo "Finished successfully"  >> "$LOG_FILE"
 	echo "Finished successfully"
 	echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 fi
