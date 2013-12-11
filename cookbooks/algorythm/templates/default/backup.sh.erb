@@ -45,11 +45,19 @@ PATH="$PATH:$INSTALL_DIR/bin"
 BACKUP_ID="backup-$BACKUP_DATE"
 LOG_FILE="$LOG_DIR/$BACKUP_ID.log"
 TMP_DIR="/tmp/$BACKUP_ID"
-SCRIPT_ERROR=false
+BACKUP_EXIT_CODE=0
 
 if [ -d "$TMP_DIR" ]; then
 	echo "Temp directory $TMP_DIR is in use" 2>&1
 	exit 4
+fi
+
+ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$'
+$BACKUP_DATE_SEARCH_EXIT_CODE=$?
+
+if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
+	echo "Backup date $BACKUP_DATE already exists" 2>&1
+	exit 5
 fi
 
 mkdir $TMP_DIR
@@ -147,7 +155,7 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
         TASK_EXIT_CODE=$?
 
         if [ $TASK_EXIT_CODE != '0' ]; then
-                SCRIPT_ERROR=true
+                BACKUP_EXIT_CODE=3
         fi
 done
 
@@ -156,7 +164,7 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 	echo '===============================================================================' >> "$LOG_FILE"
-	echo "    $ACTION_LABEL $BACKUP_TYPE ###" >> "$LOG_FILE"
+	echo "   $ACTION_LABEL $BACKUP_TYPE ..." >> "$LOG_FILE"
 	echo '===============================================================================' >> "$LOG_FILE"
 	cat "$LOG_DIR/$BACKUP_TASK_ID.log"    >> "$LOG_FILE"
 	rm -rf "$LOG_DIR/$BACKUP_TASK_ID.log"
@@ -165,15 +173,16 @@ done
 rm -rf $TMP_DIR
 
 
-if $SCRIPT_ERROR; then
-	echo "Finished with error(s)" >> "$LOG_FILE"
-	echo "Finished with error(s) (see log file $LOG_FILE)"
-	exit 3
-else
+if [ $BACKUP_EXIT_CODE = '0' ]; then
 	echo "Finished successfully"  >> "$LOG_FILE"
 	echo "Finished successfully (see log file $LOG_FILE)"
 
 	if [ $ACTION = 'dump' ]; then
 		echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 	fi
+else
+	echo "Finished with error(s)" >> "$LOG_FILE"
+	echo "Finished with error(s) (see log file $LOG_FILE)"
 fi
+
+exit $BACKUP_EXIT_CODE
