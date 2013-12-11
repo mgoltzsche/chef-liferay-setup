@@ -185,6 +185,15 @@ function runBackup {
 	rm -rf $TMP_DIR
 }
 
+function toBackupDates {
+	while read -r ARCHIVE; do
+		A_TYPE=${ARCHIVE%-*-*-*_*-*.tar.bz2}
+		A_DATE=${ARCHIVE%.tar.bz2}
+		A_DATE=${A_DATE#$A_TYPE-}
+		echo $A_DATE
+	done
+}
+
 
 case "$ACTION" in
 	dump)
@@ -208,20 +217,11 @@ case "$ACTION" in
 		runBackup
 	;;
 	list)
-		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P '\.tar\.bz2$'); do
-			BAK_TYPE=${ARCHIVE%-*-*-*_*-*.tar.bz2}
-			BAK_DATE=${ARCHIVE%.tar.bz2}
-			BAK_DATE=${BAK_DATE#$BAK_TYPE-}
-			FLAG_VAR="LISTED_$BAK_DATE"
-			if [ -z "${!PID_VAR}" ]; then
-				echo "$BAK_DATE"
-				declare "$FLAG_VAR=true"
-
-				for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$BAK_DATE\.tar\.bz2$"); do
-					BAK_TYPE=${ARCHIVE%$BAK_DATE.tar.bz2}
-					echo " * BAK_TYPE"
-				end
-			fi
+		ls "$BACKUP_DIR" | grep -P '\.tar\.bz2$' | toBackupDates | uniq | sort -r | while read -r ARCHIVE_DATE; do
+			echo "$ARCHIVE_DATE"
+			for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
+				echo "  * ${ARCHIVE%$ARCHIVE_DATE.tar.bz2}"
+			end
 		done
 	;;
 	*)
