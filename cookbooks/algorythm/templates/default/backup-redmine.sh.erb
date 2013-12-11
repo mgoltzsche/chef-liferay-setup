@@ -1,51 +1,47 @@
 #!/bin/bash
+#####################################################
+# Usage: backup-redmine.sh {dump|restore} DIRECTORY #
+# Must be run as root                               #
+#####################################################
 
 SCRIPT_NAME="$0"
 ACTION="$1"
-BACKUP_ID="$2"
-BAK="$BACKUP_DIR/redmine/$BACKUP_ID"
+BAK="$2"
+SCRIPTS="$(dirname $(readlink -f \"$0\"))/../scripts"
+SCRIPT_PG="$SCRIPTS/backup-pg.sh"
+SCRIPT_FILES="$SCRIPTS/backup-files.sh"
 REDMINE_HOME="<%=@homeDir%>"
 REDMINE_DIR="<%=@dir%>"
 DB_CFG_FILE="$REDMINE_DIR/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
-export PGPASSWORD=$(cat $DB_CFG_FILE | grep -Po "(?<=password:\s).*")
 
 case "$ACTION" in
-	backup)
-		if [ -d "$BAK" ]; then
-			echo "already exists"
-		else
-			mkdir -p "$BAK" &&
-			chown root:postgres "$BACKUP_DIR/redmine" &&
-			chmod 750 "$BACKUP_DIR/redmine" &&
-			pg_dump -h localhost -U "$USER" -Fc --file="$BAK/db.bak" "$DB_NAME" &&
-			cp -R "$REDMINE_HOME" "$BAK/files"
-		fi
-	;;
-	restore)
-		if [ -z "$BACKUP_ID" ]; then
-			echo "Usage: $SCRIPT_NAME {backup|restore ID}"
-			exit 2
-		fi
-
-		if [ ! -d "$BAK" ]; then
-			echo "Cannot restore because $BAK does not exist" 2>&1
-			exit 3
-		fi
-
-		service thin stop >> /dev/null
-		su postgres -c "dropdb \"$DB_NAME\"" &&
-		rm -rf "$REDMINE_HOME/files" &&
-		su postgres -c "createdb \"$DB_NAME\" -O \"$USER\" -E UTF8 -T template0" &&
-		su postgres -c "pg_restore -d \"$DB_NAME\" -Fc \"$BAK/db.bak\"" &&
-		cp -R "$BAK/files" "$REDMINE_HOME/files" &&
-		chown -R "$USER:$USER" "$REDMINE_HOME/files" &&
-		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
-		service thin start >> /dev/null
+	dump|restore)
 	;;
 	*)
-		echo "Usage: $SCRIPT_NAME {backup|restore ID}"
+		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
 		exit 2
+	;;
+esac
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	exit 2
+fi
+
+
+
+case "$ACTION" in
+	dump)
+		$SCRIPT_PG dump "$DB_NAME" "$BAK/db.sql" &&
+		$SCRIPT_FILES dump "$REDMINE_HOME" "$BAK/files"
+	;;
+	restore)
+		service thin stop >> /dev/null
+		$SCRIPT_PG restore "$DB_NAME" "$BAK/db.sql" "$USER" &&
+		$SCRIPT_FILES restore "$REDMINE_HOME" "$BAK/files" "$USER" &&
+		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
+		service thin start >> /dev/null
 	;;
 esac
