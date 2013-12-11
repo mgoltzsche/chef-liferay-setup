@@ -52,8 +52,8 @@ if [ -d "$TMP_DIR" ]; then
 	exit 4
 fi
 
-ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$'
-$BACKUP_DATE_SEARCH_EXIT_CODE=$?
+ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
 	echo "Backup date $BACKUP_DATE already exists" 2>&1
@@ -140,9 +140,11 @@ echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
         BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
         BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+	PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
         echo "  - $BACKUP_TYPE"
+	echo "" > $PARTIAL_LOG_FILE
 
-        runBackupTask "$SCRIPT_FILE" &>> "$LOG_DIR/$BACKUP_TASK_ID.log" &
+        runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
         declare "${BACKUP_TYPE}_PID=$!"
 
         rm -rf $TMP_DIR/$BACKUP_TASK_ID
@@ -160,18 +162,17 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
 done
 
 # Merge logs
+echo "" > $LOG_FILE
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+	PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 	echo '===============================================================================' >> "$LOG_FILE"
 	echo "   $ACTION_LABEL $BACKUP_TYPE ..." >> "$LOG_FILE"
 	echo '===============================================================================' >> "$LOG_FILE"
-	cat "$LOG_DIR/$BACKUP_TASK_ID.log"    >> "$LOG_FILE"
-	rm -rf "$LOG_DIR/$BACKUP_TASK_ID.log"
+	cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
+	rm -rf "$PARTIAL_LOG_FILE"
 done
-
-rm -rf $TMP_DIR
-
 
 if [ $BACKUP_EXIT_CODE = '0' ]; then
 	echo "Finished successfully"  >> "$LOG_FILE"
@@ -184,5 +185,7 @@ else
 	echo "Finished with error(s)" >> "$LOG_FILE"
 	echo "Finished with error(s) (see log file $LOG_FILE)"
 fi
+
+rm -rf $TMP_DIR
 
 exit $BACKUP_EXIT_CODE
