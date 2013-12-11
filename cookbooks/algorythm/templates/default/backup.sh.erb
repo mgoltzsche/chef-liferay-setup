@@ -23,7 +23,6 @@ function showUsageAndExit {
 
 case "$ACTION" in
 	dump)
-		ACTION_LABEL="Backing up"
 		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
 
 		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
@@ -35,7 +34,6 @@ case "$ACTION" in
 		fi
 	;;
 	restore)
-		ACTION_LABEL="Restoring"
 		BACKUP_DATE="$2"
 
 		if [ -z "$BACKUP_DATE" ]; then
@@ -140,7 +138,7 @@ function runBackupTask {
 }
 
 function runBackup {
-	echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
+	echo "$ACTION date $BACKUP_DATE ($BACKUP_DIR):"
 	mkdir -p $BACKUP_DIR
 	mkdir $TMP_DIR
 
@@ -149,7 +147,7 @@ function runBackup {
 		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
-		echo "  - $BACKUP_TYPE"
+		echo "  * $BACKUP_TYPE"
 		printf '' > $PARTIAL_LOG_FILE
 
 		runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
@@ -176,28 +174,30 @@ function runBackup {
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
-		echo "   $ACTION_LABEL $BACKUP_TYPE ..." >> "$LOG_FILE"
+		echo "   $ACTION $BACKUP_TYPE" >> "$LOG_FILE"
 		echo '===============================================================================' >> "$LOG_FILE"
 		cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
 		rm -rf "$PARTIAL_LOG_FILE"
 	done
 
 	if [ $BACKUP_EXIT_CODE = '0' ]; then
-		printf "\nCopying compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
+		if [ $ACTION = 'dump' ]; then
+			printf "\nCopying compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
 
-		for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
-			mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
-		done
+			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
+				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
+			done
+		fi
 
 		echo "Finished successfully" >> "$LOG_FILE"
-		printf "\nFinished successfully (see log file $LOG_FILE)\n"
+		printf "\nFinished successfully (see $LOG_FILE)\n"
 		
 		if [ $ACTION = 'dump' ]; then
 			echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 		fi
 	else
 		echo "Finished with error(s)" >> "$LOG_FILE"
-		printf "\nFinished with error(s) (see log file $LOG_FILE)\n"
+		printf "\nFinished with error(s) (see $LOG_FILE)\n"
 	fi
 
 	rm -rf $TMP_DIR
