@@ -112,6 +112,12 @@ end
 
 directory "#{redmineDir}/public/plugin_assets"
 
+directory "#{redmineHome}/files" do
+  owner usr
+  group usr
+  mode 0700
+end
+
 link redmineDirLink do
   to redmineDir
 end

@@ -49,7 +49,7 @@ function runBackupTask {
 	TASK_NAME=${SCRIPT_FILE#backup-}
 	TASK_NAME=${TASK_NAME%.sh}
 
-	echo "* $ACTION_LABEL $scriptName ..."
+	echo "* $ACTION_LABEL $TASK_NAME ..."
 
 	TASK_BACKUP_DIR="$BACKUP_DIR/$TASK_NAME"
 	BACKUP_ARCHIVE="$TASK_BACKUP_DIR/$BACKUP_ID.tar.bz2"
@@ -57,6 +57,11 @@ function runBackupTask {
 	mkdir -p $TASK_BACKUP_DIR
 
 	if [ $ACTION = 'dump' ]; then
+		if [ -f $BACKUP_ARCHIVE ]; then
+			echo "  ... failed: $BACKUP_ARCHIVE already exists" 2>&1
+			return 1
+		fi
+
 		mkdir $CUR_TMP_DIR
 		chmod 777 $CUR_TMP_DIR
 	else
