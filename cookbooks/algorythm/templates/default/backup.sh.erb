@@ -15,56 +15,14 @@ fi
 
 SCRIPT_NAME="$0"
 ACTION="$1"
+BACKUP_DATE="$2"
+INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
+EXIT_CODE=0
 
 function showUsageAndExit {
 	echo "Usage: $SCRIPT_NAME {dump|restore ID}"
 	exit 2
 }
-
-case "$ACTION" in
-	dump)
-		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
-
-		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
-		BACKUP_DATE_SEARCH_EXIT_CODE=$?
-
-		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			echo "Backup date $BACKUP_DATE already exists" 2>&1
-			exit 5
-		fi
-	;;
-	restore)
-		BACKUP_DATE="$2"
-
-		if [ -z "$BACKUP_DATE" ]; then
-			showUsageAndExit
-		fi
-	;;
-	*)
-		showUsageAndExit
-	;;
-esac
-
-INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
-LOG_DIR="$INSTALL_DIR/log"
-PATH="$PATH:$INSTALL_DIR/bin"
-LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
-TMP_DIR="/tmp/backup-$BACKUP_DATE"
-TMP_ARCHIVE_DIR="$TMP_DIR/backups"
-BACKUP_EXIT_CODE=0
-
-if [ -d "$TMP_DIR" ]; then
-	echo "Temp directory $TMP_DIR is in use" 2>&1
-	exit 4
-fi
-
-LOG_FILE_NAME_INC=0
-TMP_LOG_FILE_NAME=$LOG_FILE
-while [ -f "$TMP_LOG_FILE_NAME" ]; do
-	LOG_FILE_NAME_INC=$(expr $LOG_FILE_NAME_INC + 1)
-	TMP_LOG_FILE_NAME="$LOG_DIR/$ACTION-$BACKUP_DATE.$LOG_FILE_NAME_INC.log"
-done
-LOG_FILE=$TMP_LOG_FILE_NAME
 
 function toBackupType {
 	SCRIPT_FILE=$1
@@ -136,12 +94,31 @@ function runBackupTask {
 }
 
 function runBackup {
+	LOG_DIR="$INSTALL_DIR/log"
+	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
+	TMP_DIR="/tmp/backup-$BACKUP_DATE"
+	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
+	PATH="$PATH:$INSTALL_DIR/bin"
+
+	LOG_FILE_NAME_INC=0
+	TMP_LOG_FILE_NAME=$LOG_FILE
+	while [ -f "$TMP_LOG_FILE_NAME" ]; do
+		LOG_FILE_NAME_INC=$(expr $LOG_FILE_NAME_INC + 1)
+		TMP_LOG_FILE_NAME="$LOG_DIR/$ACTION-$BACKUP_DATE.$LOG_FILE_NAME_INC.log"
+	done
+	LOG_FILE=$TMP_LOG_FILE_NAME
+
+	if [ -d "$TMP_DIR" ]; then
+		echo "Temp directory $TMP_DIR is in use" 2>&1
+		exit 4
+	fi
+
 	echo "$ACTION date $BACKUP_DATE (in $BACKUP_DIR):"
 	mkdir -p $BACKUP_DIR
 	mkdir -p $TMP_ARCHIVE_DIR
 
 	# Run backup tasks parallel
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
 		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
@@ -154,20 +131,24 @@ function runBackup {
 		rm -rf $TMP_DIR/$BACKUP_TASK_ID
 	done
 
+	echo ''
+
 	# Wait for tasks to terminate and collect exit codes
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
+		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 		PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
 
 		if [ $TASK_EXIT_CODE != '0' ]; then
-		        BACKUP_EXIT_CODE=3
+			echo "  ! $BACKUP_TYPE failed"
+		        EXIT_CODE=3
 		fi
 	done
 
 	# Concat task logs and write to single $LOG_FILE
 	printf '' > $LOG_FILE
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
 		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
@@ -180,7 +161,7 @@ function runBackup {
 
 	echo '' >> "$LOG_FILE"
 
-	if [ $BACKUP_EXIT_CODE = '0' ]; then
+	if [ $EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
 			echo "* copy compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
@@ -191,7 +172,7 @@ function runBackup {
 		fi
 
 		echo "finished successfully" >> "$LOG_FILE"
-		printf "\nfinished successfully (see $LOG_FILE)\n"
+		echo "finished successfully (see $LOG_FILE)"
 		
 		if [ $ACTION = 'dump' ]; then
 			echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
@@ -204,5 +185,48 @@ function runBackup {
 	rm -rf $TMP_DIR
 }
 
-runBackup
-exit $BACKUP_EXIT_CODE
+
+case "$ACTION" in
+	dump)
+		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
+
+		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+		BACKUP_DATE_SEARCH_EXIT_CODE=$?
+
+		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
+			echo "Backup date $BACKUP_DATE already exists" 2>&1
+			exit 5
+		fi
+
+		runBackup
+	;;
+	restore)
+		if [ -z "$BACKUP_DATE" ]; then
+			showUsageAndExit
+		fi
+
+		runBackup
+	;;
+	list)
+		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P '\.tar\.bz2$'); do
+			BAK_TYPE=${ARCHIVE%-*-*-*_*-*.tar.bz2}
+			BAK_DATE=${ARCHIVE%.tar.bz2}
+			BAK_DATE=${BAK_DATE#$BAK_TYPE-}
+			FLAG_VAR="LISTED_$BAK_DATE"
+			if [ -z "${!PID_VAR}" ]; then
+				echo "$BAK_DATE"
+				declare "$FLAG_VAR=true"
+
+				for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$BAK_DATE\.tar\.bz2$"); do
+					BAK_TYPE=${ARCHIVE%$BAK_DATE.tar.bz2}
+					echo " * BAK_TYPE"
+				end
+			fi
+		done
+	;;
+	*)
+		showUsageAndExit
+	;;
+esac
+
+exit $EXIT_CODE
