@@ -194,9 +194,9 @@ function runBackup {
 			done
 
 			echo "* clean backups" >> "$LOG_FILE"
-			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
+			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS >> "$LOG_FILE"
 			echo "* clean logs" >> "$LOG_FILE"
-			cleanDirectory "$LOG_DIR" $MAX_LOGS
+			cleanDirectory "$LOG_DIR" $MAX_LOGS >> "$LOG_FILE"
 		fi
 
 		echo "finished successfully" >> "$LOG_FILE"
