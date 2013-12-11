@@ -1,9 +1,9 @@
 #!/bin/bash
-##########################################
-# Usage: backup {list|dump|restore DATE} #
-# DATE: YY-MM-DD                         #
-# Must be run as root                    #
-##########################################
+##################################################
+# Usage: backup {list|dump [force]|restore DATE} #
+# DATE: YY-MM-DD                                 #
+# Must be run as root                            #
+##################################################
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script' 2>&1
@@ -18,12 +18,12 @@ SCRIPT_NAME="$0"
 ACTION="$1"
 BACKUP_DATE="$2"
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
-MAX_BACKUPS=5
-MAX_LOGS=5
+MAX_BACKUPS=1
+MAX_LOGS=1
 EXIT_CODE=0
 
 function showUsageAndExit {
-	printf "Usage: $SCRIPT_NAME {list|dump|restore DATE}\nDATE: YY-MM-DD\n"
+	printf "Usage: $SCRIPT_NAME {list|dump [force]|restore DATE}\nDATE: YY-MM-DD\n"
 	exit 2
 }
 
@@ -52,7 +52,7 @@ function cleanDirectory {
 	CLEAN_DIR="$1"
 	MAX_COUNT=$2
 	ls "$CLEAN_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
-		echo "* remove expired date $ARCHIVE_DATE from $CLEAN_DIR"
+		echo "  * remove $ARCHIVE_DATE"
 		cd $CLEAN_DIR
 		ls | grep $ARCHIVE_DATE | xargs rm
 	done
@@ -137,10 +137,7 @@ function runBackup {
 	mkdir -p "$BACKUP_DIR"
 	mkdir -p $TMP_ARCHIVE_DIR
 
-	cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
-	cleanDirectory "$LOG_DIR" $MAX_LOGS
-
-	echo "$ACTION date $BACKUP_DATE (in $BACKUP_DIR):"
+	echo "$ACTION date $BACKUP_DATE:"
 
 	# Run backup tasks parallel
 	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
@@ -166,7 +163,7 @@ function runBackup {
 		TASK_EXIT_CODE=$?
 
 		if [ $TASK_EXIT_CODE != '0' ]; then
-			echo "  ! $BACKUP_TYPE failed"
+			echo "! $BACKUP_TYPE failed"
 		        EXIT_CODE=3
 		fi
 	done
@@ -188,13 +185,18 @@ function runBackup {
 
 	if [ $EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
-			# Copy compressed backups to $BACKUP_DIR
-			echo "* copy compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
+			# Move compressed backups to $BACKUP_DIR
+			echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
 				chmod 600 "$BACKUP_DIR/$ARCHIVE"
 			done
+
+			echo "* clean backups" >> "$LOG_FILE"
+			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
+			echo "* clean logs" >> "$LOG_FILE"
+			cleanDirectory "$LOG_DIR" $MAX_LOGS
 		fi
 
 		echo "finished successfully" >> "$LOG_FILE"
