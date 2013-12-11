@@ -173,7 +173,7 @@ function runBackup {
 		rm -rf "$PARTIAL_LOG_FILE"
 	done
 
-	printf '\n\n' >> "$LOG_FILE"
+	echo '===============================================================================' >> "$LOG_FILE"
 
 	if [ $EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
