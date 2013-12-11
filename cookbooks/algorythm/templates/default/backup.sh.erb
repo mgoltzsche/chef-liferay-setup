@@ -223,7 +223,7 @@ case "$ACTION" in
 				exit 5
 			fi
 		else
-			if [ ! -z "$FORCE_OVERWRITE" ]; then
+			if [ "$FORCE_OVERWRITE" != '' ] && [ "$FORCE_OVERWRITE" != 'force' ]; then
 				showUsageAndExit
 			fi
 		fi
