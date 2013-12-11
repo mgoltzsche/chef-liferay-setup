@@ -112,7 +112,7 @@ end
 
 directory "#{redmineDir}/public/plugin_assets"
 
-directory "#{redmineHome}/files" do
+directory "#{redmineHomeDir}/files" do
   owner usr
   group usr
   mode 0700
