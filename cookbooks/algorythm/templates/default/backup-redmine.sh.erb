@@ -19,7 +19,7 @@ case "$ACTION" in
 			mkdir -p "$BAK" &&
 			chown root:postgres "$BACKUP_DIR/redmine" &&
 			chmod 750 "$BACKUP_DIR/redmine" &&
-			pg_dump -h localhost -U "$USER" -Fc --file="$BAK/db.sqlc" "$DB_NAME" &&
+			pg_dump -h localhost -U "$USER" -Fc --file="$BAK/db.bak" "$DB_NAME" &&
 			cp -R "$REDMINE_HOME" "$BAK/files"
 		fi
 	;;
@@ -38,7 +38,7 @@ case "$ACTION" in
 		su postgres -c "dropdb \"$DB_NAME\"" &&
 		rm -rf "$REDMINE_HOME/files" &&
 		su postgres -c "createdb \"$DB_NAME\" -O \"$USER\" -E UTF8 -T template0" &&
-		su postgres -c " \"$DB_NAME\" < \"$BAK/db.sqlc\"" &&
+		su postgres -c "pg_restore -d \"$DB_NAME\" -Fc \"$BAK/db.bak\"" &&
 		cp -R "$BAK/files" "$REDMINE_HOME/files" &&
 		chown -R "$USER:$USER" "$REDMINE_HOME/files" &&
 		su "$USER" -c "cd \"$REDMINE_DIR\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate && rake redmine:backlogs:install" &&
