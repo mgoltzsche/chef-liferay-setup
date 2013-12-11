@@ -52,6 +52,7 @@ LOG_DIR="$INSTALL_DIR/log"
 PATH="$PATH:$INSTALL_DIR/bin"
 LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 TMP_DIR="/tmp/backup-$BACKUP_DATE"
+TMP_ARCHIVE_DIR="$TMP_DIR/backups"
 BACKUP_EXIT_CODE=0
 
 if [ -d "$TMP_DIR" ]; then
@@ -66,9 +67,6 @@ while [ -f "$TMP_LOG_FILE_NAME" ]; do
 	TMP_LOG_FILE_NAME="$LOG_DIR/$ACTION-$BACKUP_DATE.$LOG_FILE_NAME_INC.log"
 done
 LOG_FILE=$TMP_LOG_FILE_NAME
-
-mkdir $TMP_DIR
-mkdir -p $BACKUP_DIR
 
 function toBackupType {
 	SCRIPT_FILE=$1
@@ -104,11 +102,12 @@ function runBackupTask {
 			return 1
 		fi
 
+		echo '* Decompressing backup'
 		cd $TMP_DIR
-		tar xjf "$BACKUP_ARCHIVE"
-		STATUS=$?
+		tar xvjf "$BACKUP_ARCHIVE"
+		DECOMPRESSION_EXIT_CODE=$?
 
-		if [ $STATUS != '0' ]; then
+		if [ $DECOMPRESSION_EXIT_CODE != '0' ]; then
 			echo "failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
 			return 1
 		fi
@@ -119,8 +118,9 @@ function runBackupTask {
 
 	if [ $STATUS = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
+			echo '* Compressing backup'
 			cd $TMP_DIR
-			tar cjf "$BACKUP_ARCHIVE" $BACKUP_TASK_ID
+			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
 			COMPRESSION_EXIT_CODE=$?
 
 			if [ $COMPRESSION_EXIT_CODE = '0' ]; then
@@ -139,60 +139,69 @@ function runBackupTask {
 	fi
 }
 
+function runBackup {
+	echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
+	mkdir -p $BACKUP_DIR
+	mkdir $TMP_DIR
 
+	# Run backup tasks parallel
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
+		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
+		echo "  - $BACKUP_TYPE"
+		printf '' > $PARTIAL_LOG_FILE
 
-echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
+		runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
+		declare "${BACKUP_TYPE}_PID=$!"
 
-# Run backup tasks parallel
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
-        BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-        BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
-	PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
-        echo "  - $BACKUP_TYPE"
-	printf '' > $PARTIAL_LOG_FILE
+		rm -rf $TMP_DIR/$BACKUP_TASK_ID
+	done
 
-        runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
-        declare "${BACKUP_TYPE}_PID=$!"
+	# Wait for tasks to terminate and collect exit codes
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+		PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
+		wait ${!PID_VAR}
+		TASK_EXIT_CODE=$?
 
-        rm -rf $TMP_DIR/$BACKUP_TASK_ID
-done
+		if [ $TASK_EXIT_CODE != '0' ]; then
+		        BACKUP_EXIT_CODE=3
+		fi
+	done
 
-# Wait for tasks to terminate and collect exit codes
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
-        PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
-        wait ${!PID_VAR}
-        TASK_EXIT_CODE=$?
+	# Concat task logs and write to single $LOG_FILE
+	printf '' > $LOG_FILE
+	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
+		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
+		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
+		echo '===============================================================================' >> "$LOG_FILE"
+		echo "   $ACTION_LABEL $BACKUP_TYPE ..." >> "$LOG_FILE"
+		echo '===============================================================================' >> "$LOG_FILE"
+		cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
+		rm -rf "$PARTIAL_LOG_FILE"
+	done
 
-        if [ $TASK_EXIT_CODE != '0' ]; then
-                BACKUP_EXIT_CODE=3
-        fi
-done
+	if [ $BACKUP_EXIT_CODE = '0' ]; then
+		printf "\nCopying compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
 
-# Merge logs
-printf '' > $LOG_FILE
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
-	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
-	PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
-	echo '===============================================================================' >> "$LOG_FILE"
-	echo "   $ACTION_LABEL $BACKUP_TYPE ..." >> "$LOG_FILE"
-	echo '===============================================================================' >> "$LOG_FILE"
-	cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
-	rm -rf "$PARTIAL_LOG_FILE"
-done
+		for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
+			mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
+		done
 
-if [ $BACKUP_EXIT_CODE = '0' ]; then
-	echo "Finished successfully"  >> "$LOG_FILE"
-	printf "\nFinished successfully (see log file $LOG_FILE)\n"
-
-	if [ $ACTION = 'dump' ]; then
-		echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
+		echo "Finished successfully" >> "$LOG_FILE"
+		printf "\nFinished successfully (see log file $LOG_FILE)\n"
+		
+		if [ $ACTION = 'dump' ]; then
+			echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
+		fi
+	else
+		echo "Finished with error(s)" >> "$LOG_FILE"
+		printf "\nFinished with error(s) (see log file $LOG_FILE)\n"
 	fi
-else
-	echo "Finished with error(s)" >> "$LOG_FILE"
-	printf "\nFinished with error(s) (see log file $LOG_FILE)\n"
-fi
 
-rm -rf $TMP_DIR
+	rm -rf $TMP_DIR
+}
 
+runBackup
 exit $BACKUP_EXIT_CODE
