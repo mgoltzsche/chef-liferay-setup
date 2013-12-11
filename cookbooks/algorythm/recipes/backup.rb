@@ -1,26 +1,27 @@
-executable = "#{node['backup']['install_directory']}/backup.sh"
+installDir = node['backup']['install_directory']
+executable = "#{installDir}/backup.sh"
 
-directory "#{node['backup']['install_directory']}/tasks" do
+directory "#{installDir}/bin" do
   owner 'root'
   group 'root'
   mode 00755
   recursive true
 end
 
-directory "#{node['backup']['install_directory']}/scripts" do
+directory "#{installDir}/tasks" do
   owner 'root'
   group 'root'
   mode 00755
 end
 
-template "#{node['backup']['install_directory']}/scripts/backup-pg.sh" do
+template "#{installDir}/backup-pg.sh" do
   source 'backup-pg.sh.erb'
   owner 'root'
   group 'root'
   mode 00755
 end
 
-template "#{node['backup']['install_directory']}/scripts/backup-files.sh" do
+template "#{installDir}/backup-files.sh" do
   source 'backup-files.sh.erb'
   owner 'root'
   group 'root'
@@ -39,4 +40,16 @@ end
 
 link "/usr/bin/backup" do
   to executable
+end
+
+link "#{installDir}/bin/backup" do
+  to executable
+end
+
+link "#{installDir}/bin/backup-pg" do
+  to "#{installDir}/scripts/backup-pg.sh"
+end
+
+link "#{installDir}/bin/backup-files" do
+  to "#{installDir}/scripts/backup-files.sh"
 end

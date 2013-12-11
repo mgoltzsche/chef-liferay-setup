@@ -1,8 +1,8 @@
 #!/bin/bash
-#########################################################################
-# Usage: backup-dir.sh {dump DIRECTORY BAK|restore DIRECTORY BAK OWNER} #
-# Must be run as root                                                   #
-#########################################################################
+###########################################################################
+# Usage: backup-files.sh {dump DIRECTORY BAK|restore DIRECTORY BAK OWNER} #
+# Must be run as root                                                     #
+###########################################################################
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script'
@@ -24,7 +24,7 @@ case "$ACTION" in
 	;;
 esac
 
-if [ -z "$DIRECTORY" ] [ -z "$DIRECTORY_BAK" ]; then
+if [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
 	echo "Usage: $SCRIPT_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK OWNER}"
 	exit 1
 fi

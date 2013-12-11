@@ -272,7 +272,7 @@ rake redmine:backlogs:install \
 end
 
 # --- Configure backup ---
-template "#{node['backup']['install_directory']}/scripts/backup-redmine.sh" do
+template "#{node['backup']['install_directory']}/tasks/backup-redmine.sh" do
   source 'backup-redmine.sh.erb'
   owner 'root'
   group 'root'
