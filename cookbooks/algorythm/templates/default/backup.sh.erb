@@ -135,7 +135,7 @@ function runBackup {
 		exit 4
 	fi
 
-	mkdir -p $BACKUP_DIR
+	mkdir -p "$BACKUP_DIR"
 	mkdir -p $TMP_ARCHIVE_DIR
 
 	cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
