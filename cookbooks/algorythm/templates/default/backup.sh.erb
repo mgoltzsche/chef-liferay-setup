@@ -1,8 +1,8 @@
 #!/bin/bash
-#####################################
-# Usage: backup {dump|restore DATE} #
-# Must be run as root               #
-#####################################
+##########################################
+# Usage: backup {list|dump|restore DATE} #
+# Must be run as root                    #
+##########################################
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script' 2>&1
@@ -17,10 +17,12 @@ SCRIPT_NAME="$0"
 ACTION="$1"
 BACKUP_DATE="$2"
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
+MAX_BACKUPS=5
+MAX_LOGS=20
 EXIT_CODE=0
 
 function showUsageAndExit {
-	echo "Usage: $SCRIPT_NAME {dump|restore ID}"
+	echo "Usage: $SCRIPT_NAME {list|dump|restore ID}"
 	exit 2
 }
 
@@ -34,6 +36,25 @@ function toBackupTaskId {
 	SCRIPT_FILE=$1
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	echo "$BACKUP_TYPE-$BACKUP_DATE"
+}
+
+function list {
+	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}' | uniq | sort -r | while read -r ARCHIVE_DATE; do
+		echo "$ARCHIVE_DATE"
+		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
+			echo "  * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}"
+		done
+	done
+}
+
+function clean {
+	CLEAN_DIR=$1
+	MAX_COUNT=$2
+	cd $CLEAN_DIR
+	ls "$CLEAN_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
+		echo "removing old files: $ARCHIVE_DATE"
+		ls "$CLEAN_DIR" | grep $ARCHIVE_DATE | xargs rm
+	done
 }
 
 function runBackupTask {
@@ -94,6 +115,9 @@ function runBackupTask {
 }
 
 function runBackup {
+	clean "$BACKUP_DIR" $MAX_BACKUPS
+	clean "$LOG_DIR" $MAX_LOGS
+
 	LOG_DIR="$INSTALL_DIR/log"
 	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
@@ -185,16 +209,6 @@ function runBackup {
 	rm -rf $TMP_DIR
 }
 
-function toBackupDates {
-	while read -r ARCHIVE; do
-		A_TYPE=${ARCHIVE%-*-*-*_*-*.tar.bz2}
-		A_DATE=${ARCHIVE%.tar.bz2}
-		A_DATE=${A_DATE#$A_TYPE-}
-		echo $A_DATE
-	done
-}
-
-
 case "$ACTION" in
 	dump)
 		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
@@ -217,12 +231,7 @@ case "$ACTION" in
 		runBackup
 	;;
 	list)
-		ls "$BACKUP_DIR" | grep -P '\.tar\.bz2$' | toBackupDates | uniq | sort -r | while read -r ARCHIVE_DATE; do
-			echo "$ARCHIVE_DATE"
-			for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
-				echo "  * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}"
-			done
-		done
+		list
 	;;
 	*)
 		showUsageAndExit
