@@ -121,9 +121,9 @@ function runBackupTask {
 		if [ $ACTION = 'dump' ]; then
 			cd $TMP_DIR
 			tar cjf "$BACKUP_ARCHIVE" $BACKUP_TASK_ID
-			STATUS=$?
+			COMPRESSION_EXIT_CODE=$?
 
-			if [ $STATUS = '0' ]; then
+			if [ $COMPRESSION_EXIT_CODE = '0' ]; then
 				chmod 600 $BACKUP_ARCHIVE
 			else
 				echo "failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
@@ -131,10 +131,10 @@ function runBackupTask {
 			fi
 		fi
 
-		echo "done"
+		echo 'done'
 		return 0
 	else
-		echo "failed"
+		echo 'failed'
 		return 1
 	fi
 }
@@ -144,12 +144,12 @@ function runBackupTask {
 echo "$ACTION_LABEL $BACKUP_DATE in $BACKUP_DIR:"
 
 # Run backup tasks parallel
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
+for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
         BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
         BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 	PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
         echo "  - $BACKUP_TYPE"
-	echo "" > $PARTIAL_LOG_FILE
+	printf '' > $PARTIAL_LOG_FILE
 
         runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
         declare "${BACKUP_TYPE}_PID=$!"
@@ -158,7 +158,7 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
 done
 
 # Wait for tasks to terminate and collect exit codes
-for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
+for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
         PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
         wait ${!PID_VAR}
         TASK_EXIT_CODE=$?
@@ -169,7 +169,7 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
 done
 
 # Merge logs
-echo "" > $LOG_FILE
+printf '' > $LOG_FILE
 for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
@@ -183,14 +183,14 @@ done
 
 if [ $BACKUP_EXIT_CODE = '0' ]; then
 	echo "Finished successfully"  >> "$LOG_FILE"
-	echo "\nFinished successfully (see log file $LOG_FILE)"
+	printf "\nFinished successfully (see log file $LOG_FILE)\n"
 
 	if [ $ACTION = 'dump' ]; then
 		echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 	fi
 else
 	echo "Finished with error(s)" >> "$LOG_FILE"
-	echo "\nFinished with error(s) (see log file $LOG_FILE)"
+	printf "\nFinished with error(s) (see log file $LOG_FILE)\n"
 fi
 
 rm -rf $TMP_DIR
