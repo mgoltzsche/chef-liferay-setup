@@ -67,11 +67,6 @@ function runBackupTask {
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
 	if [ $ACTION = 'dump' ]; then
-		if [ -f "$BACKUP_ARCHIVE" ]; then
-			echo "failed: $BACKUP_ARCHIVE already exists"
-			return 1
-		fi
-
 		mkdir $CUR_TMP_DIR
 		chmod 777 $CUR_TMP_DIR
 	else
