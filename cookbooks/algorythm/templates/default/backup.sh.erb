@@ -25,6 +25,14 @@ case "$ACTION" in
 	dump)
 		ACTION_LABEL="Backing up"
 		BACKUP_DATE=$(date +'%y-%m-%d_%H-%M')
+
+		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+		BACKUP_DATE_SEARCH_EXIT_CODE=$?
+
+		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
+			echo "Backup date $BACKUP_DATE already exists" 2>&1
+			exit 5
+		fi
 	;;
 	restore)
 		ACTION_LABEL="Restoring"
@@ -42,9 +50,8 @@ esac
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
 LOG_DIR="$INSTALL_DIR/log"
 PATH="$PATH:$INSTALL_DIR/bin"
-BACKUP_ID="backup-$BACKUP_DATE"
-LOG_FILE="$LOG_DIR/$BACKUP_ID.log"
-TMP_DIR="/tmp/$BACKUP_ID"
+LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
+TMP_DIR="/tmp/backup-$BACKUP_DATE"
 BACKUP_EXIT_CODE=0
 
 if [ -d "$TMP_DIR" ]; then
@@ -52,13 +59,13 @@ if [ -d "$TMP_DIR" ]; then
 	exit 4
 fi
 
-ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
-BACKUP_DATE_SEARCH_EXIT_CODE=$?
-
-if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-	echo "Backup date $BACKUP_DATE already exists" 2>&1
-	exit 5
-fi
+LOG_FILE_NAME_INC=0
+TMP_LOG_FILE_NAME=$LOG_FILE
+while [ -f "$TMP_LOG_FILE_NAME" ]; do
+	LOG_FILE_NAME_INC=$(expr $LOG_FILE_NAME_INC + 1)
+	TMP_LOG_FILE_NAME="$LOG_DIR/$ACTION-$BACKUP_DATE.$LOG_FILE_NAME_INC.log"
+done
+LOG_FILE=$TMP_LOG_FILE_NAME
 
 mkdir $TMP_DIR
 mkdir -p $BACKUP_DIR
@@ -176,14 +183,14 @@ done
 
 if [ $BACKUP_EXIT_CODE = '0' ]; then
 	echo "Finished successfully"  >> "$LOG_FILE"
-	echo "Finished successfully (see log file $LOG_FILE)"
+	echo "\nFinished successfully (see log file $LOG_FILE)"
 
 	if [ $ACTION = 'dump' ]; then
 		echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 	fi
 else
 	echo "Finished with error(s)" >> "$LOG_FILE"
-	echo "Finished with error(s) (see log file $LOG_FILE)"
+	echo "\nFinished with error(s) (see log file $LOG_FILE)"
 fi
 
 rm -rf $TMP_DIR
