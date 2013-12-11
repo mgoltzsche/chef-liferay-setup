@@ -100,7 +100,7 @@ function runBackupTask {
 			return 1
 		fi
 
-		echo '* Decompressing backup'
+		echo '* decompress backup'
 		cd $TMP_DIR
 		tar xvjf "$BACKUP_ARCHIVE"
 		DECOMPRESSION_EXIT_CODE=$?
@@ -116,7 +116,7 @@ function runBackupTask {
 
 	if [ $STATUS = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
-			echo '* Compressing backup'
+			echo '* compress backup'
 			cd $TMP_DIR
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
 			COMPRESSION_EXIT_CODE=$?
@@ -138,9 +138,9 @@ function runBackupTask {
 }
 
 function runBackup {
-	echo "$ACTION date $BACKUP_DATE ($BACKUP_DIR):"
+	echo "$ACTION date $BACKUP_DATE (in $BACKUP_DIR):"
 	mkdir -p $BACKUP_DIR
-	mkdir $TMP_DIR
+	mkdir -p $TMP_ARCHIVE_DIR
 
 	# Run backup tasks parallel
 	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh'); do
@@ -174,7 +174,7 @@ function runBackup {
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
-		echo "   $ACTION $BACKUP_TYPE" >> "$LOG_FILE"
+		echo "  $ACTION $BACKUP_TYPE" >> "$LOG_FILE"
 		echo '===============================================================================' >> "$LOG_FILE"
 		cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
 		rm -rf "$PARTIAL_LOG_FILE"
@@ -182,22 +182,22 @@ function runBackup {
 
 	if [ $BACKUP_EXIT_CODE = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
-			printf "\nCopying compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
+			printf "\ncopy compressed backups to $BACKUP_DIR ...\n" >> "$LOG_FILE"
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
 			done
 		fi
 
-		echo "Finished successfully" >> "$LOG_FILE"
-		printf "\nFinished successfully (see $LOG_FILE)\n"
+		echo "finished successfully" >> "$LOG_FILE"
+		printf "\nfinished successfully (see $LOG_FILE)\n"
 		
 		if [ $ACTION = 'dump' ]; then
 			echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
 		fi
 	else
-		echo "Finished with error(s)" >> "$LOG_FILE"
-		printf "\nFinished with error(s) (see $LOG_FILE)\n"
+		echo "finished with error(s)" >> "$LOG_FILE"
+		printf "\nfinished with error(s) (see $LOG_FILE)\n"
 	fi
 
 	rm -rf $TMP_DIR
