@@ -103,13 +103,15 @@ function runBackupTask {
 	fi
 
 	sh "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR
+	STATUS=$?
 
-	if [ $? = '0' ]; then
+	if [ $STATUS = '0' ]; then
 		if [ $ACTION = 'dump' ]; then
 			cd $TMP_DIR
 			tar cjf $BACKUP_ARCHIVE $BACKUP_TASK_ID
+			STATUS=$?
 
-			if [ $? = '0' ]; then
+			if [ $STATUS = '0' ]; then
 				chmod 600 $BACKUP_ARCHIVE
 			else
 				echo "-> failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
