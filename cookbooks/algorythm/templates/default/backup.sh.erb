@@ -51,10 +51,10 @@ function list {
 function cleanDirectory {
 	CLEAN_DIR="$1"
 	MAX_COUNT=$2
-	cd $CLEAN_DIR
 	ls "$CLEAN_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
 		echo "* remove expired date $ARCHIVE_DATE from $CLEAN_DIR"
-		ls "$CLEAN_DIR" | grep $ARCHIVE_DATE | xargs rm
+		cd $CLEAN_DIR
+		ls | grep $ARCHIVE_DATE | xargs rm
 	done
 }
 
@@ -68,7 +68,7 @@ function runBackupTask {
 
 	if [ $ACTION = 'dump' ]; then
 		if [ -f "$BACKUP_ARCHIVE" ]; then
-			printf "* WARNING: $BACKUP_ARCHIVE\n           already exists and will be overwritten\n"
+			printf "WARNING: $BACKUP_ARCHIVE\n       already exists and will be overwritten\n"
 		fi
 
 		mkdir $CUR_TMP_DIR
@@ -221,8 +221,8 @@ case "$ACTION" in
 		BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			printf "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten\n           Cancel script execution now if that is not what you want!\n"
-			sleep 7
+			printf "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten\n       Cancel script execution now if that is not what you want!\n"
+			sleep 5
 		fi
 
 		runBackup
