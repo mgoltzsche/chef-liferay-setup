@@ -47,7 +47,7 @@ LOG_FILE="$LOG_DIR/$BACKUP_ID.log"
 TMP_DIR="/tmp/$BACKUP_ID"
 SCRIPT_ERROR=false
 
-if [ -d "$TMP_DIR" ] || [ -f "$LOG_FILE" ]; then
+if [ -d "$TMP_DIR" ]; then
 	echo "Temp directory $TMP_DIR is in use" 2>&1
 	exit 4
 fi
@@ -134,7 +134,7 @@ for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P "\.sh"); do
         BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
         echo "  - $BACKUP_TYPE"
 
-        runBackupTask "$SCRIPT_FILE" >> "$LOG_DIR/$BACKUP_TASK_ID.log" &
+        runBackupTask "$SCRIPT_FILE" &>> "$LOG_DIR/$BACKUP_TASK_ID.log" &
         declare "${BACKUP_TYPE}_PID=$!"
 
         rm -rf $TMP_DIR/$BACKUP_TASK_ID
@@ -172,5 +172,8 @@ if $SCRIPT_ERROR; then
 else
 	echo "Finished successfully"  >> "$LOG_FILE"
 	echo "Finished successfully"
-	echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
+
+	if [ $ACTION = 'dump' ]; then
+		echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
+	fi
 fi
