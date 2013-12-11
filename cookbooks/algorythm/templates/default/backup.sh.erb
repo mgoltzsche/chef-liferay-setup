@@ -68,7 +68,7 @@ function runBackupTask {
 
 	if [ $ACTION = 'dump' ]; then
 		if [ -f "$BACKUP_ARCHIVE" ]; then
-			printf "WARNING: $BACKUP_ARCHIVE\n       already exists and will be overwritten\n"
+			printf "WARNING: $BACKUP_ARCHIVE\n         already exists and will be overwritten\n"
 		fi
 
 		mkdir $CUR_TMP_DIR
