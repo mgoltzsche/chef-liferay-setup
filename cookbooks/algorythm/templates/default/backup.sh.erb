@@ -42,17 +42,17 @@ function list {
 	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}' | uniq | sort -r | while read -r ARCHIVE_DATE; do
 		echo "$ARCHIVE_DATE"
 		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
-			echo "  * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}"
+			echo " * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}"
 		done
 	done
 }
 
-function clean {
-	CLEAN_DIR=$1
+function cleanDirectory {
+	CLEAN_DIR="$1"
 	MAX_COUNT=$2
 	cd $CLEAN_DIR
 	ls "$CLEAN_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
-		echo "removing old files: $ARCHIVE_DATE"
+		echo "* remove expired date $ARCHIVE_DATE from $CLEAN_DIR"
 		ls "$CLEAN_DIR" | grep $ARCHIVE_DATE | xargs rm
 	done
 }
@@ -115,9 +115,6 @@ function runBackupTask {
 }
 
 function runBackup {
-	clean "$BACKUP_DIR" $MAX_BACKUPS
-	clean "$LOG_DIR" $MAX_LOGS
-
 	LOG_DIR="$INSTALL_DIR/log"
 	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
@@ -137,6 +134,9 @@ function runBackup {
 		exit 4
 	fi
 
+	cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
+	cleanDirectory "$LOG_DIR" $MAX_LOGS
+
 	echo "$ACTION date $BACKUP_DATE (in $BACKUP_DIR):"
 	mkdir -p $BACKUP_DIR
 	mkdir -p $TMP_ARCHIVE_DIR
@@ -146,7 +146,7 @@ function runBackup {
 		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
-		echo "  * $BACKUP_TYPE"
+		echo "* $BACKUP_TYPE"
 		printf '' > $PARTIAL_LOG_FILE
 
 		runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
