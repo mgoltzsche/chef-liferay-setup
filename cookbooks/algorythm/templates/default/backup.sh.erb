@@ -212,19 +212,21 @@ case "$ACTION" in
 		BACKUP_DATE=$(date +'%y-%m-%d')
 		FORCE_OVERWRITE="$2"
 
-		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' &>> /dev/null
-		BACKUP_DATE_SEARCH_EXIT_CODE=$?
+		if [ ! -z "$FORCE_OVERWRITE" ] && [ "$FORCE_OVERWRITE" != 'force' ]; then
+			showUsageAndExit
+		fi
 
-		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-			if [ "$FORCE_OVERWRITE" = 'force' ]; then
-				echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
-			else
-				printf "failed: Backup date $BACKUP_DATE already exists. \nAdd 'force' argument to overwrite old backups\n" 2>&1
-				exit 5
-			fi
-		else
-			if [ "$FORCE_OVERWRITE" != '' ] && [ "$FORCE_OVERWRITE" != 'force' ]; then
-				showUsageAndExit
+		if [ -d $BACKUP_DIR ]; then
+			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+			BACKUP_DATE_SEARCH_EXIT_CODE=$?
+
+			if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
+				if [ "$FORCE_OVERWRITE" = 'force' ]; then
+					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
+				else
+					printf "failed: Backup date $BACKUP_DATE already exists. \nAdd 'force' argument to overwrite old backups\n" 2>&1
+					exit 5
+				fi
 			fi
 		fi
 
