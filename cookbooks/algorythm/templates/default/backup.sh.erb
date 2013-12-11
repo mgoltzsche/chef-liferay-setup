@@ -121,9 +121,7 @@ function runBackupTask {
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
 			COMPRESSION_EXIT_CODE=$?
 
-			if [ $COMPRESSION_EXIT_CODE = '0' ]; then
-				chmod 600 $BACKUP_ARCHIVE
-			else
+			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
 				echo "failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
 				return 1
 			fi
@@ -186,6 +184,7 @@ function runBackup {
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
+				chmod 600 "$BACKUP_DIR/$ARCHIVE"
 			done
 		fi
 
