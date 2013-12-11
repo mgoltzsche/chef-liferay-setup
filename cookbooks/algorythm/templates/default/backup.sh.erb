@@ -121,14 +121,6 @@ function runBackup {
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
 	PATH="$PATH:$INSTALL_DIR/bin"
 
-	LOG_FILE_NAME_INC=0
-	TMP_LOG_FILE_NAME=$LOG_FILE
-	while [ -f "$TMP_LOG_FILE_NAME" ]; do
-		LOG_FILE_NAME_INC=$(expr $LOG_FILE_NAME_INC + 1)
-		TMP_LOG_FILE_NAME="$LOG_DIR/$ACTION-$BACKUP_DATE.$LOG_FILE_NAME_INC.log"
-	done
-	LOG_FILE=$TMP_LOG_FILE_NAME
-
 	if [ -d "$TMP_DIR" ]; then
 		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
 		exit 4
