@@ -135,12 +135,13 @@ function runBackup {
 		exit 4
 	fi
 
+	mkdir -p $BACKUP_DIR
+	mkdir -p $TMP_ARCHIVE_DIR
+
 	cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS
 	cleanDirectory "$LOG_DIR" $MAX_LOGS
 
 	echo "$ACTION date $BACKUP_DATE (in $BACKUP_DIR):"
-	mkdir -p $BACKUP_DIR
-	mkdir -p $TMP_ARCHIVE_DIR
 
 	# Run backup tasks parallel
 	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
