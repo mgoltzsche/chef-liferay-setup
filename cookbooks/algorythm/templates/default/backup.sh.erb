@@ -212,7 +212,7 @@ case "$ACTION" in
 		BACKUP_DATE=$(date +'%y-%m-%d')
 		FORCE_OVERWRITE="$2"
 
-		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+		ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' &>> /dev/null
 		BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 		if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
