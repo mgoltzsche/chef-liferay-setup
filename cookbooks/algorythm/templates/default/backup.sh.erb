@@ -224,7 +224,8 @@ case "$ACTION" in
 			if [ "$2" = 'force' ]; then
 				echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 			else
-				echo "failed: Backup date $BACKUP_DATE already exists"
+				printf "failed: Backup date $BACKUP_DATE already exists. \nUse 'force' argument to overwrite old backups\n" 2>&1
+				exit 5
 			fi
 		fi
 
