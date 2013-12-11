@@ -181,6 +181,7 @@ function runBackup {
 			echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
+				echo "  * $ARCHIVE" >> "$LOG_FILE"
 				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
 				chmod 600 "$BACKUP_DIR/$ARCHIVE"
 			done
