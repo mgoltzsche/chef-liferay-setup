@@ -45,6 +45,7 @@ default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
 default['liferay']['hostname'] = default['ldap']['domain']
+default['liferay']['postgresql']['port'] = 5432
 default['liferay']['postgresql']['database'] = 'liferay'
 default['liferay']['postgresql']['user'] = default['liferay']['user']
 default['liferay']['postgresql']['password'] = 'liferay'
