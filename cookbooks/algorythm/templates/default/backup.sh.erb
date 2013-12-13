@@ -182,14 +182,14 @@ function runBackup {
 
 			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 				echo "  * $ARCHIVE" >> "$LOG_FILE"
-				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE"
-				chmod 600 "$BACKUP_DIR/$ARCHIVE"
+				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
+				chmod 600 "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
 			done
 
 			echo "* remove old backups" >> "$LOG_FILE"
-			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS >> "$LOG_FILE"
+			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
 			echo "* remove old logs" >> "$LOG_FILE"
-			cleanDirectory "$LOG_DIR" $MAX_LOGS >> "$LOG_FILE"
+			cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
 		fi
 
 		echo "finished successfully" >> "$LOG_FILE"
