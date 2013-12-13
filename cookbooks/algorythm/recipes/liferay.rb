@@ -44,6 +44,12 @@ user usr do
   supports :manage_home => true
 end
 
+directory liferayHomeDir do
+  owner usr
+  group usr
+  mode 0700
+end
+
 # --- Create Liferay LDAP user ---
 execute "Register Liferay LDAP account" do
   command <<-EOH
