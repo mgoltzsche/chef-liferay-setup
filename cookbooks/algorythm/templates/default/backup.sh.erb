@@ -193,7 +193,7 @@ function runBackup {
 			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
 			echo "* remove old logs" >> "$LOG_FILE"
 			cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
-		done
+		fi
 	fi
 
 	if [ $EXIT_CODE = '0' ]; then
