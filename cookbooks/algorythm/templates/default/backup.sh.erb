@@ -141,8 +141,6 @@ function runBackup {
 
 		runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
 		declare "${BACKUP_TYPE}_PID=$!"
-
-		rm -rf $TMP_DIR/$BACKUP_TASK_ID
 	done
 
 	echo ''
@@ -175,23 +173,30 @@ function runBackup {
 
 	echo '===============================================================================' >> "$LOG_FILE"
 
-	if [ $EXIT_CODE = '0' ]; then
-		if [ $ACTION = 'dump' ]; then
-			# Move compressed backups to $BACKUP_DIR
-			echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
+	if [ $EXIT_CODE = '0' ] && [ $ACTION = 'dump' ]; then
+		# Move compressed backups to $BACKUP_DIR
+		echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
-			for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
-				echo "  * $ARCHIVE" >> "$LOG_FILE"
-				mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
-				chmod 600 "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
+		for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
+			echo "  * $ARCHIVE" >> "$LOG_FILE"
+			mv "$TMP_ARCHIVE_DIR/$ARCHIVE" "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE" &&
+			chmod 600 "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
+			ARCHIVE_MV_EXIT_CODE=$?
+
+			if [ $ARCHIVE_MV_EXIT_CODE != '0' ]; then
+				EXIT_CODE=6
 			done
+		done
 
+		if [ $EXIT_CODE = '0' ]; then
 			echo "* remove old backups" >> "$LOG_FILE"
 			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
 			echo "* remove old logs" >> "$LOG_FILE"
 			cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
-		fi
+		done
+	fi
 
+	if [ $EXIT_CODE = '0' ]; then
 		echo "finished successfully" >> "$LOG_FILE"
 		echo "finished successfully (see $LOG_FILE)"
 		
