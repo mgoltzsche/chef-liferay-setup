@@ -11,7 +11,7 @@ dl.file.max.size=52428800
 
 ### Database shards
 shard.selector=com.liferay.portal.dao.shard.ManualShardSelector
-shard.available.names=<%=@postgres_shards.keys.join(',')%>
+shard.available.names=<%=@shards.keys.join(',')%>
 shard.default.name=<%=defaultshard%>
 
 <%@shards.each do |name, shard|%>
