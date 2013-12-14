@@ -295,6 +295,11 @@ node['liferay']['shards'].each do |name, shard|
     })
     notifies :restart, 'service[nginx]'
   end
+
+  link "/etc/nginx/sites-enabled/#{vhostFileName}" do
+    to "/etc/nginx/sites-available/#{vhostFileName}"
+    notifies :restart, 'service[nginx]'
+  end
 end
 
 # --- Restart nginx ---
