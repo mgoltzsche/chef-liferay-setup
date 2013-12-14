@@ -64,12 +64,6 @@ http {
 
         #passenger_root /usr;
         #passenger_ruby /usr/bin/ruby;
-
-        ##
-        # Proxy Cache Path
-        ##
-        proxy_cache_path /usr/share/nginx/cache levels=1:2 keys_zone=main-cache:8m max_size=1000m inactive=600m;
-        proxy_temp_path /usr/share/nginx/cache/tmp;
         
 	##
 	# SSL
@@ -81,12 +75,9 @@ http {
 	ssl_prefer_server_ciphers on;
 
 	##
-	# Language mapping
+	# Cache
 	##
-	map $http_accept_language $lang {
-        	default en;
-        	~de de;
-	}
+	set $cacheRoot /usr/share/nginx/cache
 
         ##
         # Virtual Host Configs

@@ -7,14 +7,15 @@ server {
 	error_log  /var/log/nginx/liferay-proxy-error;
 
 	include proxy_params;
+	set $cacheName $server_name'-http-cache'
+	proxy_cache_path  $cacheRoot/$cacheName levels=1:2 keys_zone=$cacheName:8m max_size=1000m inactive=600m;
+	proxy_temp_path   $cacheRoot/$cacheName/tmp;
+	proxy_cache       $cacheName;
+	proxy_cache_valid 302 96h;
 
 	location / {
 		proxy_pass http://127.0.0.1:<%=@http_port%>/;
 	}
-
-	location ~ "^/$" {
-                rewrite ^  /$lang  redirect;
-        }
 }
 
 server {
@@ -29,12 +30,13 @@ server {
 	ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
 
 	include proxy_params;
+	set $cacheName $server_name'-https-cache'
+	proxy_cache_path  $cacheRoot/$cacheName levels=1:2 keys_zone=$cacheName:8m max_size=1000m inactive=600m;
+	proxy_temp_path   $cacheRoot/$cacheName/tmp;
+	proxy_cache       $cacheName;
+	proxy_cache_valid 302 96h;
 
 	location / {
 		proxy_pass http://127.0.0.1:<%=@https_port%>/;
 	}
-
-	location ~ "^/$" {
-                rewrite ^  /$lang  redirect;
-        }
 }
