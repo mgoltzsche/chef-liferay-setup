@@ -3,9 +3,6 @@ server {
 	server_name <%=@hostname%>;
 	root /usr/share/nginx/www;
 
-	access_log /var/log/nginx/liferay-proxy-access;
-	error_log  /var/log/nginx/liferay-proxy-error;
-
 	include proxy_params;
 
 	location / {
@@ -17,9 +14,6 @@ server {
 	listen 443 ssl;
 	server_name <%=@hostname%>;
 	root /usr/share/nginx/www;
-
-	access_log /var/log/nginx/liferay-proxy-access;
-	error_log  /var/log/nginx/liferay-proxy-error;
 
 	ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
 	ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;

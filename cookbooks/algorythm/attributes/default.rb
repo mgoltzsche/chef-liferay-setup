@@ -44,11 +44,17 @@ default['liferay']['http_port'] = 8087
 default['liferay']['https_port'] = 8089
 
 # Liferay Portal configuration
-default['liferay']['hostname'] = default['ldap']['domain']
-default['liferay']['postgresql']['port'] = 5432
-default['liferay']['postgresql']['database'] = 'liferay'
-default['liferay']['postgresql']['user'] = default['liferay']['user']
-default['liferay']['postgresql']['password'] = 'liferay'
+default['liferay']['defaultshard'] = 'default'
+default['liferay']['shards']['default']['hostname'] = default['ldap']['domain']
+default['liferay']['shards']['default']['pg']['port'] = 5432
+default['liferay']['shards']['default']['pg']['database'] = 'liferay'
+default['liferay']['shards']['default']['pg']['user'] = default['liferay']['user']
+default['liferay']['shards']['default']['pg']['password'] = 'liferay'
+default['liferay']['shards']['dieter']['hostname'] = 'dieter-goltzsche.de'
+default['liferay']['shards']['dieter']['pg']['port'] = 5432
+default['liferay']['shards']['dieter']['pg']['database'] = 'dieter'
+default['liferay']['shards']['dieter']['pg']['user'] = 'dieter'
+default['liferay']['shards']['dieter']['pg']['password'] = 'dieter'
 default['liferay']['ldap']['user'] = default['liferay']['user']
 default['liferay']['ldap']['password'] = 'password'
 default['liferay']['system_mail_prefix'] = 'no-reply'
@@ -60,7 +66,7 @@ default['liferay']['language'] = 'de'
 
 # Sonatype Nexus installation
 default['nexus']['version'] = "2.7.0-04"
-default['nexus']['hostname'] = "nexus.#{default['liferay']['hostname']}"
+default['nexus']['hostname'] = "nexus.#{default['domainname']}"
 default['nexus']['home'] = "/var/opt/nexus"
 default['nexus']['ldap']['user'] = 'nexus'
 default['nexus']['ldap']['password'] = 'password'
@@ -74,7 +80,7 @@ default['redmine']['version'] = "2.3.3"
 default['redmine']['backlogs_version'] = "v1.0.6"
 
 # Redmine Backlogs configuration
-default['redmine']['hostname'] = "redmine.#{default['liferay']['hostname']}"
+default['redmine']['hostname'] = "redmine.#{default['domainname']}"
 default['redmine']['postgresql']['database'] = "redmine"
 default['redmine']['postgresql']['user'] = default['redmine']['user']
 default['redmine']['postgresql']['password'] = "redmine"

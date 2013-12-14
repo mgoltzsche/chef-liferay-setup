@@ -1,6 +1,6 @@
 require 'uri'
 
-hostname = node['liferay']['hostname']
+hostname = node['liferay']['shards'][node['liferay']['defaultshard']]['hostname']
 usr = node['liferay']['user']
 downloadDir = "/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
@@ -15,7 +15,6 @@ nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
 liferayHomeDir = node['liferay']['home']
-dbname = node['liferay']['postgresql']['database']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
 ldapSuffix = ldapSuffix(node['ldap']['domain'])
@@ -136,21 +135,27 @@ link liferayDirLink do
 end
 
 # --- Create Liferay postgres user and database
-execute "Create liferay postgres user '#{node['liferay']['postgresql']['user']}'" do
-  user 'postgres'
-  command "psql -U postgres -c \"CREATE USER #{node['liferay']['postgresql']['user']};\""
-  not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{node['liferay']['postgresql']['user']}';\" | grep #{node['liferay']['postgresql']['user']}", :user => 'postgres')
-end
+node['liferay']['shards'].each do |name, shard|
+  pgUser = shard['pg']['user']
+  pgPassword = shard['pg']['password']
+  pgDB = shard['pg']['database']
 
-execute "Set postgres user password of '#{node['liferay']['postgresql']['user']}'" do
-  user 'postgres'
-  command "psql -U postgres -c \"ALTER ROLE #{node['liferay']['postgresql']['user']} ENCRYPTED PASSWORD '#{node['liferay']['postgresql']['password']}';\""
-end
+  execute "Create liferay postgres user '#{pgUser}'" do
+    user 'postgres'
+    command "psql -U postgres -c \"CREATE USER #{pgUser};\""
+    not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{pgUser}';\" | grep #{pgUser}", :user => 'postgres')
+  end
 
-execute "Create database '#{dbname}'" do
-  user 'postgres'
-  command "createdb '#{dbname}' -O #{node['liferay']['postgresql']['user']} -E UTF8 -T template0"
-  not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{dbname}';\" | grep '#{dbname}'", :user => 'postgres')
+  execute "Set postgres user password of '#{pgUser}'" do
+    user 'postgres'
+    command "psql -U postgres -c \"ALTER ROLE #{pgUser} ENCRYPTED PASSWORD '#{pgPassword}';\""
+  end
+
+  execute "Create database '#{pgDB}'" do
+    user 'postgres'
+    command "createdb '#{pgDB}' -O #{pgUser} -E UTF8 -T template0"
+    not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{pgDB}';\" | grep '#{pgDB}'", :user => 'postgres')
+  end
 end
 
 # --- Download & install native APR library ---
@@ -239,10 +244,8 @@ template "#{liferayHomeDir}/portal-ext.properties" do
     :timezone => timezone,
     :country => country,
     :language => language,
-    :postgres_port => node['liferay']['postgresql']['port'],
-    :postgres_database => node['liferay']['postgresql']['database'],
-    :postgres_user => node['liferay']['postgresql']['user'],
-    :postgres_password => node['liferay']['postgresql']['password'],
+    :shards => node['liferay']['shards'],
+    :defaultshard => node['liferay']['defaultshard'],
     :company_name => node['liferay']['company_default_name'],
     :hostname => hostname,
     :admin_full_name => node['liferay']['admin']['name'],
@@ -280,24 +283,18 @@ template "/etc/logrotate.d/liferay" do
 end
 
 # --- Configure default nginx vhost ---
-directory '/usr/share/nginx/cache' do
-  owner 'www-data'
-  group 'www-data'
-  mode 0744
-end
-
-cookbook_file '/usr/share/nginx/www/index.html'
-cookbook_file '/usr/share/nginx/www/50x.html'
-
-template '/etc/nginx/sites-available/default' do
-  source 'liferay.nginx.vhost.erb'
-  mode 0744
-  variables({
-    :hostname => hostname,
-    :http_port => node['liferay']['http_port'],
-    :https_port => node['liferay']['https_port']
-  })
-  notifies :restart, 'service[nginx]'
+node['liferay']['shards'].each do |name, shard|
+  vhostFileName = name == node['liferay']['defaultshard'] ? 'default' : shard['hostname']
+  template "/etc/nginx/sites-available/#{vhostFileName}" do
+    source 'liferay.nginx.vhost.erb'
+    mode 0744
+    variables({
+      :hostname => shard['hostname'],
+      :http_port => node['liferay']['http_port'],
+      :https_port => node['liferay']['https_port']
+    })
+    notifies :restart, 'service[nginx]'
+  end
 end
 
 # --- Restart nginx ---
