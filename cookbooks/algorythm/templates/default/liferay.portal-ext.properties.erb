@@ -12,7 +12,6 @@ dl.file.max.size=52428800
 ### Database shards
 hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 shard.selector=com.liferay.portal.dao.shard.ManualShardSelector
-shard.available.names=<%=@shards.keys.join(',')%>
 shard.default.name=<%=@defaultshard%>
 
 <%@shards.each do |name, shard|%>
@@ -186,4 +185,4 @@ mail.session.mail.smtp.password=<%=@ldapPassword%>
         #META-INF/memcached-spring.xml,\
         \
         classpath*:META-INF/ext-spring.xml,\
-        portal-shards.xml
+        ext-shard-data-source-spring.xml

@@ -234,10 +234,10 @@ template "#{liferayDir}/conf/server.xml" do
 end
 
 # --- Configure Liferay ---
-template "#{liferayDir}/webapps/ROOT/WEB-INF/classes/portal-shards.xml" do
+template "#{liferayDir}/webapps/ROOT/WEB-INF/classes/ext-shard-data-source-spring.xml" do
   owner 'root'
   group usr
-  source 'liferay.portal-shards.xml.erb'
+  source 'liferay.ext-shard-data-source-spring.xml.erb'
   mode 0640
   variables({
     :shard_names => node['liferay']['shards'].keys
