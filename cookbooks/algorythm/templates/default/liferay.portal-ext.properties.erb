@@ -10,6 +10,7 @@ imagemagick.enabled=true
 dl.file.max.size=52428800
 
 ### Database shards
+hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 shard.selector=com.liferay.portal.dao.shard.ManualShardSelector
 shard.available.names=<%=@shards.keys.join(',')%>
 shard.default.name=<%=@defaultshard%>
