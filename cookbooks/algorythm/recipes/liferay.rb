@@ -234,6 +234,17 @@ template "#{liferayDir}/conf/server.xml" do
 end
 
 # --- Configure Liferay ---
+template "#{liferayDir}/webapps/ROOT/WEB-INF/classes/portal-shards.xml" do
+  owner 'root'
+  group usr
+  source 'liferay.portal-shards.xml.erb'
+  mode 0640
+  variables({
+    :shard_names => node['liferay']['shards'].keys
+  })
+  notifies :restart, 'service[liferay]'
+end
+
 template "#{liferayHomeDir}/portal-ext.properties" do
   owner 'root'
   group usr
