@@ -58,13 +58,11 @@ case "$ACTION" in
 			backup-pg restore "$1" "$BAK/sql/$1.sql" "$2"
 		}
 
-		echo '* stop liferay'
-		service liferay stop >> /dev/null
+		service-wrapper liferay stop
 		doWithShards &&
 		backup-directory restore "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER" &&
 		backup-file      restore "$CFG_FILE" "$BAK/portal-ext.properties" "$LIFERAY_USER" 400 &&
-		echo '* start liferay' &&
-		service liferay start >> /dev/null
+		service-wrapper liferay start
 	;;
 	*)
 		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"

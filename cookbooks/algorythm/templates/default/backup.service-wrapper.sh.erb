@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ACTION=$2
+SERVICE=$1
+
+if [ -z "$SERVICE" ]; then
+	echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+	exit 1
+do
+
+case "$ACTION" in
+	stop)
+		echo "* stop $SERVICE"
+		service $SERVICE stop &>> /dev/null
+	;;
+	start|restart)
+		SERVICES_RESTART_LATER="$SERVICES_RESTART_LATER#$SERVICE"
+	;;
+	*)
+		echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+		exit 1
+	;;
+esac

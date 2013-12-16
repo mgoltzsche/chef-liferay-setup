@@ -55,11 +55,11 @@ function list {
         M_BYTE_COUNT=$(expr $K_BYTE_COUNT / 1024)
         M_BYTE_COUNT=$(expr $M_BYTE_COUNT + 1)
         printStatusMessage "# Total size:" "~${M_BYTE_COUNT}M"
-	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort -r | while read -r ARCHIVE_DATE; do
+	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | sort -r | uniq | while read -r ARCHIVE_DATE; do
 		echo "$ARCHIVE_DATE"
 		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
 			ARCHIVE_SIZE=$(ls -lah "$BACKUP_DIR/$ARCHIVE" | awk '{print $5}')
-			printStatusMessage " * ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}" "$ARCHIVE_SIZE"
+			printStatusMessage "* ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}" "$ARCHIVE_SIZE"
 		done
 	done
 }
@@ -134,7 +134,8 @@ function runBackup {
 	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
-	PATH="$PATH:$INSTALL_DIR/bin"
+	PATH="$PATH:$INSTALL_DIR/utils"
+	SERVICES_RESTART_LATER=''
 
 	if [ -d "$TMP_DIR" ]; then
 		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
@@ -203,13 +204,17 @@ function runBackup {
 			fi
 		done
 
-		if [ $EXIT_CODE = '0' ]; then
-			echo "* remove old backups" >> "$LOG_FILE"
-			cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
-			echo "* remove old logs" >> "$LOG_FILE"
-			cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
-		fi
+		echo '* remove old backups' >> "$LOG_FILE"
+		cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
+		echo '* remove old logs' >> "$LOG_FILE"
+		cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
 	fi
+
+	# Restart services
+	for SERVICE in $(echo $SERVICES_RESTART_LATER | grep -Po '(?<=#)[^#]+' | sort | uniq); do
+		echo "* (re)start $SERVICE" >> "$LOG_FILE"
+		service $SERVICE restart &>> "$LOG_FILE"
+	done
 
 	if [ $EXIT_CODE = '0' ]; then
 		echo "finished successfully" >> "$LOG_FILE"

@@ -27,6 +27,8 @@ case "$ACTION" in
 		done
 	;;
 	restore)
+		service-wrapper dirsrv stop
+
 		for INSTANCE in $(ls /etc/dirsrv/ | grep -P "^slapd-"); do
 			backup-directory restore "/etc/dirsrv/$INSTANCE" "$BAK/$INSTANCE" dirsrv 770
 			STATUS=$?
@@ -36,8 +38,7 @@ case "$ACTION" in
 			fi
 		done
 
-		echo '* restart dirsrv' &&
-		service dirsrv restart >> /dev/null
+		service-wrapper dirsrv start
 	;;
 	*)
 		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"

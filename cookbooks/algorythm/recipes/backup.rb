@@ -1,7 +1,7 @@
 installDir = node['backup']['install_directory']
 executable = "#{installDir}/backup.sh"
 
-directory "#{installDir}/bin" do
+directory "#{installDir}/utils" do
   owner 'root'
   group 'root'
   mode 0755
@@ -41,6 +41,13 @@ template "#{installDir}/backup-directory.sh" do
   mode 0755
 end
 
+template "#{installDir}/service-wrapper.sh" do
+  source 'backup.service-wrapper.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0700
+end
+
 template executable do
   source 'backup.sh.erb'
   owner 'root'
@@ -55,18 +62,18 @@ link "/usr/bin/backup" do
   to executable
 end
 
-link "#{installDir}/bin/backup" do
-  to executable
-end
-
-link "#{installDir}/bin/backup-pg" do
+link "#{installDir}/utils/backup-pg" do
   to "#{installDir}/backup-pg.sh"
 end
 
-link "#{installDir}/bin/backup-file" do
+link "#{installDir}/utils/backup-file" do
   to "#{installDir}/backup-file.sh"
 end
 
-link "#{installDir}/bin/backup-directory" do
+link "#{installDir}/utils/backup-directory" do
   to "#{installDir}/backup-directory.sh"
+end
+
+link "#{installDir}/utils/service-wrapper" do
+  to "#{installDir}/service-wrapper.sh"
 end
