@@ -46,7 +46,8 @@ function doWithShards {
 case "$ACTION" in
 	dump)
 		function doWithShard {
-			backup-pg dump "$1" "$BAK/$1.sql"
+			mkdir -p "$BAK/sql" &&
+			backup-pg dump "$1" "$BAK/sql/$1.sql"
 		}
 
 		doWithShards &&
