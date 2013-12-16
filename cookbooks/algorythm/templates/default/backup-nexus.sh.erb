@@ -27,7 +27,8 @@ case "$ACTION" in
 		rm -rf "$BAK/files/indexer" &&
 		rm -rf "$BAK/files/timeline" &&
 		rm -rf "$BAK/files/storage/codehaus-snapshots" &&
-		rm -rf "$BAK/files/storage/central/apache-snapshots"
+		rm -rf "$BAK/files/storage/apache-snapshots" &&
+		rm -rf "$BAK/files/storage/central"
 	;;
 	restore)
 		echo '* stop liferay'
