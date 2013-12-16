@@ -282,10 +282,11 @@ template "#{node['backup']['install_directory']}/tasks/backup-redmine.sh" do
   source 'backup-redmine.sh.erb'
   owner 'root'
   group 'root'
-  mode 0700
+  mode 0744
   variables({
     :dir => redmineDir,
-    :homeDir => redmineHomeDir
+    :homeDir => redmineHomeDir,
+    :user => usr
   })
 end
 

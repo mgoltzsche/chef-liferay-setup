@@ -293,6 +293,18 @@ template "/etc/logrotate.d/liferay" do
   })
 end
 
+# --- Configure backup ---
+template "#{node['backup']['install_directory']}/tasks/backup-liferay.sh" do
+  source 'backup-liferay.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0744
+  variables({
+    :home => liferayHomeDir,
+    :user => usr
+  })
+end
+
 # --- Configure default nginx vhost ---
 node['liferay']['shards'].each do |name, shard|
   vhostFileName = name == node['liferay']['defaultshard'] ? 'default' : shard['hostname']

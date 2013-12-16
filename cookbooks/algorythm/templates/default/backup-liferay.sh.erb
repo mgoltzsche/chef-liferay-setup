@@ -1,0 +1,71 @@
+#!/bin/bash
+#####################################################
+# Usage: backup-liferay.sh {dump|restore} DIRECTORY #
+# Must be run as root                               #
+#####################################################
+
+if [ -z "$LIFERAY_HOME" ]; then
+	LIFERAY_HOME='<%=@home%>'
+fi
+
+if [ -z "$LIFERAY_USER" ]; then
+	LIFERAY_USER='<%=@user%>'
+fi
+
+SCRIPT_NAME="$0"
+ACTION="$1"
+BAK="$2"
+CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	exit 1
+fi
+
+function doWithShards {
+	for SHARD in $(cat $CFG_FILE | grep -P '^jdbc\.[^\.]+\.url='); do
+		SHARD_NAME=$(echo $SHARD | grep -Po '(?<=^jdbc\.)[^\.]+')
+		SHARD_DB=$(echo $SHARD | grep -Po '[^/]+$')
+		SHARD_DB_USER=$(cat $CFG_FILE | grep -Po "(?<=^jdbc\.$SHARD_NAME\.username=).*")
+
+		if [ -z "$SHARD_NAME" ] || [ -z "$SHARD_DB" ] || [ -z "$SHARD_DB_USER" ]; then
+			echo "! Invalid shard configuration at shard '$SHARD'. Check $CFG_FILE"
+			return 1
+		fi
+
+		doWithShard "$SHARD_NAME" "$SHARD_DB" "$SHARD_DB_USER"
+
+		STATUS=$?
+
+		if [ $STATUS != '0' ]; then
+			return 1
+		fi
+	done
+}
+
+case "$ACTION" in
+	dump)
+		function doWithShard {
+			backup-pg dump "$2" "$BAK/$1.sql"
+		}
+
+		doWithShards &&
+		backup-files dump "$LIFERAY_HOME" "$BAK"
+	;;
+	restore)
+		function doWithShard {
+			backup-pg restore "$2" "$BAK/$1.sql" "$3"
+		}
+
+		echo '* stop liferay'
+		service liferay stop >> /dev/null
+		doWithShards &&
+		backup-files restore "$LIFERAY_HOME" "$BAK" "$LIFERAY_USER" &&
+		echo '* start liferay' &&
+		service liferay start >> /dev/null
+	;;
+	*)
+		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+		exit 1
+	;;
+esac
