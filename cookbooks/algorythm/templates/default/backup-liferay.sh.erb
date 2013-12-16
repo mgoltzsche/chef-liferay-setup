@@ -52,7 +52,7 @@ case "$ACTION" in
 		}
 
 		doWithShards &&
-		backup-files dump "$LIFERAY_HOME/data" "$BAK/data" &&
+		backup-files dump "$LIFERAY_HOME/data" "$BAK/data"
 	;;
 	restore)
 		function doWithShard {
