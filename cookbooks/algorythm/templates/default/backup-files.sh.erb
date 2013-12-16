@@ -34,7 +34,7 @@ echo "* $ACTION directory $DIRECTORY"
 
 case "$ACTION" in
 	dump)
-		mkdir -p "$(dirname \"$DIRECTORY_BAK\")" &&
+		mkdir -p $(dirname "$DIRECTORY_BAK") &&
 		cp -r "$DIRECTORY" "$DIRECTORY_BAK"
 	;;
 	restore)

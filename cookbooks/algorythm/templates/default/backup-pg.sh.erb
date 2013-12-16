@@ -34,7 +34,7 @@ echo "* $ACTION postgresql database $DATABASE"
 
 case "$ACTION" in
 	dump)
-		BAK_DIR="$(dirname \"$SQL_FILE\")"
+		BAK_DIR=$(dirname "$SQL_FILE")
 		mkdir -p "$BAK_DIR" &&
 		chown root:postgres "$BAK_DIR" &&
 		chmod 770 "$BAK_DIR" &&
