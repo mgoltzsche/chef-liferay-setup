@@ -47,6 +47,7 @@ case "$ACTION" in
 	dump)
 		function doWithShard {
 			mkdir -p "$BAK/sql" &&
+			chmod 777 "$BAK/sql" &&
 			backup-pg dump "$1" "$BAK/sql/$1.sql"
 		}
 
