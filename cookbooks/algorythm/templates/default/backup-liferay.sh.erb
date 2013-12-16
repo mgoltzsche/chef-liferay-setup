@@ -33,7 +33,7 @@ function doWithShards {
 			return 1
 		fi
 
-		doWithShard "$SHARD_NAME" "$SHARD_DB" "$SHARD_DB_USER"
+		doWithShard "$SHARD_DB" "$SHARD_DB_USER"
 
 		STATUS=$?
 
@@ -46,21 +46,21 @@ function doWithShards {
 case "$ACTION" in
 	dump)
 		function doWithShard {
-			backup-pg dump "$2" "$BAK/$1.sql"
+			backup-pg dump "$1" "$BAK/$1.sql"
 		}
 
 		doWithShards &&
-		backup-files dump "$LIFERAY_HOME" "$BAK"
+		backup-files dump "$LIFERAY_HOME" "$BAK/files"
 	;;
 	restore)
 		function doWithShard {
-			backup-pg restore "$2" "$BAK/$1.sql" "$3"
+			backup-pg restore "$1" "$BAK/$1.sql" "$2"
 		}
 
 		echo '* stop liferay'
 		service liferay stop >> /dev/null
 		doWithShards &&
-		backup-files restore "$LIFERAY_HOME" "$BAK" "$LIFERAY_USER" &&
+		backup-files restore "$LIFERAY_HOME" "$BAK/files" "$LIFERAY_USER" &&
 		echo '* start liferay' &&
 		service liferay start >> /dev/null
 	;;
