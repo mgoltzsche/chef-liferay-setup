@@ -48,8 +48,8 @@ function printStatusMessage {
 
 function list {
 	BYTE_COUNT=0
-	for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P '[\d]{2}-[\d]{2}-[\d]{2}\.tar\.bz2'); do
-		BYTE_COUNT=$(expr $BYTE_COUNT + $(stat -c %s "$BACKUP_DIR/$ARCHIVE"))
+	for FILE in $(ls "$BACKUP_DIR"); do
+		BYTE_COUNT=$(expr $BYTE_COUNT + $(stat -c %s "$BACKUP_DIR/$FILE"))
 	done
         K_BYTE_COUNT=$(expr $BYTE_COUNT / 1024)
         M_BYTE_COUNT=$(expr $K_BYTE_COUNT / 1024)
