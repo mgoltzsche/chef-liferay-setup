@@ -22,7 +22,12 @@ fi
 
 case "$ACTION" in
 	dump)
-		backup-files dump "$NEXUS_HOME" "$BAK/files"
+		backup-files dump "$NEXUS_HOME" "$BAK/files" &&
+		rm -rf "$BAK/files/logs" &&
+		rm -rf "$BAK/files/indexer" &&
+		rm -rf "$BAK/files/timeline" &&
+		rm -rf "$BAK/files/storage/codehaus-snapshots" &&
+		rm -rf "$BAK/files/storage/central/apache-snapshots"
 	;;
 	restore)
 		echo '* stop liferay'

@@ -52,7 +52,10 @@ case "$ACTION" in
 		}
 
 		doWithShards &&
-		backup-files dump "$LIFERAY_HOME" "$BAK/files"
+		backup-files dump "$LIFERAY_HOME" "$BAK/files" &&
+		rm -rf "$BAK/files/logs"&&
+		rm -rf "$BAK/files/deploy" &&
+		rm -rf "$BAK/files/logs"
 	;;
 	restore)
 		function doWithShard {
@@ -62,7 +65,7 @@ case "$ACTION" in
 		echo '* stop liferay'
 		service liferay stop >> /dev/null
 		doWithShards &&
-		backup-files restore "$LIFERAY_HOME" "$BAK/files" "$LIFERAY_USER" &&
+		backup-files restore "$LIFERAY_HOME" "$BAK/files" "$LIFERAY_USER"
 		echo '* start liferay' &&
 		service liferay start >> /dev/null
 	;;
