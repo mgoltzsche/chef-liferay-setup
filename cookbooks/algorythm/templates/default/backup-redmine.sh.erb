@@ -31,13 +31,13 @@ fi
 case "$ACTION" in
 	dump)
 		backup-pg    dump "$DB_NAME" "$BAK/db.sql" &&
-		backup-files dump "$REDMINE_HOME/files" "$BAK/files"
+		backup-directory dump "$REDMINE_HOME/files" "$BAK/files"
 	;;
 	restore)
 		echo '* stop thin'
 		service thin stop >> /dev/null
 		backup-pg    restore "$DB_NAME" "$BAK/db.sql" "$DB_USER" &&
-		backup-files restore "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER" &&
+		backup-directory restore "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER" &&
 		echo '* migrate database' &&
 		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
 		echo '* reconfigure backlogs plugin' &&

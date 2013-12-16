@@ -1,0 +1,48 @@
+#!/bin/bash
+###################################################
+# Usage: backup-ldap.sh {dump|restore} DIRECTORY  #
+# Must be run as root                             #
+###################################################
+
+SCRIPT_NAME="$0"
+ACTION="$1"
+BAK="$2"
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	exit 1
+fi
+
+EXIT_CODE=0
+
+case "$ACTION" in
+	dump)
+		for INSTANCE in $(ls /etc/dirsrv/ | grep -P "^slapd-"); do
+			backup-directory dump "/etc/dirsrv/$INSTANCE" "$BAK/$INSTANCE"
+			STATUS=$?
+
+			if [ $STATUS != '0' ]; then
+				EXIT_CODE=1
+			fi
+		done
+	;;
+	restore)
+		for INSTANCE in $(ls /etc/dirsrv/ | grep -P "^slapd-"); do
+			backup-directory restore "/etc/dirsrv/$INSTANCE" "$BAK/$INSTANCE" dirsrv 770
+			STATUS=$?
+
+			if [ $STATUS != '0' ]; then
+				EXIT_CODE=1
+			fi
+		done
+
+		echo '* restart dirsrv' &&
+		service dirsrv restart >> /dev/null
+	;;
+	*)
+		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+		exit 1
+	;;
+esac
+
+exit $EXIT_CODE

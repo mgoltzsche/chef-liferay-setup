@@ -27,8 +27,15 @@ template "#{installDir}/backup-pg.sh" do
   mode 0755
 end
 
-template "#{installDir}/backup-files.sh" do
-  source 'backup-files.sh.erb'
+template "#{installDir}/backup-file.sh" do
+  source 'backup-file.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0755
+end
+
+template "#{installDir}/backup-directory.sh" do
+  source 'backup-directory.sh.erb'
   owner 'root'
   group 'root'
   mode 0755

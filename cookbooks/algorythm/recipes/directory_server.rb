@@ -124,6 +124,14 @@ userPassword:: #{userPassword}
   not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
 end
 
+# --- Configure config backup ---
+template "#{node['backup']['install_directory']}/tasks/backup-ldap.sh" do
+  source 'backup-ldap.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0744
+end
+
 # --- Restart dirsrv ---
 service "dirsrv" do
   supports :restart => true
