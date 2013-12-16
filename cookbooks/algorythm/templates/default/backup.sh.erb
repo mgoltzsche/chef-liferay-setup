@@ -72,7 +72,6 @@ function runBackupTask {
 		fi
 
 		mkdir $CUR_TMP_DIR
-		chmod 777 $CUR_TMP_DIR
 	else
 		if [ ! -f "$BACKUP_ARCHIVE" ]; then
 			echo "failed: $BACKUP_ARCHIVE does not exist"
