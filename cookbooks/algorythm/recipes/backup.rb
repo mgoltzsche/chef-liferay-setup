@@ -63,6 +63,10 @@ link "#{installDir}/bin/backup-pg" do
   to "#{installDir}/backup-pg.sh"
 end
 
-link "#{installDir}/bin/backup-files" do
-  to "#{installDir}/backup-files.sh"
+link "#{installDir}/bin/backup-file" do
+  to "#{installDir}/backup-file.sh"
+end
+
+link "#{installDir}/bin/backup-directory" do
+  to "#{installDir}/backup-directory.sh"
 end
