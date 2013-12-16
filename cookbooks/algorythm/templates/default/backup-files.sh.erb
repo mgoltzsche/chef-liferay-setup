@@ -34,6 +34,7 @@ echo "* $ACTION directory $DIRECTORY"
 
 case "$ACTION" in
 	dump)
+		mkdir -p "$(dirname \"$DIRECTORY_BAK\")" &&
 		cp -r "$DIRECTORY" "$DIRECTORY_BAK"
 	;;
 	restore)
@@ -42,7 +43,6 @@ case "$ACTION" in
 			exit 1
 		fi
 		
-		mkdir -p "$DIRECTORY" &&
 		rm -rf "$DIRECTORY" &&
 		cp -r "$DIRECTORY_BAK" "$DIRECTORY" &&
 		chown -R "$OWNER:$OWNER" "$DIRECTORY"

@@ -52,20 +52,21 @@ case "$ACTION" in
 		}
 
 		doWithShards &&
-		backup-files dump "$LIFERAY_HOME" "$BAK/files" &&
-		rm -rf "$BAK/files/logs"&&
-		rm -rf "$BAK/files/deploy" &&
-		rm -rf "$BAK/files/logs"
+		backup-files dump "$LIFERAY_HOME/data" "$BAK/data" &&
 	;;
 	restore)
 		function doWithShard {
-			backup-pg restore "$1" "$BAK/$1.sql" "$2"
+			backup-pg restore "$1" "$BAK/sql/$1.sql" "$2"
 		}
 
 		echo '* stop liferay'
 		service liferay stop >> /dev/null
 		doWithShards &&
-		backup-files restore "$LIFERAY_HOME" "$BAK/files" "$LIFERAY_USER"
+		backup-files restore "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER" &&
+		rm -f "$CFG_FILE" &&
+		cp "$BAK/portal-ext.properties" $CFG_FILE &&
+		chown "$LIFERAY_USER:$LIFERAY_USER" $CFG_FILE &&
+		chmod 400 $CFG_FILE &&
 		echo '* start liferay' &&
 		service liferay start >> /dev/null
 	;;
