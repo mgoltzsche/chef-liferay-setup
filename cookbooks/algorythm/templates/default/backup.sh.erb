@@ -48,11 +48,10 @@ function printStatusMessage {
 
 function list {
 	BYTE_COUNT=0
-	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort -r | while read -r ARCHIVE_DATE; do
-		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
-			BYTE_COUNT=$(expr $BYTE_COUNT + $(stat -c %s "$BACKUP_DIR/$ARCHIVE"))
-		done
+	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | while read -r ARCHIVE_DATE; do
+		BYTE_COUNT=$(expr $BYTE_COUNT + $(stat -c %s "$BACKUP_DIR/$ARCHIVE"))
 	done
+	echo "bc: $BYTE_COUNT"
 	MEGA_BYTE_COUNT=$(expr BYTE_COUNT / 1024)
 	echo "# Total size: ${MEGA_BYTE_COUNT}MB"
 	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort -r | while read -r ARCHIVE_DATE; do
