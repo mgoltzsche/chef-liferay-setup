@@ -22,3 +22,11 @@ directory '/var/log/nginx' do
   group 'www-data'
   mode 0770
 end
+
+# --- Configure config backup ---
+template "#{node['backup']['install_directory']}/tasks/backup-nginx.sh" do
+  source 'backup-nginx.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0744
+end

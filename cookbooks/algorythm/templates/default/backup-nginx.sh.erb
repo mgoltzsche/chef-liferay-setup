@@ -1,0 +1,35 @@
+#!/bin/bash
+###################################################
+# Usage: backup-nginx.sh {dump|restore} DIRECTORY #
+# Must be run as root                             #
+###################################################
+
+SCRIPT_NAME="$0"
+ACTION="$1"
+BAK="$2"
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	exit 1
+fi
+
+case "$ACTION" in
+	dump)
+		backup-files dump /etc/nginx/sites-available "$BAK/sites-available" &&
+		backup-files dump /etc/nginx/sites-enabled "$BAK/sites-enabled" &&
+		cp /etc/nginx/nginx.conf "$BAK/nginx.conf" &&
+		cp /etc/nginx/proxy_params "$BAK/proxy_params"
+	;;
+	restore)
+		backup-files restore /etc/nginx/sites-available "$BAK/sites-available" root &&
+		backup-files restore /etc/nginx/sites-enabled "$BAK/sites-enabled" root &&
+		mv "$BAK/nginx.conf" /etc/nginx/nginx.conf &&
+		mv "$BAK/proxy_params" /etc/nginx/proxy_params &&
+		echo '* restart nginx' &&
+		service nginx restart >> /dev/null
+	;;
+	*)
+		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+		exit 1
+	;;
+esac
