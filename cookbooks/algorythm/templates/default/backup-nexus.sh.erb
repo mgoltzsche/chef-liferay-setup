@@ -31,11 +31,10 @@ case "$ACTION" in
 		rm -rf "$BAK/files/storage/central"
 	;;
 	restore)
-		echo '* stop liferay'
-		service liferay stop >> /dev/null
+		service-wrapper liferay stop
 		backup-directory restore "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER" &&
 		echo '* start liferay' &&
-		service liferay start >> /dev/null
+		service-wrapper liferay start
 	;;
 	*)
 		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"

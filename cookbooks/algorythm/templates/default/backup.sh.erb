@@ -68,7 +68,7 @@ function cleanDirectory {
 	CLEAN_DIR="$1"
 	MAX_COUNT=$2
 	cd "$CLEAN_DIR"
-	ls | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | uniq | sort | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
+	ls | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | sort | uniq | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
 		echo "  * remove $ARCHIVE_DATE"
 		ls | grep $ARCHIVE_DATE | xargs rm
 	done
