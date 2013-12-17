@@ -12,19 +12,20 @@
 function printTaskMsg {
 	MSG="$1"
 	DETAIL="$2"
-	SPACER_SMALL="                        "
+	SPACER_SMALL="                      "
 	SPACER_BIG="                                                      "
 	echo "* $MSG${SPACER_SMALL:${#MSG}}$DETAIL${SPACER_BIG:${#DETAIL}}"
 }
 
 function backupPostgreDB {
+	FN_NAME='backupPostgresDB'
 	ACTION="$1"
 	DATABASE="$2"
 	SQL_FILE="$3"
 	DB_OWNER="$4"
 
-	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
-		echo "Usage: $0 {dump DATABASE FILE|restore DATABASE FILE OWNER}"
+	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
+		echo "Usage: $FN_NAME {dump DATABASE FILE|restore DATABASE FILE OWNER}"
 		return 1
 	fi
 
@@ -41,7 +42,7 @@ function backupPostgreDB {
 		;;
 		restore)
 			if [ -z "$DB_OWNER" ]; then
-				echo "Usage: $0 restore DATABASE FILE OWNER"
+				echo "Usage: $FN restore DATABASE FILE OWNER"
 				return 1
 			fi
 
@@ -53,6 +54,7 @@ function backupPostgreDB {
 }
 
 function backupFile {
+	FN_NAME='backupFile'
 	ACTION="$1"
 	FILE="$2"
 	FILE_BAK="$3"
@@ -67,8 +69,8 @@ function backupFile {
 		PERMISSIONS='600'
 	fi
 
-	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
-		echo "Usage: $0 {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
+	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
+		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
 		return 1
 	fi
 
@@ -81,7 +83,7 @@ function backupFile {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $0 restore FILE BAK [OWNER[, PERMISSIONS]]"
+				echo "Usage: $FN_NAME restore FILE BAK [OWNER[, PERMISSIONS]]"
 				return 1
 			fi
 		
@@ -94,6 +96,7 @@ function backupFile {
 }
 
 function backupDirectory {
+	FN_NAME='backupDirectory'
 	ACTION="$1"
 	DIRECTORY="$2"
 	DIRECTORY_BAK="$3"
@@ -108,8 +111,8 @@ function backupDirectory {
 		PERMISSIONS='700'
 	fi
 
-	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
-		echo "Usage: $0 {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
+	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
+		echo "Usage: $FN_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
 		return 1
 	fi
 
@@ -122,7 +125,7 @@ function backupDirectory {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $0 restore DIRECTORY BAK [OWNER[, PERMISSIONS]]"
+				echo "Usage: $FN_NAME restore DIRECTORY BAK [OWNER[, PERMISSIONS]]"
 				return 1
 			fi
 		
@@ -135,24 +138,25 @@ function backupDirectory {
 }
 
 function serviceWrapper {
+	FN_NAME='serviceWrapper'
 	SERVICE=$1
 	ACTION=$2
 
 	if [ -z "$SERVICE" ]; then
-		echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+		echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
 		return 1
 	fi
 
 	case "$ACTION" in
 		stop)
 			printTaskMsg "stop $SERVICE"
-			service $SERVICE stop &>> /dev/null
+			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
 			SERVICES_RESTART_LATER="$SERVICES_RESTART_LATER#$SERVICE"
 		;;
 		*)
-			echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
 			return 1
 		;;
 	esac

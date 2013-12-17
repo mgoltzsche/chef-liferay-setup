@@ -50,7 +50,7 @@ case "$ACTION" in
 
 		doWithShards &&
 		backupDirectory dump "$LIFERAY_HOME/data" "$BAK/data" &&
-		backupFile      dump "$CFG_FILE" "$BAK/portal-ext.properties"
+		backupFile      dump "$CFG_FILE"          "$BAK/portal-ext.properties"
 	;;
 	restore)
 		function doWithShard {
@@ -60,7 +60,7 @@ case "$ACTION" in
 		serviceWrapper liferay stop
 		doWithShards &&
 		backupDirectory restore "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER" &&
-		backupFile      restore "$CFG_FILE" "$BAK/portal-ext.properties" "$LIFERAY_USER" 400 &&
+		backupFile      restore "$CFG_FILE"          "$BAK/portal-ext.properties" "$LIFERAY_USER" 400 &&
 		serviceWrapper liferay start
 	;;
 	*)

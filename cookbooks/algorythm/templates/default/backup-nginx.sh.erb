@@ -15,15 +15,15 @@ fi
 case "$ACTION" in
 	dump)
 		backupDirectory dump /etc/nginx/sites-available "$BAK/sites-available" &&
-		backupDirectory dump /etc/nginx/sites-enabled "$BAK/sites-enabled" &&
-		backupFile      dump /etc/nginx/nginx.conf "$BAK/nginx.conf" &&
-		backupFile      dump /etc/nginx/proxy_params "$BAK/proxy_params"
+		backupDirectory dump /etc/nginx/sites-enabled   "$BAK/sites-enabled" &&
+		backupFile      dump /etc/nginx/nginx.conf      "$BAK/nginx.conf" &&
+		backupFile      dump /etc/nginx/proxy_params    "$BAK/proxy_params"
 	;;
 	restore)
-		backup-directory restore /etc/nginx/sites-available "$BAK/sites-available" root &&
-		backup-directory restore /etc/nginx/sites-enabled "$BAK/sites-enabled" root &&
-		backupFile       restore "$BAK/nginx.conf" /etc/nginx/nginx.conf &&
-		backupFile       restore "$BAK/proxy_params" /etc/nginx/proxy_params &&
+		backupDirectory restore /etc/nginx/sites-available "$BAK/sites-available" &&
+		backupDirectory restore /etc/nginx/sites-enabled   "$BAK/sites-enabled" &&
+		backupFile      restore "$BAK/nginx.conf"          /etc/nginx/nginx.conf &&
+		backupFile      restore "$BAK/proxy_params"        /etc/nginx/proxy_params &&
 		serviceWrapper nginx restart
 	;;
 	*)

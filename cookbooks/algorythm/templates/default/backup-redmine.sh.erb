@@ -29,12 +29,12 @@ fi
 
 case "$ACTION" in
 	dump)
-		backupPostgresDB dump "$DB_NAME" "$BAK/db.sql" &&
+		backupPostgresDB dump "$DB_NAME"            "$BAK/db.sql" &&
 		backupDirectory  dump "$REDMINE_HOME/files" "$BAK/files"
 	;;
 	restore)
 		serviceWrapper thin stop
-		backupPostgresDB restore "$DB_NAME" "$BAK/db.sql" "$DB_USER" &&
+		backupPostgresDB restore "$DB_NAME"            "$BAK/db.sql" "$DB_USER" &&
 		backupDirectory  restore "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER" &&
 		echo '* migrate database' &&
 		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
