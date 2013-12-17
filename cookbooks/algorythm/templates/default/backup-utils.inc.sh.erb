@@ -21,12 +21,7 @@ function printTaskMsg {
 function runLaterOnce {
 	LABEL="$1"
 	LINE="$2"
-	cat "$FINISH_SCRIPT_FILE" | grep -x "$LINE" >> /dev/null
-	STATUS=$?
-
-	if [ $STATUS != '0' ]; then
-		echo "echo '* $LABEL'; $LINE; STATUS=\$?; if [ \$STATUS != '0' ]; then echo '  failed'; EXIT_CODE=1; fi" >> "$FINISH_SCRIPT_FILE"
-	fi
+	echo "echo '* $LABEL'; $LINE" >> "$FINISH_LISTENER_FILE"
 }
 
 function backupPostgreDB {
