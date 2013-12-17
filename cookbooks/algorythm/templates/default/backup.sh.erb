@@ -211,6 +211,7 @@ function runBackup {
 	fi
 
 	# Restart services
+echo "### RESTART SERVICES: $SERVICES_RESTART_LATER"
 	for SERVICE in $(echo $SERVICES_RESTART_LATER | grep -Po '(?<=#)[^#]+' | sort | uniq); do
 		echo "* (re)start $SERVICE" >> "$LOG_FILE"
 		service $SERVICE restart &>> "$LOG_FILE"
