@@ -212,8 +212,7 @@ function runBackup {
 	fi
 
 	# Run finish listeners
-	for FINISH_LISTENER in $(cat "$FINISH_LISTENER_FILE" | sort | uniq); do
-echo "### $FINISH_LISTENER"
+	LISTENER_RESULT=$(cat "$FINISH_LISTENER_FILE" | sort | uniq | while read -r FINISH_LISTENER; do
 echo "### $FINISH_LISTENER" >> "$LOG_FILE"
 		($FINISH_LISTENER) &>> "$LOG_FILE"
 
@@ -221,9 +220,16 @@ echo "### $FINISH_LISTENER" >> "$LOG_FILE"
 
 		if [ $STATUS != '0' ]; then
 			echo 'failed' >> "$LOG_FILE"
-			EXIT_CODE=7
+			echo 'failed'
 		fi
-	done
+	done)
+
+	echo $LISTENER_RESULT | grep 'failed' >> /dev/null
+	STATUS=$?
+
+	if [ $STATUS != '0' ]; then
+		EXIT_CODE=7
+	fi
 
 	# Print final status message
 	if [ $EXIT_CODE = '0' ]; then
