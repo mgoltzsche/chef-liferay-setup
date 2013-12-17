@@ -25,9 +25,7 @@ function runLaterOnce {
 	STATUS=$?
 
 	if [ $STATUS != '0' ]; then
-		echo "echo '* $LABEL'" >> "$FINISH_SCRIPT_FILE"
-		echo "$LINE" >> "$FINISH_SCRIPT_FILE"
-		echo 'STATUS=$?; if [ STATUS != "0" ]; then FINISH_SCRIPT_EXIT_CODE=1; fi' >> "$FINISH_SCRIPT_FILE"
+		echo "echo '* $LABEL'; $LINE; STATUS=$?; if [ STATUS != '0' ]; then EXIT_CODE=1; fi" >> "$FINISH_SCRIPT_FILE"
 	fi
 }
 

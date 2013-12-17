@@ -144,7 +144,7 @@ function runBackup {
 
 	mkdir -p "$BACKUP_DIR"
 	mkdir -p $TMP_ARCHIVE_DIR
-	printf '#!/bin/bash\nFINISH_SCRIPT_EXIT_CODE=0\n' > "$FINISH_SCRIPT_FILE"
+	printf '#!/bin/bash\nEXIT_CODE=0\n' > "$FINISH_SCRIPT_FILE"
 
 	echo "$ACTION date $BACKUP_DATE:"
 
@@ -212,7 +212,7 @@ function runBackup {
 	fi
 
 	# Run finish script
-	echo 'exit $FINISH_SCRIPT_EXIT_CODE' >> "$FINISH_SCRIPT_FILE"
+	echo 'exit $EXIT_CODE' >> "$FINISH_SCRIPT_FILE"
 	bash "$FINISH_SCRIPT_FILE" &>> "$LOG_FILE"
 	
 	FINISH_SCRIPT_EXIT_CODE=$?
