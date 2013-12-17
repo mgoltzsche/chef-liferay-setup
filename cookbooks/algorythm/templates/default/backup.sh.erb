@@ -140,11 +140,11 @@ function runBackup {
 		exit 4
 	fi
 
-	echo '#!/bin/bash' > "$FINISH_SCRIPT_FILE"
 	source "$INSTALL_DIR/backup-utils.inc.sh"
 
 	mkdir -p "$BACKUP_DIR"
 	mkdir -p $TMP_ARCHIVE_DIR
+	echo '#!/bin/bash' > "$FINISH_SCRIPT_FILE"
 
 	echo "$ACTION date $BACKUP_DATE:"
 
