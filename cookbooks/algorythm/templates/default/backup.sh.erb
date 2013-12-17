@@ -40,10 +40,10 @@ function toBackupTaskId {
 }
 
 function printStatusMessage {
-			MSG="$1"
-			STATE="$2"
-			SPACER="                                                          "
-			printf "%s%s%20s\n" "$MSG" "${SPACER:${#MSG}}" "$STATE"
+	MSG="$1"
+	STATE="$2"
+	SPACER="                                                          "
+	printf "%s%s%20s\n" "$MSG" "${SPACER:${#MSG}}" "$STATE"
 }
 
 function list {
@@ -212,9 +212,7 @@ function runBackup {
 	fi
 
 	# Run finish script
-	echo "printf ''" >> "$FINISH_SCRIPT_FILE"
-
-	sh "$FINISH_SCRIPT_FILE" &>> "$LOG_FILE"
+	bash "$FINISH_SCRIPT_FILE" &>> "$LOG_FILE"
 	
 	FINISH_SCRIPT_EXIT_CODE=$?
 

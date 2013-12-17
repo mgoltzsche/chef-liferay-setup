@@ -19,8 +19,8 @@ function printTaskMsg {
 }
 
 function runLaterOnce {
-	LINE="$1 &&"
-	cat "$FINISH_SCRIPT_FILE" | grep -x "$LINE"
+	LINE="$1"
+	cat "$FINISH_SCRIPT_FILE" | grep -x "$LINE" >> /dev/null
 	STATUS=$?
 
 	if [ $STATUS != '0' ]; then
