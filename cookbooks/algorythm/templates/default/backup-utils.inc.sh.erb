@@ -24,11 +24,10 @@ function backupPostgreDB {
 	SQL_FILE="$3"
 	DB_OWNER="$4"
 
-	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
+	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
 		echo "Usage: $FN_NAME {dump DATABASE FILE|restore DATABASE FILE OWNER}"
 		return 1
 	fi
-
 
 	printTaskMsg "$ACTION postgres db" "$DATABASE"
 
@@ -69,7 +68,7 @@ function backupFile {
 		PERMISSIONS='600'
 	fi
 
-	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
+	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
 		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
 		return 1
 	fi
@@ -111,7 +110,7 @@ function backupDirectory {
 		PERMISSIONS='700'
 	fi
 
-	if [ ! "$ACTION" = 'dump' -o "$ACTION" = 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
+	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
 		echo "Usage: $FN_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
 		return 1
 	fi
