@@ -19,13 +19,15 @@ function printTaskMsg {
 }
 
 function runLaterOnce {
-	LINE="$1"
+	LABEL="$1"
+	LINE="$2"
 	cat "$FINISH_SCRIPT_FILE" | grep -x "$LINE" >> /dev/null
 	STATUS=$?
 
 	if [ $STATUS != '0' ]; then
+		echo "echo '* $LABEL'" >> "$FINISH_SCRIPT_FILE"
 		echo "$LINE" >> "$FINISH_SCRIPT_FILE"
-		echo 'STATUS=$?; if [ STATUS != "0" ]; then FINISH_SCRIPT_EXIT_CODE=1 fi' >> "$FINISH_SCRIPT_FILE"
+		echo 'STATUS=$?; if [ STATUS != "0" ]; then FINISH_SCRIPT_EXIT_CODE=1; fi' >> "$FINISH_SCRIPT_FILE"
 	fi
 }
 
@@ -164,8 +166,7 @@ function serviceWrapper {
 			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
-			runLaterOnce "echo '* (re)start $SERVICE'"
-			runLaterOnce "service '$SERVICE' restart &>> /dev/null"
+			runLaterOnce "(re)start $SERVICE" "service '$SERVICE' restart &>> /dev/null"
 		;;
 		*)
 			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
