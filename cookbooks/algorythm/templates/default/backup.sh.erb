@@ -213,6 +213,8 @@ function runBackup {
 
 	# Run finish listeners
 	for FINISH_LISTENER in $(cat "$FINISH_LISTENER_FILE" | sort | uniq); do
+echo "### $FINISH_LISTENER"
+echo "### $FINISH_LISTENER" >> "$LOG_FILE"
 		($FINISH_LISTENER) &>> "$LOG_FILE"
 
 		STATUS=$?;
@@ -238,6 +240,7 @@ function runBackup {
 
 	rm -rf $TMP_DIR
 }
+
 
 case "$ACTION" in
 	dump)
