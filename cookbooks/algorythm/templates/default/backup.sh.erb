@@ -213,6 +213,7 @@ function runBackup {
 
 	# Run finish listeners
 	LISTENER_RESULT=$(cat "$FINISH_LISTENER_FILE" | sort | uniq | while read -r FINISH_LISTENER; do
+echo "### $FINISH_LISTENER" >> "$LOG_FILE"
 		($FINISH_LISTENER) &>> "$LOG_FILE"
 
 		STATUS=$?;
