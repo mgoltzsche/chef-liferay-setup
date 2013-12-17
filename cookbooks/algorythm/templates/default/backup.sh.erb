@@ -140,7 +140,7 @@ function runBackup {
 		exit 4
 	fi
 
-	printf '#!/bin/bash\n' > $FINISH_SCRIPT_FILE
+	echo '#!/bin/bash' > "$FINISH_SCRIPT_FILE"
 	source "$INSTALL_DIR/backup-utils.inc.sh"
 
 	mkdir -p "$BACKUP_DIR"
@@ -212,13 +212,13 @@ function runBackup {
 	fi
 
 	# Run finish script
-	echo "printf ''" >> $FINISH_SCRIPT_FILE
+	echo "printf ''" >> "$FINISH_SCRIPT_FILE"
 
-	sh $FINISH_SCRIPT_FILE &>> "$LOG_FILE"
+	sh "$FINISH_SCRIPT_FILE" &>> "$LOG_FILE"
 	
 	FINISH_SCRIPT_EXIT_CODE=$?
 
-	if [ $FINISH_SCRIPT_EXIT_CODE = '0' ]; then
+	if [ $FINISH_SCRIPT_EXIT_CODE != '0' ]; then
 		echo '! finish script failed'
 		EXIT_CODE=7
 	fi
