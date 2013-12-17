@@ -2,7 +2,6 @@
 #######################################################################################
 # source this file to use the contained functions:                                    #
 #   printTaskMsg    MESSAGE PATH                                                      #
-#   runLaterOnce    COMMAND                                                           #
 #   backupPostgreDB {dump DATABASE FILE|restore DATABASE FILE OWNER}                  #
 #   backupFile      {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}           #
 #   backupDirectory {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]} #
@@ -16,12 +15,6 @@ function printTaskMsg {
 	SPACER_SMALL="                      "
 	SPACER_BIG="                                                      "
 	echo "* $MSG${SPACER_SMALL:${#MSG}}$DETAIL${SPACER_BIG:${#DETAIL}}"
-}
-
-function runLaterOnce {
-	LABEL="$1"
-	LINE="$2"
-	echo "echo '* $LABEL'; $LINE" >> "$FINISH_LISTENER_FILE"
 }
 
 function backupPostgreDB {
@@ -159,7 +152,7 @@ function serviceWrapper {
 			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
-			runLaterOnce "(re)start $SERVICE" "service '$SERVICE' restart &>> /dev/null"
+			echo "echo '* (re)start $SERVICE'; service '$SERVICE' restart &>> /dev/null" >> "$FINISH_LISTENER_FILE"
 		;;
 		*)
 			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
