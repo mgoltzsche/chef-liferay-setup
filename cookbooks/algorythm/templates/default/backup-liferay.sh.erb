@@ -45,7 +45,7 @@ function doWithShards {
 case "$ACTION" in
 	dump)
 		function doWithShard {
-			backup-pg dump "$1" "$BAK/sql/$1.sql"
+			backupPostgreDB dump "$1" "$BAK/sql/$1.sql"
 		}
 
 		doWithShards &&
@@ -54,7 +54,7 @@ case "$ACTION" in
 	;;
 	restore)
 		function doWithShard {
-			backup-pg restore "$1" "$BAK/sql/$1.sql" "$2"
+			backupPostgreDB restore "$1" "$BAK/sql/$1.sql" "$2"
 		}
 
 		serviceWrapper liferay stop

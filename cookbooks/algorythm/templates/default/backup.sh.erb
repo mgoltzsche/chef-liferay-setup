@@ -104,7 +104,7 @@ function runBackupTask {
 		fi
 	fi
 
-	source "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR
+	(source "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR)
 	STATUS=$?
 
 	if [ $STATUS = '0' ]; then

@@ -12,8 +12,9 @@
 function printTaskMsg {
 	MSG="$1"
 	DETAIL="$2"
-	SPACER="                        "
-	printf "* %s%s%55s\n" "$MSG" "${SPACER:${#MSG}}" "$DETAIL"
+	SPACER_SMALL="                        "
+	SPACER_BIG="                                                      "
+	echo "* $MSG${SPACER_SMALL:${#MSG}}$DETAIL${SPACER_BIG:${#DETAIL}}"
 }
 
 function backupPostgreDB {
@@ -24,7 +25,7 @@ function backupPostgreDB {
 
 	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
 		echo "Usage: $0 {dump DATABASE FILE|restore DATABASE FILE OWNER}"
-		exit 1
+		return 1
 	fi
 
 
@@ -41,7 +42,7 @@ function backupPostgreDB {
 		restore)
 			if [ -z "$DB_OWNER" ]; then
 				echo "Usage: $0 restore DATABASE FILE OWNER"
-				exit 1
+				return 1
 			fi
 
 			su postgres -c "dropdb \"$DATABASE\"" >> /dev/null
@@ -68,7 +69,7 @@ function backupFile {
 
 	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
 		echo "Usage: $0 {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
-		exit 1
+		return 1
 	fi
 
 	printTaskMsg "$ACTION file" "$FILE"
@@ -81,7 +82,7 @@ function backupFile {
 		restore)
 			if [ -z "$OWNER" ]; then
 				echo "Usage: $0 restore FILE BAK [OWNER[, PERMISSIONS]]"
-				exit 1
+				return 1
 			fi
 		
 			rm -f "$FILE" &&
@@ -109,7 +110,7 @@ function backupDirectory {
 
 	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
 		echo "Usage: $0 {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
-		exit 1
+		return 1
 	fi
 
 	printTaskMsg "$ACTION directory" "$DIRECTORY"
@@ -122,7 +123,7 @@ function backupDirectory {
 		restore)
 			if [ -z "$OWNER" ]; then
 				echo "Usage: $0 restore DIRECTORY BAK [OWNER[, PERMISSIONS]]"
-				exit 1
+				return 1
 			fi
 		
 			rm -rf "$DIRECTORY" &&
@@ -139,7 +140,7 @@ function serviceWrapper {
 
 	if [ -z "$SERVICE" ]; then
 		echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
-		exit 1
+		return 1
 	fi
 
 	case "$ACTION" in
@@ -152,7 +153,7 @@ function serviceWrapper {
 		;;
 		*)
 			echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
-			exit 1
+			return 1
 		;;
 	esac
 }
