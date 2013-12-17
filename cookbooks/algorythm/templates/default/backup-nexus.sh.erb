@@ -33,7 +33,6 @@ case "$ACTION" in
 	restore)
 		service-wrapper liferay stop
 		backup-directory restore "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER" &&
-		echo '* start liferay' &&
 		service-wrapper liferay start
 	;;
 	*)
