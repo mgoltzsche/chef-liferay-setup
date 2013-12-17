@@ -37,7 +37,7 @@ function backupPostgreDB {
 			mkdir -p "$BAK_DIR" &&
 			chown root:postgres "$BAK_DIR" &&
 			chmod 770 "$BAK_DIR" &&
-			su postgres -c "pg_dump -O -X \"$DATABASE\" > \"$SQL_FILE\""
+			su postgres -c "pg_dump -O -x \"$DATABASE\" > \"$SQL_FILE\""
 		;;
 		restore)
 			if [ -z "$DB_OWNER" ]; then
