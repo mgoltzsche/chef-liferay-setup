@@ -78,7 +78,6 @@ function runBackupTask {
 	SCRIPT_FILE="$1"
 	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
 	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
-	
 	BACKUP_ARCHIVE="$BACKUP_DIR/$BACKUP_TASK_ID.tar.bz2"
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
@@ -105,7 +104,7 @@ function runBackupTask {
 		fi
 	fi
 
-	bash "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR
+	source "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR
 	STATUS=$?
 
 	if [ $STATUS = '0' ]; then
@@ -134,8 +133,9 @@ function runBackup {
 	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
-	PATH="$PATH:$INSTALL_DIR/utils"
 	SERVICES_RESTART_LATER=''
+
+	source "$INSTALL_DIR/backup-utils.inc.sh"
 
 	if [ -d "$TMP_DIR" ]; then
 		echo "failed: Temp directory $TMP_DIR is in use" 2>&1

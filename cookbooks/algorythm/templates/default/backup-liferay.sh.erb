@@ -12,13 +12,12 @@ if [ -z "$LIFERAY_USER" ]; then
 	LIFERAY_USER='<%=@user%>'
 fi
 
-SCRIPT_NAME="$0"
 ACTION="$1"
 BAK="$2"
 CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
 
 if [ -z "$BAK" ]; then
-	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	echo "Usage: $0 {dump|restore} DIRECTORY"
 	exit 1
 fi
 
@@ -50,22 +49,22 @@ case "$ACTION" in
 		}
 
 		doWithShards &&
-		backup-directory dump "$LIFERAY_HOME/data" "$BAK/data" &&
-		backup-file      dump "$CFG_FILE" "$BAK/portal-ext.properties"
+		backupDirectory dump "$LIFERAY_HOME/data" "$BAK/data" &&
+		backupFile      dump "$CFG_FILE" "$BAK/portal-ext.properties"
 	;;
 	restore)
 		function doWithShard {
 			backup-pg restore "$1" "$BAK/sql/$1.sql" "$2"
 		}
 
-		service-wrapper liferay stop
+		serviceWrapper liferay stop
 		doWithShards &&
-		backup-directory restore "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER" &&
-		backup-file      restore "$CFG_FILE" "$BAK/portal-ext.properties" "$LIFERAY_USER" 400 &&
-		service-wrapper liferay start
+		backupDirectory restore "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER" &&
+		backupFile      restore "$CFG_FILE" "$BAK/portal-ext.properties" "$LIFERAY_USER" 400 &&
+		serviceWrapper liferay start
 	;;
 	*)
-		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+		echo "Usage: $0 {dump|restore} DIRECTORY"
 		exit 1
 	;;
 esac

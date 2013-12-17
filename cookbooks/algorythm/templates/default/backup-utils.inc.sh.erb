@@ -1,0 +1,158 @@
+#!/bin/bash
+#######################################################################################
+# source this file to use the contained functions:                                    #
+#   printTaskMsg    MESSAGE PATH                                                      #
+#   backupPostgreDB {dump DATABASE FILE|restore DATABASE FILE OWNER}                  #
+#   backupFile      {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}           #
+#   backupDirectory {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]} #
+#   serviceWrapper  {stop|start|restart} SERVICE                                      #
+# Must be run as root                                                                 #
+#######################################################################################
+
+function printTaskMsg {
+	MSG="$1"
+	DETAIL="$2"
+	SPACER="                        "
+	printf "* %s%s%55s\n" "$MSG" "${SPACER:${#MSG}}" "$DETAIL"
+}
+
+function backupPostgreDB {
+	ACTION="$1"
+	DATABASE="$2"
+	SQL_FILE="$3"
+	DB_OWNER="$4"
+
+	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
+		echo "Usage: $0 {dump DATABASE FILE|restore DATABASE FILE OWNER}"
+		exit 1
+	fi
+
+
+	printTaskMsg "$ACTION postgres db" "$DATABASE"
+
+	case "$ACTION" in
+		dump)
+			BAK_DIR=$(dirname "$SQL_FILE")
+			mkdir -p "$BAK_DIR" &&
+			chown root:postgres "$BAK_DIR" &&
+			chmod 770 "$BAK_DIR" &&
+			su postgres -c "pg_dump \"$DATABASE\" > \"$SQL_FILE\""
+		;;
+		restore)
+			if [ -z "$DB_OWNER" ]; then
+				echo "Usage: $0 restore DATABASE FILE OWNER"
+				exit 1
+			fi
+
+			su postgres -c "dropdb \"$DATABASE\"" >> /dev/null
+			su postgres -c "createdb \"$DATABASE\" -O \"$DB_OWNER\"" &&
+			su postgres -c "psql -1 \"$DATABASE\" < \"$SQL_FILE\""
+		;;
+	esac
+}
+
+function backupFile {
+	ACTION="$1"
+	FILE="$2"
+	FILE_BAK="$3"
+	OWNER="$4"
+	PERMISSIONS="$5"
+
+	if [ -z "$OWNER" ]; then
+		OWNER='root'
+	fi
+
+	if [ -z "$PERMISSIONS" ]; then
+		PERMISSIONS='600'
+	fi
+
+	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
+		echo "Usage: $0 {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
+		exit 1
+	fi
+
+	printTaskMsg "$ACTION file" "$FILE"
+
+	case "$ACTION" in
+		dump)
+			mkdir -p $(dirname "$FILE_BAK") &&
+			cp "$FILE" "$FILE_BAK"
+		;;
+		restore)
+			if [ -z "$OWNER" ]; then
+				echo "Usage: $0 restore FILE BAK [OWNER[, PERMISSIONS]]"
+				exit 1
+			fi
+		
+			rm -f "$FILE" &&
+			cp "$FILE_BAK" "$FILE" &&
+			chown -R "$OWNER:$OWNER" "$FILE" &&
+			chmod -R $PERMISSIONS "$FILE"
+		;;
+	esac
+}
+
+function backupDirectory {
+	ACTION="$1"
+	DIRECTORY="$2"
+	DIRECTORY_BAK="$3"
+	OWNER="$4"
+	PERMISSIONS="$5"
+
+	if [ -z "$OWNER" ]; then
+		OWNER='root'
+	fi
+
+	if [ -z "$PERMISSIONS" ]; then
+		PERMISSIONS='700'
+	fi
+
+	if [ ! $ACTION = 'dump' -o $ACTION = 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
+		echo "Usage: $0 {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
+		exit 1
+	fi
+
+	printTaskMsg "$ACTION directory" "$DIRECTORY"
+
+	case "$ACTION" in
+		dump)
+			mkdir -p $(dirname "$DIRECTORY_BAK") &&
+			cp -r "$DIRECTORY" "$DIRECTORY_BAK"
+		;;
+		restore)
+			if [ -z "$OWNER" ]; then
+				echo "Usage: $0 restore DIRECTORY BAK [OWNER[, PERMISSIONS]]"
+				exit 1
+			fi
+		
+			rm -rf "$DIRECTORY" &&
+			cp -r "$DIRECTORY_BAK" "$DIRECTORY" &&
+			chown -R "$OWNER:$OWNER" "$DIRECTORY" &&
+			chmod -R $PERMISSIONS "$DIRECTORY"
+		;;
+	esac
+}
+
+function serviceWrapper {
+	SERVICE=$1
+	ACTION=$2
+
+	if [ -z "$SERVICE" ]; then
+		echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+		exit 1
+	fi
+
+	case "$ACTION" in
+		stop)
+			printTaskMsg "stop $SERVICE"
+			service $SERVICE stop &>> /dev/null
+		;;
+		start|restart)
+			SERVICES_RESTART_LATER="$SERVICES_RESTART_LATER#$SERVICE"
+		;;
+		*)
+			echo "Usage: $0 {stop|start|restart} SERVICE" 2>&1
+			exit 1
+		;;
+	esac
+}

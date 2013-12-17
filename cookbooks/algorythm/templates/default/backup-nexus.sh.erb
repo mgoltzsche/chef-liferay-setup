@@ -11,18 +11,17 @@ if [ -z "$NEXUS_SYSTEM_USER" ]; then
 	NEXUS_SYSTEM_USER='<%=@user%>'
 fi
 
-SCRIPT_NAME="$0"
 ACTION="$1"
 BAK="$2"
 
 if [ -z "$BAK" ]; then
-	echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+	echo "Usage: $0 {dump|restore} DIRECTORY"
 	exit 1
 fi
 
 case "$ACTION" in
 	dump)
-		backup-directory dump "$NEXUS_HOME" "$BAK/files" &&
+		backupDirectory dump "$NEXUS_HOME" "$BAK/files" &&
 		rm -rf "$BAK/files/logs" &&
 		rm -rf "$BAK/files/indexer" &&
 		rm -rf "$BAK/files/timeline" &&
@@ -31,12 +30,12 @@ case "$ACTION" in
 		rm -rf "$BAK/files/storage/central"
 	;;
 	restore)
-		service-wrapper liferay stop
-		backup-directory restore "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER" &&
-		service-wrapper liferay start
+		serviceWrapper liferay stop
+		backupDirectory restore "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER" &&
+		serviceWrapper liferay start
 	;;
 	*)
-		echo "Usage: $SCRIPT_NAME {dump|restore} DIRECTORY"
+		echo "Usage: $0 {dump|restore} DIRECTORY"
 		exit 1
 	;;
 esac
