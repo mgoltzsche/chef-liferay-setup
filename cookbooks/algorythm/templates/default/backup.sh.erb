@@ -133,14 +133,15 @@ function runBackup {
 	LOG_FILE="$LOG_DIR/$ACTION-$BACKUP_DATE.log"
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
-	SERVICES_RESTART_LATER=''
-
-	source "$INSTALL_DIR/backup-utils.inc.sh"
+	FINISH_SCRIPT_FILE="$TMP_DIR/finish.sh"
 
 	if [ -d "$TMP_DIR" ]; then
 		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
 		exit 4
 	fi
+
+	printf '#!/bin/bash\n' > $FINISH_SCRIPT_FILE
+	source "$INSTALL_DIR/backup-utils.inc.sh"
 
 	mkdir -p "$BACKUP_DIR"
 	mkdir -p $TMP_ARCHIVE_DIR
@@ -210,13 +211,19 @@ function runBackup {
 		cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
 	fi
 
-	# Restart services
-echo "### RESTART SERVICES: $SERVICES_RESTART_LATER"
-	for SERVICE in $(echo $SERVICES_RESTART_LATER | grep -Po '(?<=#)[^#]+' | sort | uniq); do
-		echo "* (re)start $SERVICE" >> "$LOG_FILE"
-		service "$SERVICE" restart &>> "$LOG_FILE"
-	done
+	# Run finish script
+	echo "printf ''" >> $FINISH_SCRIPT_FILE
 
+	sh $FINISH_SCRIPT_FILE &>> "$LOG_FILE"
+	
+	FINISH_SCRIPT_EXIT_CODE=$?
+
+	if [ $FINISH_SCRIPT_EXIT_CODE = '0' ]; then
+		echo '! finish script failed'
+		EXIT_CODE=7
+	fi
+
+	# Print final status message
 	if [ $EXIT_CODE = '0' ]; then
 		echo "finished successfully" >> "$LOG_FILE"
 		echo "finished successfully (see $LOG_FILE)"

@@ -2,6 +2,7 @@
 #######################################################################################
 # source this file to use the contained functions:                                    #
 #   printTaskMsg    MESSAGE PATH                                                      #
+#   runLaterOnce    COMMAND                                                           #
 #   backupPostgreDB {dump DATABASE FILE|restore DATABASE FILE OWNER}                  #
 #   backupFile      {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}           #
 #   backupDirectory {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]} #
@@ -15,6 +16,16 @@ function printTaskMsg {
 	SPACER_SMALL="                      "
 	SPACER_BIG="                                                      "
 	echo "* $MSG${SPACER_SMALL:${#MSG}}$DETAIL${SPACER_BIG:${#DETAIL}}"
+}
+
+function runLaterOnce {
+	LINE="$1 &&"
+	cat "$FINISH_SCRIPT_FILE" | grep -x "$LINE"
+	STATUS=$?
+
+	if [ $STATUS != '0' ]; then
+		echo "$LINE" >> "$FINISH_SCRIPT_FILE"
+	fi
 }
 
 function backupPostgreDB {
@@ -148,11 +159,12 @@ function serviceWrapper {
 
 	case "$ACTION" in
 		stop)
-			printTaskMsg "stop $SERVICE"
+			echo "* stop $SERVICE"
 			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
-			SERVICES_RESTART_LATER="$SERVICES_RESTART_LATER#$SERVICE"
+			runLaterOnce "echo '* (re)start $SERVICE'"
+			runLaterOnce "service '$SERVICE' restart &>> /dev/null"
 		;;
 		*)
 			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
