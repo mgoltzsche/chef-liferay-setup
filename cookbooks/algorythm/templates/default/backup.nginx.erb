@@ -1,12 +1,4 @@
 #!/bin/bash
-ACTION="$1"
-BAK="$2"
-
-if [ -z "$BAK" ]; then
-	echo "Usage: $0 {dump|restore} DIRECTORY"
-	exit 1
-fi
-
 function nginxBackup {
 	backupDirectory /etc/nginx/sites-available 'sites-available' &&
 	backupDirectory /etc/nginx/sites-enabled   'sites-enabled' &&

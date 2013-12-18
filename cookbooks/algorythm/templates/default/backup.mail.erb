@@ -1,18 +1,9 @@
 #!/bin/bash
-
 if [ -z "$VMAIL_HOME" ]; then
 	VMAIL_HOME='<%=@home%>'
 fi
 if [ -z "$VMAIL_USER" ]; then
 	VMAIL_USER='<%=@user%>'
-fi
-
-ACTION="$1"
-BAK="$2"
-
-if [ -z "$BAK" ]; then
-	echo "Usage: $0 {dump|restore} DIRECTORY"
-	exit 1
 fi
 
 function mailBackup {
