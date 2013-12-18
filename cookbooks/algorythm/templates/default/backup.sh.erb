@@ -99,8 +99,10 @@ function runBackupTask {
 
 		echo '* decompress backup'
 		cd $TMP_DIR
-		tar xvjf "$BACKUP_ARCHIVE"
-		DECOMPRESSION_EXIT_CODE=$?
+		tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
+			echo "  * $LINE"
+		done
+		DECOMPRESSION_EXIT_CODE=$PIPESTATUS
 
 		if [ $DECOMPRESSION_EXIT_CODE != '0' ]; then
 			echo "failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
@@ -116,7 +118,10 @@ function runBackupTask {
 			echo '* compress backup'
 			cd $TMP_DIR
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
-			COMPRESSION_EXIT_CODE=$?
+			tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
+				echo "  * $LINE"
+			done
+			COMPRESSION_EXIT_CODE=$PIPESTATUS
 
 			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
 				echo "failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
