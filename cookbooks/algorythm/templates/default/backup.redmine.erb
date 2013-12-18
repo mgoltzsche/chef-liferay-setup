@@ -5,7 +5,6 @@ fi
 if [ -z "$REDMINE_HOME" ]; then
 	REDMINE_HOME='<%=@homeDir%>'
 fi
-
 if [ -z "$REDMINE_USER" ]; then
 	REDMINE_USER='<%=@user%>'
 fi
@@ -14,7 +13,7 @@ DB_CFG_FILE="$REDMINE_INSTALLATION/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
 
-redmineBackup {
+function redmineBackup {
 	backupPostgresDB "$DB_NAME" "$DB_USER" &&
 	backupDirectory  "$REDMINE_HOME/files" 'files'  "$REDMINE_USER:$REDMINE_USER"
 }
