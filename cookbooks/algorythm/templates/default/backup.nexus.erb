@@ -9,7 +9,7 @@ fi
 function nexusBackup {
 	backupDirectory "$NEXUS_HOME/conf" 'conf' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER" &&
 	backupDirectory "$NEXUS_HOME/storage" 'storage' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER" \
-		-e codehaus-snapshots apache-snapshots central
+		-i codehaus-snapshots apache-snapshots central
 }
 
 case "$ACTION" in
