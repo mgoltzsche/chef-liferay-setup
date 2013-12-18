@@ -15,16 +15,22 @@ if [ -z "$BACKUP_DIR" ]; then
 fi
 
 SCRIPT_NAME="$0"
-ACTION="$1"
-BACKUP_DATE="$2"
+ACTION=
+BACKUP_DATE=
+FORCE_OVERWRITE=
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
 MAX_BACKUPS=1
 MAX_LOGS=1
 EXIT_CODE=0
 
 function showUsageAndExit {
+	EXIT_STATUS=$1
+	
+	if [ -z $EXIT_STATUS ]; then
+		EXIT_STATUS=1
+
 	printf "Usage: backup {list|dump [force]|restore DATE}\nDATE: YY-MM-DD\n"
-	exit 2
+	exit $EXIT_STATUS
 }
 
 function toBackupType {
@@ -246,15 +252,30 @@ function runBackup {
 	rm -rf $TMP_DIR
 }
 
+# Write parameters to variables
+while [ "$1" != "" ]; do
+    case "$1" in
+        -f | --force )          FORCE_OVERWRITE=1
+                                ;;
+        -h | --help )           showUsageAndExit 0
+                                ;;
+        * )                     showUsageAndExit
+                                exit 1
+    esac
+    shift
+done
 
+ACTION="$1"
+BACKUP_DATE="$2"
+
+# Apply action
 case "$ACTION" in
 	dump)
-		BACKUP_DATE=$(date +'%y-%m-%d')
-		FORCE_OVERWRITE="$2"
-
-		if [ ! -z "$FORCE_OVERWRITE" ] && [ "$FORCE_OVERWRITE" != 'force' ]; then
+		if [ ! -z "$BACKUP_DATE" ]; then
 			showUsageAndExit
 		fi
+		
+		BACKUP_DATE=$(date +'%y-%m-%d')
 
 		if [ -d $BACKUP_DIR ]; then
 			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
@@ -280,6 +301,10 @@ case "$ACTION" in
 		runBackup
 	;;
 	list)
+		if [ ! -z "$BACKUP_DATE" ]; then
+			showUsageAndExit
+		fi
+
 		list
 	;;
 	*)

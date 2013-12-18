@@ -152,7 +152,7 @@ function serviceWrapper {
 			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
-			echo "echo '* (re)start $SERVICE'; service '$SERVICE' restart &>> /dev/null" >> "$FINISH_LISTENER_FILE"
+			echo "echo '* restart $SERVICE'; service '$SERVICE' restart &>> /dev/null" >> "$FINISH_LISTENER_FILE"
 		;;
 		*)
 			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
