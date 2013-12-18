@@ -28,7 +28,7 @@ function backupPostgreDB {
 		return 1
 	fi
 
-	printTaskMsg "$ACTION postgres db" "$DATABASE"
+	printTaskMsg "postgres db" "$DATABASE"
 
 	case "$ACTION" in
 		dump)
