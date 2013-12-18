@@ -39,7 +39,7 @@ case "$ACTION" in
 		liferayBackup
 	;;
 	restore)
-		serviceWrapper liferay stop &&
+		serviceWrapper liferay stop
 		liferayBackup &&
 		serviceWrapper liferay start
 	;;

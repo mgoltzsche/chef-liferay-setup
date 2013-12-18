@@ -17,7 +17,7 @@ case "$ACTION" in
 		nexusBackup
 	;;
 	restore)
-		serviceWrapper liferay stop &&
+		serviceWrapper liferay stop
 		nexusBackup &&
 		serviceWrapper liferay start
 	;;
