@@ -14,7 +14,7 @@ DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
 
 function redmineBackup {
-	backupPostgresDB "$DB_NAME" "$DB_USER" &&
+	backupPostgreDB "$DB_NAME" "$DB_USER" &&
 	backupDirectory  "$REDMINE_HOME/files" 'files'  "$REDMINE_USER:$REDMINE_USER"
 }
 
