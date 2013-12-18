@@ -187,8 +187,8 @@ uniqueMember: cn=#{adminCN},ou=people,#{ldapSuffix}
 end
 
 # --- Configure backup ---
-template "#{node['backup']['install_directory']}/tasks/backup-nexus.sh" do
-  source 'backup-nexus.sh.erb'
+template "#{node['backup']['install_directory']}/tasks/nexus" do
+  source 'backup.nexus.erb'
   owner 'root'
   group 'root'
   mode 0700

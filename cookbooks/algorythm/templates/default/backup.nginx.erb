@@ -1,0 +1,29 @@
+#!/bin/bash
+ACTION="$1"
+BAK="$2"
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $0 {dump|restore} DIRECTORY"
+	exit 1
+fi
+
+function nginxBackup {
+	backupDirectory $ACTION /etc/nginx/sites-available "$BAK/sites-available" &&
+	backupDirectory $ACTION /etc/nginx/sites-enabled   "$BAK/sites-enabled" &&
+	backupFile      $ACTION /etc/nginx/nginx.conf      "$BAK/nginx.conf" &&
+	backupFile      $ACTION /etc/nginx/proxy_params    "$BAK/proxy_params"
+}
+
+case "$ACTION" in
+	dump)
+		nginxBackup
+	;;
+	restore)
+		nginxBackup &&
+		serviceWrapper nginx restart
+	;;
+	*)
+		echo "Usage: $0 {dump|restore} DIRECTORY"
+		exit 1
+	;;
+esac

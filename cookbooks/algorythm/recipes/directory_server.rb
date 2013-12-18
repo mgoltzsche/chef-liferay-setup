@@ -125,8 +125,8 @@ userPassword:: #{userPassword}
 end
 
 # --- Configure config backup ---
-template "#{node['backup']['install_directory']}/tasks/backup-ldap.sh" do
-  source 'backup-ldap.sh.erb'
+template "#{node['backup']['install_directory']}/tasks/ldap" do
+  source 'backup.ldap.erb'
   owner 'root'
   group 'root'
   mode 0744

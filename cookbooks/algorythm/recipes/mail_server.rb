@@ -195,6 +195,18 @@ link '/etc/dovecot/dovecot-ldap-userdb.conf.ext' do
   notifies :restart, 'service[dovecot]'
 end
 
+# --- Configure backup ---
+template "#{node['backup']['install_directory']}/tasks/mail" do
+  source 'backup.mail.erb'
+  owner 'root'
+  group 'root'
+  mode 0744
+  variables({
+    :home => vmailDirectory,
+    :user => usr
+  })
+end
+
 # --- Restart postfix & dovecot ---
 service 'postfix' do
   supports :restart => true

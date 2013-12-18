@@ -24,8 +24,8 @@ directory '/var/log/nginx' do
 end
 
 # --- Configure config backup ---
-template "#{node['backup']['install_directory']}/tasks/backup-nginx.sh" do
-  source 'backup-nginx.sh.erb'
+template "#{node['backup']['install_directory']}/tasks/nginx" do
+  source 'backup.nginx.erb'
   owner 'root'
   group 'root'
   mode 0744

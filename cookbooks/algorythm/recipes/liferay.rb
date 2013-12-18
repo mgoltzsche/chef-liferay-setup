@@ -294,8 +294,8 @@ template "/etc/logrotate.d/liferay" do
 end
 
 # --- Configure backup ---
-template "#{node['backup']['install_directory']}/tasks/backup-liferay.sh" do
-  source 'backup-liferay.sh.erb'
+template "#{node['backup']['install_directory']}/tasks/liferay" do
+  source 'backup.liferay.erb'
   owner 'root'
   group 'root'
   mode 0744

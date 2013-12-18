@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ -z "$VMAIL_HOME" ]; then
+	VMAIL_HOME='<%=@home%>'
+fi
+if [ -z "$VMAIL_USER" ]; then
+	VMAIL_USER='<%=@user%>'
+fi
+
+ACTION="$1"
+BAK="$2"
+
+if [ -z "$BAK" ]; then
+	echo "Usage: $0 {dump|restore} DIRECTORY"
+	exit 1
+fi
+
+function mailBackup {
+	backupFile      $ACTION '/etc/postfix/main.cf'                      "$BAK/etc/postfix/main.cf" &&
+	backupFile      $ACTION '/etc/postfix/master.cf'                    "$BAK/etc/postfix/master.cf" &&
+	backupDirectory $ACTION '/etc/postfix/ldap'                         "$BAK/etc/postfix/ldap" root:postfix 750 &&
+	backupFile      $ACTION '/etc/dovecot/dovecot.conf'                 "$BAK/etc/dovecot/dovecot.conf" root:root 600 &&
+	backupFile      $ACTION '/etc/dovecot/dovecot-ldap.conf.ext'        "$BAK/etc/dovecot/dovecot-ldap.conf.ext" root:root 600 &&
+	backupFile      $ACTION '/etc/dovecot/dovecot-ldap-userdb.conf.ext' "$BAK/etc/dovecot/dovecot-ldap-userdb.conf.ext" root:root 600 &&
+	backupFile      $ACTION "$VMAIL_HOME"                               "$BAK/vmail" "$VMAIL_USER:$VMAIL_USER" 750
+}
+
+case "$ACTION" in
+	dump)
+		mailBackup
+	;;
+	restore)
+		serviceWrapper postfix stop
+		serviceWrapper dovecot stop
+		mailBackup &&
+		serviceWrapper dovecot start &&
+		serviceWrapper postfix start
+	;;
+	*)
+		echo "Usage: $0 {dump|restore} DIRECTORY"
+		exit 1
+	;;
+esac

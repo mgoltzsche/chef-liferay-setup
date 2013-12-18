@@ -1,9 +1,4 @@
 #!/bin/bash
-#####################################################
-# Usage: backup-redmine.sh {dump|restore} DIRECTORY #
-# Must be run as root                               #
-#####################################################
-
 if [ -z "$REDMINE_INSTALLATION" ]; then
 	REDMINE_INSTALLATION='<%=@dir%>'
 fi
@@ -27,15 +22,18 @@ if [ -z "$BAK" ]; then
 	exit 1
 fi
 
+redmineBackup {
+	backupPostgresDB $ACTION "$DB_NAME"            "$BAK/db.sql" "$DB_USER" &&
+	backupDirectory  $ACTION "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER:$REDMINE_USER"
+}
+
 case "$ACTION" in
 	dump)
-		backupPostgresDB dump "$DB_NAME"            "$BAK/db.sql" &&
-		backupDirectory  dump "$REDMINE_HOME/files" "$BAK/files"
+		redmineBackup
 	;;
 	restore)
 		serviceWrapper thin stop
-		backupPostgresDB restore "$DB_NAME"            "$BAK/db.sql" "$DB_USER" &&
-		backupDirectory  restore "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER" &&
+		redmineBackup &&
 		echo '* migrate database' &&
 		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
 		echo '* reconfigure backlogs plugin' &&

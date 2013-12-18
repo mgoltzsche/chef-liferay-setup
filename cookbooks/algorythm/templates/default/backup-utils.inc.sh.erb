@@ -88,7 +88,7 @@ function backupFile {
 		
 			rm -f "$FILE" &&
 			cp "$FILE_BAK" "$FILE" &&
-			chown -R "$OWNER:$OWNER" "$FILE" &&
+			chown -R "$OWNER" "$FILE" &&
 			chmod -R $PERMISSIONS "$FILE"
 		;;
 	esac
@@ -130,7 +130,7 @@ function backupDirectory {
 		
 			rm -rf "$DIRECTORY" &&
 			cp -r "$DIRECTORY_BAK" "$DIRECTORY" &&
-			chown -R "$OWNER:$OWNER" "$DIRECTORY" &&
+			chown -R "$OWNER" "$DIRECTORY" &&
 			chmod -R $PERMISSIONS "$DIRECTORY"
 		;;
 	esac

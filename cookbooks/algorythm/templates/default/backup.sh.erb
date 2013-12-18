@@ -37,16 +37,9 @@ function showUsageAndExit {
 	exit $EXIT_STATUS
 }
 
-function toBackupType {
-	SCRIPT_FILE=$1
-	BACKUP_TYPE=${SCRIPT_FILE%.sh}
-	echo ${BACKUP_TYPE#backup-}
-}
-
 function toBackupTaskId {
-	SCRIPT_FILE=$1
-	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-	echo "$BACKUP_TYPE-$BACKUP_DATE"
+	BAK_TYPE=$1
+	echo "$BAK_TYPE-$BACKUP_DATE"
 }
 
 function printStatusMessage {
@@ -85,9 +78,8 @@ function cleanDirectory {
 }
 
 function runBackupTask {
-	SCRIPT_FILE="$1"
-	BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-	BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+	BACKUP_TYPE="$1"
+	BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 	BACKUP_ARCHIVE="$BACKUP_DIR/$BACKUP_TASK_ID.tar.bz2"
 	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
@@ -114,7 +106,7 @@ function runBackupTask {
 		fi
 	fi
 
-	(source "$INSTALL_DIR/tasks/$SCRIPT_FILE" $ACTION $CUR_TMP_DIR)
+	(source "$INSTALL_DIR/tasks/$BACKUP_TYPE" $ACTION $CUR_TMP_DIR)
 	STATUS=$?
 
 	if [ $STATUS = '0' ]; then
@@ -156,26 +148,22 @@ function runBackup {
 	mkdir -p $TMP_ARCHIVE_DIR
 	printf '' > "$FINISH_LISTENER_FILE"
 
-	echo "$ACTION date $BACKUP_DATE:"
-
 	# Run backup tasks parallel
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
-		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '[\w-_]+[^\d]$'); do
+		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo "* $BACKUP_TYPE"
 		printf '' > $PARTIAL_LOG_FILE
 
-		runBackupTask "$SCRIPT_FILE" &>> "$PARTIAL_LOG_FILE" &
+		runBackupTask "$BACKUP_TYPE" &>> "$PARTIAL_LOG_FILE" &
 		declare "${BACKUP_TYPE}_PID=$!"
 	done
 
 	echo ''
 
 	# Wait for tasks to terminate and collect exit codes
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
-		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-		PID_VAR=$(toBackupType $SCRIPT_FILE)'_PID'
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
+		PID_VAR="${BACKUP_TYPE}_PID"
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
 
@@ -187,9 +175,8 @@ function runBackup {
 
 	# Concat task logs and write to single $LOG_FILE
 	printf '' > $LOG_FILE
-	for SCRIPT_FILE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
-		BACKUP_TYPE=$(toBackupType $SCRIPT_FILE)
-		BACKUP_TASK_ID=$(toBackupTaskId $SCRIPT_FILE)
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '\.sh$'); do
+		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
 		echo "  $ACTION $BACKUP_TYPE" >> "$LOG_FILE"
@@ -272,6 +259,10 @@ while [ "$1" != "" ]; do
 	shift
 done
 
+if [ -z "$ACTION" ]; then
+	showUsageAndExit
+fi
+
 # Apply action
 case "$ACTION" in
 	dump)
@@ -290,6 +281,8 @@ case "$ACTION" in
 				fi
 			fi
 		fi
+
+		echo "backup date $BACKUP_DATE:"
 
 		runBackup
 	;;

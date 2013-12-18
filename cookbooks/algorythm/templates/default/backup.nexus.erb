@@ -1,9 +1,4 @@
 #!/bin/bash
-###################################################
-# Usage: backup-nexus.sh {dump|restore} DIRECTORY #
-# Must be run as root                             #
-###################################################
-
 if [ -z "$NEXUS_HOME" ]; then
 	NEXUS_HOME='<%=@home%>'
 fi
@@ -19,9 +14,13 @@ if [ -z "$BAK" ]; then
 	exit 1
 fi
 
+function nexusBackup {
+	backupDirectory $ACTION "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER"
+}
+
 case "$ACTION" in
 	dump)
-		backupDirectory dump "$NEXUS_HOME" "$BAK/files" &&
+		nexusBackup &&
 		rm -rf "$BAK/files/logs" &&
 		rm -rf "$BAK/files/indexer" &&
 		rm -rf "$BAK/files/timeline" &&
@@ -31,7 +30,7 @@ case "$ACTION" in
 	;;
 	restore)
 		serviceWrapper liferay stop
-		backupDirectory restore "$NEXUS_HOME" "$BAK/files" "$NEXUS_SYSTEM_USER" &&
+		nexusBackup &&
 		serviceWrapper liferay start
 	;;
 	*)
