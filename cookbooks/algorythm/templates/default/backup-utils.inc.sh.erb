@@ -24,7 +24,7 @@ function backupPostgreDB {
 	SQL_BACKUP_TMP_DIR="$BACKUP_TMP_DIR/pgsql"
 	SQL_FILE="$SQL_BACKUP_TMP_DIR/$DB.sql"
 
-	printTaskMsg "postgres db" "$DB"
+	printTaskMsg "Postgres DB" "$DB"
 
 	if [ -z "$DB" ]; then
 		echo "Usage: $FN_NAME DATABASE OWNER"
@@ -73,7 +73,7 @@ function backupFile {
 		OWNER='root'
 	fi
 
-	printTaskMsg 'file' "$FILE"
+	printTaskMsg 'File' "$FILE"
 
 	if [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
 		echo "Usage: $FN_NAME FILE BAK [OWNER]"
@@ -109,7 +109,7 @@ function backupDirectory {
 	DIRECTORY_BAK="$BACKUP_TMP_DIR/$2"
 	OWNER="$3"
 
-	printTaskMsg 'directory' "$DIRECTORY"
+	printTaskMsg 'Directory' "$DIRECTORY"
 
 	if [ -z "$OWNER" ]; then
 		OWNER='root'
@@ -139,7 +139,7 @@ function backupDirectory {
 				shift
 			done
 			if [ "$3" == '-i' ]; then
-				printf '  * ignore sub directories:'
+				printf '  * Ignore sub directories:'
 				while [ "$4" != '' ]; do
 					printf " $4"
 					rm -rf "$DIRECTORY_BAK/$4"
@@ -179,11 +179,11 @@ function serviceWrapper {
 
 	case "$ACTION" in
 		stop)
-			echo "* stop $SERVICE"
+			echo "* Stop $SERVICE"
 			service "$SERVICE" stop &>> /dev/null
 		;;
 		start|restart)
-			echo "echo '* restart $SERVICE'; service '$SERVICE' restart &>> /dev/null" >> "$FINISH_LISTENER_FILE"
+			echo "echo '* Restart $SERVICE'; service '$SERVICE' restart &>> /dev/null" >> "$FINISH_LISTENER_FILE"
 		;;
 		*)
 			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1

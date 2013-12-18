@@ -97,7 +97,7 @@ function runBackupTask {
 			return 1
 		fi
 
-		echo '* decompress backup'
+		echo '* Decompress backup'
 		cd $TMP_DIR
 		tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
 			echo "  * $LINE"
@@ -115,7 +115,7 @@ function runBackupTask {
 
 	if [ $STATUS -eq 0 ]; then
 		if [ $ACTION = 'dump' ]; then
-			echo '* compress backup'
+			echo '* Compress backup'
 			cd $TMP_DIR
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID | while read -r LINE; do
 				echo "  * $LINE"
@@ -185,7 +185,7 @@ function runBackup {
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
-		echo "  $ACTION $BACKUP_TYPE" >> "$LOG_FILE"
+		echo "  $ACTION_LABEL $BACKUP_TYPE" >> "$LOG_FILE"
 		echo '===============================================================================' >> "$LOG_FILE"
 		cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
 		rm -rf "$PARTIAL_LOG_FILE"
@@ -195,7 +195,7 @@ function runBackup {
 
 	if [ $EXIT_CODE -eq 0 ] && [ $ACTION = 'dump' ]; then
 		# Move compressed backups to $BACKUP_DIR
-		echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
+		echo "* Move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
 		for ARCHIVE in $(ls "$TMP_ARCHIVE_DIR"); do
 			echo "  * $ARCHIVE" >> "$LOG_FILE"
@@ -208,9 +208,9 @@ function runBackup {
 			fi
 		done
 
-		echo '* remove old backups' >> "$LOG_FILE"
+		echo '* Remove old backups' >> "$LOG_FILE"
 		cleanDirectory "$BACKUP_DIR" $MAX_BACKUPS &>> "$LOG_FILE"
-		echo '* remove old logs' >> "$LOG_FILE"
+		echo '* Remove old logs' >> "$LOG_FILE"
 		cleanDirectory "$LOG_DIR" $MAX_LOGS &>> "$LOG_FILE"
 	fi
 
@@ -235,15 +235,11 @@ function runBackup {
 
 	# Print final status message
 	if [ $EXIT_CODE -eq 0 ]; then
-		echo "finished successfully" >> "$LOG_FILE"
-		echo "finished successfully (see $LOG_FILE)"
-		
-		if [ $ACTION = 'dump' ]; then
-			echo "Run 'backup restore $BACKUP_DATE' to restore this backup"
-		fi
+		echo "Finished successfully" >> "$LOG_FILE"
+		echo "Finished successfully (see $LOG_FILE)"
 	else
-		echo "finished with error(s)" >> "$LOG_FILE"
-		printf "\nfinished with error(s) (see $LOG_FILE)\n"
+		echo "Finished with error(s)" >> "$LOG_FILE"
+		printf "\nFinished with error(s) (see $LOG_FILE)\n"
 	fi
 
 	rm -rf $TMP_DIR
@@ -273,6 +269,7 @@ fi
 # Apply action
 case "$ACTION" in
 	dump)
+		ACTION_LABEL='Backup'
 		BACKUP_DATE=$(date +'%y-%m-%d')
 
 		if [ -d $BACKUP_DIR ]; then
@@ -289,11 +286,12 @@ case "$ACTION" in
 			fi
 		fi
 
-		echo "backup date $BACKUP_DATE:"
+		echo "Backup date $BACKUP_DATE:"
 
 		runBackup
 	;;
 	restore)
+		ACTION_LABEL='Restore'
 		if [ -z "$BACKUP_DATE" ]; then
 			showUsageAndExit
 		fi
