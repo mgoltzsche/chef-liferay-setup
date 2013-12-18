@@ -104,7 +104,7 @@ function runBackupTask {
 		done
 		DECOMPRESSION_EXIT_CODE=$PIPESTATUS
 
-		if [ $DECOMPRESSION_EXIT_CODE != '0' ]; then
+		if [ $DECOMPRESSION_EXIT_CODE -ne 0 ]; then
 			echo "failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
 			return 1
 		fi
@@ -113,7 +113,7 @@ function runBackupTask {
 	(source "$INSTALL_DIR/tasks/$BACKUP_TYPE")
 	STATUS=$?
 
-	if [ $STATUS = '0' ]; then
+	if [ $STATUS -eq 0 ]; then
 		if [ $ACTION = 'dump' ]; then
 			echo '* compress backup'
 			cd $TMP_DIR
@@ -173,7 +173,7 @@ function runBackup {
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
 
-		if [ $TASK_EXIT_CODE != '0' ]; then
+		if [ $TASK_EXIT_CODE -ne 0 ]; then
 			echo "! $BACKUP_TYPE failed"
 		        EXIT_CODE=3
 		fi
@@ -193,7 +193,7 @@ function runBackup {
 
 	echo '===============================================================================' >> "$LOG_FILE"
 
-	if [ $EXIT_CODE = '0' ] && [ $ACTION = 'dump' ]; then
+	if [ $EXIT_CODE -eq 0 ] && [ $ACTION = 'dump' ]; then
 		# Move compressed backups to $BACKUP_DIR
 		echo "* move compressed backups to $BACKUP_DIR" >> "$LOG_FILE"
 
@@ -203,7 +203,7 @@ function runBackup {
 			chmod 600 "$BACKUP_DIR/$ARCHIVE" &>> "$LOG_FILE"
 			ARCHIVE_MV_EXIT_CODE=$?
 
-			if [ $ARCHIVE_MV_EXIT_CODE != '0' ]; then
+			if [ $ARCHIVE_MV_EXIT_CODE -ne 0 ]; then
 				EXIT_CODE=6
 			fi
 		done
@@ -220,7 +220,7 @@ function runBackup {
 
 		STATUS=$?;
 
-		if [ $STATUS != '0' ]; then
+		if [ $STATUS -ne 0 ]; then
 			echo 'failed' >> "$LOG_FILE"
 			echo 'failed'
 		fi
@@ -229,12 +229,12 @@ function runBackup {
 	echo $LISTENER_RESULT | grep 'failed' >> /dev/null
 	STATUS=$?
 
-	if [ $STATUS = '0' ]; then
+	if [ $STATUS -eq 0 ]; then
 		EXIT_CODE=7
 	fi
 
 	# Print final status message
-	if [ $EXIT_CODE = '0' ]; then
+	if [ $EXIT_CODE -eq 0 ]; then
 		echo "finished successfully" >> "$LOG_FILE"
 		echo "finished successfully (see $LOG_FILE)"
 		
@@ -279,7 +279,7 @@ case "$ACTION" in
 			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
 			BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
-			if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
+			if [ $BACKUP_DATE_SEARCH_EXIT_CODE -eq 0 ]; then
 				if [ "$FORCE_OVERWRITE" = '1' ]; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
