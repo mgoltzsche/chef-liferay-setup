@@ -81,14 +81,14 @@ function runBackupTask {
 	BACKUP_TYPE="$1"
 	BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 	BACKUP_ARCHIVE="$BACKUP_DIR/$BACKUP_TASK_ID.tar.bz2"
-	CUR_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
+	BACKUP_TMP_DIR="$TMP_DIR/$BACKUP_TASK_ID"
 
 	if [ $ACTION = 'dump' ]; then
 		if [ -f "$BACKUP_ARCHIVE" ]; then
 			printf "WARNING: $BACKUP_ARCHIVE\n         already exists and will be overwritten\n"
 		fi
 
-		mkdir $CUR_TMP_DIR
+		mkdir $BACKUP_TMP_DIR
 	else
 		if [ ! -f "$BACKUP_ARCHIVE" ]; then
 			echo "failed: $BACKUP_ARCHIVE does not exist"
@@ -106,7 +106,7 @@ function runBackupTask {
 		fi
 	fi
 
-	(source "$INSTALL_DIR/tasks/$BACKUP_TYPE" $ACTION $CUR_TMP_DIR)
+	(source "$INSTALL_DIR/tasks/$BACKUP_TYPE")
 	STATUS=$?
 
 	if [ $STATUS = '0' ]; then

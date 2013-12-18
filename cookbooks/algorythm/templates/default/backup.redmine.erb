@@ -10,21 +10,13 @@ if [ -z "$REDMINE_USER" ]; then
 	REDMINE_USER='<%=@user%>'
 fi
 
-ACTION="$1"
-BAK="$2"
-
 DB_CFG_FILE="$REDMINE_INSTALLATION/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
 
-if [ -z "$BAK" ]; then
-	echo "Usage: $0 {dump|restore} DIRECTORY"
-	exit 1
-fi
-
 redmineBackup {
-	backupPostgresDB $ACTION "$DB_NAME"            "$BAK/db.sql" "$DB_USER" &&
-	backupDirectory  $ACTION "$REDMINE_HOME/files" "$BAK/files"  "$REDMINE_USER:$REDMINE_USER"
+	backupPostgresDB "$DB_NAME"            'db.sql' "$DB_USER" &&
+	backupDirectory  "$REDMINE_HOME/files" 'files'  "$REDMINE_USER:$REDMINE_USER"
 }
 
 case "$ACTION" in

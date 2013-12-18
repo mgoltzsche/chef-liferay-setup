@@ -19,10 +19,9 @@ function printTaskMsg {
 
 function backupPostgreDB {
 	FN_NAME='backupPostgresDB'
-	ACTION="$1"
-	DATABASE="$2"
-	SQL_FILE="$3"
-	DB_OWNER="$4"
+	DATABASE="$1"
+	SQL_FILE="$BACKUP_TMP_DIR/$2"
+	DB_OWNER="$3"
 
 	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
 		echo "Usage: $FN_NAME {dump DATABASE FILE|restore DATABASE FILE OWNER}"
@@ -54,18 +53,16 @@ function backupPostgreDB {
 
 function backupFile {
 	FN_NAME='backupFile'
-	ACTION="$1"
-	FILE="$2"
-	FILE_BAK="$3"
-	OWNER="$4"
-	PERMISSIONS="$5"
+	FILE="$1"
+	FILE_BAK="$BACKUP_TMP_DIR/$2"
+	OWNER="$3"
 
 	if [ -z "$OWNER" ]; then
 		OWNER='root'
 	fi
 
 	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
-		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
+		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER]}"
 		return 1
 	fi
 
@@ -78,7 +75,7 @@ function backupFile {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $FN_NAME restore FILE BAK [OWNER[, PERMISSIONS]]"
+				echo "Usage: $FN_NAME restore FILE BAK [OWNER]"
 				return 1
 			fi
 		
@@ -91,18 +88,16 @@ function backupFile {
 
 function backupDirectory {
 	FN_NAME='backupDirectory'
-	ACTION="$1"
-	DIRECTORY="$2"
-	DIRECTORY_BAK="$3"
-	OWNER="$4"
-	PERMISSIONS="$5"
+	DIRECTORY="$1"
+	DIRECTORY_BAK="$BACKUP_TMP_DIR/$2"
+	OWNER="$3"
 
 	if [ -z "$OWNER" ]; then
 		OWNER='root'
 	fi
 
 	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
-		echo "Usage: $FN_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]}"
+		echo "Usage: $FN_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER]}"
 		return 1
 	fi
 
@@ -115,7 +110,7 @@ function backupDirectory {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $FN_NAME restore DIRECTORY BAK [OWNER[, PERMISSIONS]]"
+				echo "Usage: $FN_NAME restore DIRECTORY BAK [OWNER]"
 				return 1
 			fi
 		

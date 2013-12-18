@@ -8,10 +8,10 @@ if [ -z "$BAK" ]; then
 fi
 
 function nginxBackup {
-	backupDirectory $ACTION /etc/nginx/sites-available "$BAK/sites-available" &&
-	backupDirectory $ACTION /etc/nginx/sites-enabled   "$BAK/sites-enabled" &&
-	backupFile      $ACTION /etc/nginx/nginx.conf      "$BAK/nginx.conf" &&
-	backupFile      $ACTION /etc/nginx/proxy_params    "$BAK/proxy_params"
+	backupDirectory /etc/nginx/sites-available 'sites-available' &&
+	backupDirectory /etc/nginx/sites-enabled   'sites-enabled' &&
+	backupFile      /etc/nginx/nginx.conf      'nginx.conf' &&
+	backupFile      /etc/nginx/proxy_params    'proxy_params'
 }
 
 case "$ACTION" in

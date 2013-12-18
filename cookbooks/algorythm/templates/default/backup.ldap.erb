@@ -1,16 +1,8 @@
 #!/bin/bash
-ACTION="$1"
-BAK="$2"
-
-if [ -z "$BAK" ]; then
-	echo "Usage: $0 {dump|restore} DIRECTORY"
-	exit 1
-fi
-
 function ldapBackup {
 	EXIT_CODE=0
 	for INSTANCE in $(ls /etc/dirsrv/ | grep -P "^slapd-"); do
-		backupDirectory $ACTION "/etc/dirsrv/$INSTANCE" "$BAK/$INSTANCE" dirsrv:dirsrv
+		backupDirectory "/etc/dirsrv/$INSTANCE" "$INSTANCE" dirsrv:dirsrv
 		STATUS=$?
 
 		if [ $STATUS != '0' ]; then

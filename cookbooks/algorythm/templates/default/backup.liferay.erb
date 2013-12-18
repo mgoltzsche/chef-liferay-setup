@@ -2,19 +2,10 @@
 if [ -z "$LIFERAY_HOME" ]; then
 	LIFERAY_HOME='<%=@home%>'
 fi
-
 if [ -z "$LIFERAY_USER" ]; then
 	LIFERAY_USER='<%=@user%>'
 fi
-
-ACTION="$1"
-BAK="$2"
 CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
-
-if [ -z "$BAK" ]; then
-	echo "Usage: $0 {dump|restore} DIRECTORY"
-	exit 1
-fi
 
 function backupLiferayDBs {
 	for SHARD in $(cat $CFG_FILE | grep -P '^jdbc\.[^\.]+\.url='); do
@@ -27,7 +18,7 @@ function backupLiferayDBs {
 			return 1
 		fi
 
-		backupPostgreDB $ACTION "$SHARD_DB" "$BAK/sql/$SHARD_DB.sql" "$SHARD_DB_USER"
+		backupPostgreDB "$SHARD_DB" "sql/$SHARD_DB.sql" "$SHARD_DB_USER"
 
 		STATUS=$?
 
@@ -39,8 +30,8 @@ function backupLiferayDBs {
 
 function liferayBackup {
 	backupLiferayDBs &&
-	backupDirectory $ACTION "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER:$LIFERAY_USER" &&
-	backupFile      $ACTION "$CFG_FILE"          "$BAK/portal-ext.properties" "$LIFERAY_USER:$LIFERAY_USER"
+	backupDirectory "$LIFERAY_HOME/data" 'data'                  "$LIFERAY_USER:$LIFERAY_USER" &&
+	backupFile      "$CFG_FILE"          'portal-ext.properties' "$LIFERAY_USER:$LIFERAY_USER"
 }
 
 case "$ACTION" in
@@ -48,7 +39,7 @@ case "$ACTION" in
 		liferayBackup
 	;;
 	restore)
-		serviceWrapper liferay stop
+		serviceWrapper liferay stop &&
 		liferayBackup &&
 		serviceWrapper liferay start
 	;;
