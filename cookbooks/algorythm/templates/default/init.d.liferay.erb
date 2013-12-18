@@ -44,9 +44,9 @@ function start {
 	status=$?
 
 	if [ $status = 0 ]; then
-		echo '  ...done'
+		echo '  done'
 	else
-		echo '  ...failed' 2>&1
+		echo '  failed' 2>&1
 	fi
 
 	return $status
@@ -56,7 +56,7 @@ function stop {
 	echo "* Stopping $APP_NAME"
 
 	if [ ! -f $CATALINA_PID ] || [ ! -s $CATALINA_PID ]; then
-		echo "  ...failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
+		echo "  failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
 		return 1
 	fi
 
@@ -67,7 +67,7 @@ function stop {
 	GREP_ERROR_STATUS=$?
 	
 	if [ $GREP_ERROR_STATUS = '0' ]; then
-		echo '  ...Killing process since it does not listen (maybe not yet booted completely)'
+		echo '  Killing process since it does not listen'
 		kill -9 $pid
 		sleep 1
 	fi
@@ -79,14 +79,14 @@ function stop {
 	done
 
 	if [ $waited_time -ge $SHUTDOWN_TIMEOUT ]; then
-		echo "  ...Killing process after a timeout of $SHUTDOWN_TIMEOUT seconds"
+		echo "  Killing process after a timeout of $SHUTDOWN_TIMEOUT seconds"
 		kill -9 $pid
 		sleep 1
 	fi
 
 	rm -f "$CATALINA_PID"
 
-	echo '  ...done'
+	echo '  done'
 }
 
 function restart {
