@@ -24,7 +24,7 @@ fi
 
 redmineBackup {
 	backupPostgresDB $ACTION "$DB_NAME"            "$BAK/db.sql" "$DB_USER" &&
-	backupDirectory  $ACTION "$REDMINE_HOME/files" "$BAK/files" "$REDMINE_USER:$REDMINE_USER"
+	backupDirectory  $ACTION "$REDMINE_HOME/files" "$BAK/files"  "$REDMINE_USER:$REDMINE_USER"
 }
 
 case "$ACTION" in

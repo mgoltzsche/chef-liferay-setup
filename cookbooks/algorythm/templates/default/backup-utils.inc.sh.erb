@@ -64,10 +64,6 @@ function backupFile {
 		OWNER='root'
 	fi
 
-	if [ -z "$PERMISSIONS" ]; then
-		PERMISSIONS='600'
-	fi
-
 	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
 		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}"
 		return 1
@@ -88,8 +84,7 @@ function backupFile {
 		
 			rm -f "$FILE" &&
 			cp "$FILE_BAK" "$FILE" &&
-			chown -R "$OWNER" "$FILE" &&
-			chmod -R $PERMISSIONS "$FILE"
+			chown -R "$OWNER" "$FILE"
 		;;
 	esac
 }
@@ -104,10 +99,6 @@ function backupDirectory {
 
 	if [ -z "$OWNER" ]; then
 		OWNER='root'
-	fi
-
-	if [ -z "$PERMISSIONS" ]; then
-		PERMISSIONS='700'
 	fi
 
 	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
@@ -130,8 +121,7 @@ function backupDirectory {
 		
 			rm -rf "$DIRECTORY" &&
 			cp -r "$DIRECTORY_BAK" "$DIRECTORY" &&
-			chown -R "$OWNER" "$DIRECTORY" &&
-			chmod -R $PERMISSIONS "$DIRECTORY"
+			chown -R "$OWNER" "$DIRECTORY"
 		;;
 	esac
 }

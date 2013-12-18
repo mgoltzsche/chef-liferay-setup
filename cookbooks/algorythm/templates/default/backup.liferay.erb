@@ -16,7 +16,7 @@ if [ -z "$BAK" ]; then
 	exit 1
 fi
 
-function doWithShards {
+function backupLiferayDBs {
 	for SHARD in $(cat $CFG_FILE | grep -P '^jdbc\.[^\.]+\.url='); do
 		SHARD_NAME=$(echo $SHARD | grep -Po '(?<=^jdbc\.)[^\.]+')
 		SHARD_DB=$(echo $SHARD | grep -Po '[^/]+$')
@@ -27,7 +27,7 @@ function doWithShards {
 			return 1
 		fi
 
-		doWithShard "$SHARD_DB" "$SHARD_DB_USER"
+		backupPostgreDB $ACTION "$SHARD_DB" "$BAK/sql/$1.sql" "$SHARD_DB_USER"
 
 		STATUS=$?
 
@@ -37,14 +37,10 @@ function doWithShards {
 	done
 }
 
-function doWithShard {
-	backupPostgreDB $ACTION "$1" "$BAK/sql/$1.sql" "$2"
-}
-
 function liferayBackup {
-	doWithShards &&
+	backupLiferayDBs &&
 	backupDirectory $ACTION "$LIFERAY_HOME/data" "$BAK/data" "$LIFERAY_USER:$LIFERAY_USER" &&
-	backupFile      $ACTION "$CFG_FILE"          "$BAK/portal-ext.properties" "$LIFERAY_USER:$LIFERAY_USER" 640
+	backupFile      $ACTION "$CFG_FILE"          "$BAK/portal-ext.properties" "$LIFERAY_USER:$LIFERAY_USER"
 }
 
 case "$ACTION" in

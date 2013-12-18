@@ -18,11 +18,11 @@ fi
 function mailBackup {
 	backupFile      $ACTION '/etc/postfix/main.cf'                      "$BAK/etc/postfix/main.cf" &&
 	backupFile      $ACTION '/etc/postfix/master.cf'                    "$BAK/etc/postfix/master.cf" &&
-	backupDirectory $ACTION '/etc/postfix/ldap'                         "$BAK/etc/postfix/ldap" root:postfix 750 &&
-	backupFile      $ACTION '/etc/dovecot/dovecot.conf'                 "$BAK/etc/dovecot/dovecot.conf" root:root 600 &&
-	backupFile      $ACTION '/etc/dovecot/dovecot-ldap.conf.ext'        "$BAK/etc/dovecot/dovecot-ldap.conf.ext" root:root 600 &&
-	backupFile      $ACTION '/etc/dovecot/dovecot-ldap-userdb.conf.ext' "$BAK/etc/dovecot/dovecot-ldap-userdb.conf.ext" root:root 600 &&
-	backupFile      $ACTION "$VMAIL_HOME"                               "$BAK/vmail" "$VMAIL_USER:$VMAIL_USER" 750
+	backupDirectory $ACTION '/etc/postfix/ldap'                         "$BAK/etc/postfix/ldap" root:postfix &&
+	backupFile      $ACTION '/etc/dovecot/dovecot.conf'                 "$BAK/etc/dovecot/dovecot.conf" root:root &&
+	backupFile      $ACTION '/etc/dovecot/dovecot-ldap.conf.ext'        "$BAK/etc/dovecot/dovecot-ldap.conf.ext" root:root &&
+	backupFile      $ACTION '/etc/dovecot/dovecot-ldap-userdb.conf.ext' "$BAK/etc/dovecot/dovecot-ldap-userdb.conf.ext" root:root &&
+	backupDirectory $ACTION "$VMAIL_HOME"                               "$BAK/vmail" "$VMAIL_USER:$VMAIL_USER"
 }
 
 case "$ACTION" in
