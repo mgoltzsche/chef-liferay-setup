@@ -185,7 +185,7 @@ function runBackup {
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
-		echo "  $ACTION_LABEL $BACKUP_TYPE" >> "$LOG_FILE"
+		echo "  $ACTION_LABEL $BACKUP_TYPE $BACKUP_DATE" >> "$LOG_FILE"
 		echo '===============================================================================' >> "$LOG_FILE"
 		cat "$PARTIAL_LOG_FILE" >> "$LOG_FILE"
 		rm -rf "$PARTIAL_LOG_FILE"
@@ -295,6 +295,8 @@ case "$ACTION" in
 		if [ -z "$BACKUP_DATE" ]; then
 			showUsageAndExit
 		fi
+
+		echo "$ACTION_LABEL"
 
 		runBackup
 	;;
