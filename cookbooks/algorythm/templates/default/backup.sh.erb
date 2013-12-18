@@ -120,7 +120,7 @@ function runBackupTask {
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
 			tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
 				echo "  * $LINE"
-			done
+			done > /dev/null
 			COMPRESSION_EXIT_CODE=$PIPESTATUS
 
 			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
