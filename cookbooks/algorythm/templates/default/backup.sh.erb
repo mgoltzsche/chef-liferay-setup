@@ -281,7 +281,7 @@ case "$ACTION" in
 			BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 			if [ $BACKUP_DATE_SEARCH_EXIT_CODE = '0' ]; then
-				if [ "$FORCE_OVERWRITE" = 'force' ]; then
+				if [ "$FORCE_OVERWRITE" = '1' ]; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
 					printf "failed: Backup date $BACKUP_DATE already exists. \nAdd -f option to overwrite old backups\n" 2>&1
