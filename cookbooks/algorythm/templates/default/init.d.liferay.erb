@@ -63,12 +63,13 @@ function stop {
 	pid=$(cat $CATALINA_PID)
 	waited_time=0
 
-	su $USER -c "$CATALINA_HOME/bin/catalina.sh stop" | grep 'java.net.ConnectException:' &>> /dev/null
+	su $USER -c "$CATALINA_HOME/bin/catalina.sh stop" 2>&1 | grep -P '^java\.net\.ConnectException:' &> /dev/null
 	GREP_ERROR_STATUS=$?
 	
 	if [ $GREP_ERROR_STATUS = '0' ]; then
-		echo '  ...Killing process since it does not listen (maybe not yet booted)'
+		echo '  ...Killing process since it does not listen (maybe not yet booted completely)'
 		kill -9 $pid
+		sleep 1
 	fi
 
 	until [ $(ps -p $pid | grep -c $pid) = 0 ] || [ $waited_time -ge $SHUTDOWN_TIMEOUT ]; do
@@ -80,6 +81,7 @@ function stop {
 	if [ $waited_time -ge $SHUTDOWN_TIMEOUT ]; then
 		echo "  ...Killing process after a timeout of $SHUTDOWN_TIMEOUT seconds"
 		kill -9 $pid
+		sleep 1
 	fi
 
 	rm -f "$CATALINA_PID"
