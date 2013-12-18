@@ -155,7 +155,7 @@ function runBackup {
 	printf '' > "$FINISH_LISTENER_FILE"
 
 	# Run backup tasks parallel
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+[^\d]$'); do
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo "* $BACKUP_TYPE"
@@ -168,7 +168,7 @@ function runBackup {
 	echo ''
 
 	# Wait for tasks to terminate and collect exit codes
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+[^\d]$'); do
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
 		PID_VAR="${BACKUP_TYPE}_PID"
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
@@ -181,7 +181,7 @@ function runBackup {
 
 	# Concat task logs and write to single $LOG_FILE
 	printf '' > $LOG_FILE
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+[^\d]$'); do
+	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
@@ -248,6 +248,7 @@ function runBackup {
 
 	rm -rf $TMP_DIR
 }
+
 
 # Apply parameters
 while [ "$1" != '' ]; do
