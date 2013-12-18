@@ -39,7 +39,7 @@ function showUsageAndExit {
 
 function toBackupTaskId {
 	BAK_TYPE=$1
-	echo "$BAK_TYPE-$BACKUP_DATE"
+	echo "$BACKUP_DATE-$BAK_TYPE"
 }
 
 function printStatusMessage {
@@ -60,9 +60,11 @@ function list {
         printStatusMessage "# Total size:" "~${M_BYTE_COUNT}M"
 	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | sort -r | uniq | while read -r ARCHIVE_DATE; do
 		echo "$ARCHIVE_DATE"
-		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "$ARCHIVE_DATE\.tar\.bz2$"); do
+		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "^$ARCHIVE_DATE-.*\.tar\.bz2$"); do
 			ARCHIVE_SIZE=$(ls -lah "$BACKUP_DIR/$ARCHIVE" | awk '{print $5}')
-			printStatusMessage "* ${ARCHIVE%-$ARCHIVE_DATE.tar.bz2}" "$ARCHIVE_SIZE"
+			BACKUP_TYPE=${ARCHIVE%.tar.bz2}
+			BACKUP_TYPE=${BACKUP_TYPE#${ARCHIVE_DATE}-}
+			printStatusMessage "* $BACKUP_TYPE" "$ARCHIVE_SIZE"
 		done
 	done
 }
@@ -71,9 +73,9 @@ function cleanDirectory {
 	CLEAN_DIR="$1"
 	MAX_COUNT=$2
 	cd "$CLEAN_DIR"
-	ls | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | sort | uniq | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
+	ls | grep -Po '^[\d]{2}-[\d]{2}-[\d]{2}' | sort | uniq | head -n "-$MAX_COUNT" | while read -r ARCHIVE_DATE; do
 		echo "  * remove $ARCHIVE_DATE"
-		ls | grep $ARCHIVE_DATE | xargs rm
+		ls | grep -P "^$ARCHIVE_DATE" | xargs rm
 	done
 }
 
