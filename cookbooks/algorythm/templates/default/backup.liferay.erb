@@ -27,7 +27,7 @@ function backupLiferayDBs {
 			return 1
 		fi
 
-		backupPostgreDB $ACTION "$SHARD_DB" "$BAK/sql/$1.sql" "$SHARD_DB_USER"
+		backupPostgreDB $ACTION "$SHARD_DB" "$BAK/sql/$SHARD_DB.sql" "$SHARD_DB_USER"
 
 		STATUS=$?
 

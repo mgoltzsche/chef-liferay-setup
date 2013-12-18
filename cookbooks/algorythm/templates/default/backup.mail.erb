@@ -18,6 +18,7 @@ fi
 function mailBackup {
 	backupFile      $ACTION '/etc/postfix/main.cf'                      "$BAK/etc/postfix/main.cf" &&
 	backupFile      $ACTION '/etc/postfix/master.cf'                    "$BAK/etc/postfix/master.cf" &&
+	backupFile      $ACTION '/etc/postfix/dynamicmaps.cf'               "$BAK/etc/postfix/dynamicmaps.cf" &&
 	backupDirectory $ACTION '/etc/postfix/ldap'                         "$BAK/etc/postfix/ldap" root:postfix &&
 	backupFile      $ACTION '/etc/dovecot/dovecot.conf'                 "$BAK/etc/dovecot/dovecot.conf" root:root &&
 	backupFile      $ACTION '/etc/dovecot/dovecot-ldap.conf.ext'        "$BAK/etc/dovecot/dovecot-ldap.conf.ext" root:root &&
