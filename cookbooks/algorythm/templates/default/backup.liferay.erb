@@ -18,7 +18,7 @@ function backupLiferayDBs {
 			return 1
 		fi
 
-		backupPostgreDB "$SHARD_DB" "sql/$SHARD_DB.sql" "$SHARD_DB_USER"
+		backupPostgreDB "$SHARD_DB" "$SHARD_DB_USER"
 
 		STATUS=$?
 

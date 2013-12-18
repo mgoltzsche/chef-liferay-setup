@@ -1,13 +1,13 @@
 #!/bin/bash
-#######################################################################################
-# source this file to use the contained functions:                                    #
-#   printTaskMsg    MESSAGE PATH                                                      #
-#   backupPostgreDB {dump DATABASE FILE|restore DATABASE FILE OWNER}                  #
-#   backupFile      {dump FILE BAK|restore FILE BAK [OWNER[, PERMISSIONS]]}           #
-#   backupDirectory {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER[, PERMISSIONS]]} #
-#   serviceWrapper  {stop|start|restart} SERVICE                                      #
-# Must be run as root                                                                 #
-#######################################################################################
+####################################################
+# source this file to use the contained functions: #
+#   printTaskMsg    MESSAGE PATH                   #
+#   backupPostgreDB DATABASE OWNER                 #
+#   backupFile      FILE BAK [OWNER]}              #
+#   backupDirectory DIRECTORY BAK [OWNER]}         #
+#   serviceWrapper  {stop|start|restart} SERVICE   #
+# Must be run as root                              #
+####################################################
 
 function printTaskMsg {
 	MSG="$1"
@@ -19,24 +19,29 @@ function printTaskMsg {
 
 function backupPostgreDB {
 	FN_NAME='backupPostgresDB'
-	DATABASE="$1"
-	SQL_FILE="$BACKUP_TMP_DIR/$2"
-	DB_OWNER="$3"
+	DB="$1"
+	DB_OWNER="$2"
+	SQL_BACKUP_TMP_DIR="$BACKUP_TMP_DIR/pgsql"
+	SQL_FILE="$SQL_BACKUP_TMP_DIR/$DB.sql"
 
-	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DATABASE" ] || [ -z "$SQL_FILE" ]; then
-		echo "Usage: $FN_NAME {dump DATABASE FILE|restore DATABASE FILE OWNER}"
+	printTaskMsg "postgres db" "$DB"
+
+	if [ -z "$DB" ]; then
+		echo "Usage: $FN_NAME DATABASE OWNER"
 		return 1
 	fi
 
-	printTaskMsg "postgres db" "$DATABASE"
+	if [ -f "$SQL_FILE" ]; then
+		echo "$SQL_FILE already exists"
+		return 1
+	fi
 
 	case "$ACTION" in
 		dump)
-			BAK_DIR=$(dirname "$SQL_FILE")
-			mkdir -p "$BAK_DIR" &&
-			chown root:postgres "$BAK_DIR" &&
-			chmod 770 "$BAK_DIR" &&
-			su postgres -c "pg_dump \"$DATABASE\" > \"$SQL_FILE\""
+			mkdir -p "$SQL_BACKUP_TMP_DIR" &&
+			chown root:postgres "$SQL_BACKUP_TMP_DIR" &&
+			chmod 770 "$SQL_BACKUP_TMP_DIR" &&
+			su postgres -c "pg_dump '$DB' > '$SQL_FILE'"
 		;;
 		restore)
 			if [ -z "$DB_OWNER" ]; then
@@ -44,9 +49,9 @@ function backupPostgreDB {
 				return 1
 			fi
 
-			su postgres -c "dropdb \"$DATABASE\"" >> /dev/null
-			su postgres -c "createdb \"$DATABASE\" -O \"$DB_OWNER\"" &&
-			su postgres -c "psql -1 \"$DATABASE\" < \"$SQL_FILE\""
+			su postgres -c "dropdb '$DB'" >> /dev/null
+			su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
+			su postgres -c "psql -1 '$DB' < '$SQL_FILE'"
 		;;
 	esac
 }
@@ -61,12 +66,18 @@ function backupFile {
 		OWNER='root'
 	fi
 
-	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
-		echo "Usage: $FN_NAME {dump FILE BAK|restore FILE BAK [OWNER]}"
+	printTaskMsg 'file' "$FILE"
+
+	if [ -z "$FILE" ] || [ -z "$FILE_BAK" ]; then
+		echo "Usage: $FN_NAME FILE BAK [OWNER]"
 		return 1
 	fi
 
-	printTaskMsg 'file' "$FILE"
+	if [ -f "$FILE_BAK" ]; then
+		echo "$FILE_BAK already exists"
+		return 1
+	fi
+
 
 	case "$ACTION" in
 		dump)
@@ -75,7 +86,7 @@ function backupFile {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $FN_NAME restore FILE BAK [OWNER]"
+				echo "Usage: $FN_NAME FILE BAK [OWNER]"
 				return 1
 			fi
 		
@@ -92,16 +103,21 @@ function backupDirectory {
 	DIRECTORY_BAK="$BACKUP_TMP_DIR/$2"
 	OWNER="$3"
 
+	printTaskMsg 'directory' "$DIRECTORY"
+
 	if [ -z "$OWNER" ]; then
 		OWNER='root'
 	fi
 
-	if [ "$ACTION" != 'dump' ] && [ "$ACTION" != 'restore' ] || [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
-		echo "Usage: $FN_NAME {dump DIRECTORY BAK|restore DIRECTORY BAK [OWNER]}"
+	if [ -z "$DIRECTORY" ] || [ -z "$DIRECTORY_BAK" ]; then
+		echo "Usage: $FN_NAME DIRECTORY BAK [OWNER]"
 		return 1
 	fi
 
-	printTaskMsg 'directory' "$DIRECTORY"
+	if [ -d "$DIRECTORY_BAK" ]; then
+		echo "$DIRECTORY_BAK already exists"
+		return 1
+	fi
 
 	case "$ACTION" in
 		dump)
@@ -134,7 +150,7 @@ function backupDirectory {
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then
-				echo "Usage: $FN_NAME restore DIRECTORY BAK [OWNER]"
+				echo "Usage: $FN_NAME DIRECTORY BAK [OWNER]"
 				return 1
 			fi
 		
