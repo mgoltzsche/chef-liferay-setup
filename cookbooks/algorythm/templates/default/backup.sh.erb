@@ -1,6 +1,9 @@
 #!/bin/bash
 ##################################################
-# Usage: backup {list|dump [force]|restore DATE} #
+# Usage: backup [OPTIONS] {list|dump|restore [DATE]}    #
+# Options:                                       #
+#   -h --help    Usage                           #
+#   -f --force   Force backup overwrite          #
 # DATE: YY-MM-DD                                 #
 # Must be run as root                            #
 ##################################################
@@ -255,25 +258,23 @@ function runBackup {
 
 # Write parameters to variables
 while [ "$1" != "" ]; do
-        case "$1" in
-                dump|restore|list) break;;
-                -f|--force)        FORCE_OVERWRITE=1;;
-                -h|--help)         showUsageAndExit 0;;
-                *)                 showUsageAndExit
-        esac
-        shift
+	case "$1" in
+		restore)
+			ACTION=$1
+			shift
+			BACKUP_DATE="$1"
+		;;
+		dump|list)  ACTION=$1;;
+		-f|--force) FORCE_OVERWRITE=1;;
+		-h|--help)  showUsageAndExit 0;;
+		*)          showUsageAndExit
+	esac
+	shift
 done
-
-ACTION="$1"
-BACKUP_DATE="$2"
 
 # Apply action
 case "$ACTION" in
 	dump)
-		if [ ! -z "$BACKUP_DATE" ]; then
-			showUsageAndExit
-		fi
-		
 		BACKUP_DATE=$(date +'%y-%m-%d')
 
 		if [ -d $BACKUP_DIR ]; then
@@ -300,10 +301,6 @@ case "$ACTION" in
 		runBackup
 	;;
 	list)
-		if [ ! -z "$BACKUP_DATE" ]; then
-			showUsageAndExit
-		fi
-
 		list
 	;;
 	*)
