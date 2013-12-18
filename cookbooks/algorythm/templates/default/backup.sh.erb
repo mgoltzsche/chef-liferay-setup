@@ -255,15 +255,13 @@ function runBackup {
 
 # Write parameters to variables
 while [ "$1" != "" ]; do
-    case "$1" in
-        -f | --force )          FORCE_OVERWRITE=1
-                                ;;
-        -h | --help )           showUsageAndExit 0
-                                ;;
-        * )                     showUsageAndExit
-                                exit 1
-    esac
-    shift
+        case "$1" in
+                dump|restore|list) break;;
+                -f|--force)        FORCE_OVERWRITE=1;;
+                -h|--help)         showUsageAndExit 0;;
+                *)                 showUsageAndExit
+        esac
+        shift
 done
 
 ACTION="$1"
@@ -286,7 +284,7 @@ case "$ACTION" in
 				if [ "$FORCE_OVERWRITE" = 'force' ]; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
-					printf "failed: Backup date $BACKUP_DATE already exists. \nAdd 'force' argument to overwrite old backups\n" 2>&1
+					printf "failed: Backup date $BACKUP_DATE already exists. \nAdd -f option to overwrite old backups\n" 2>&1
 					exit 5
 				fi
 			fi
