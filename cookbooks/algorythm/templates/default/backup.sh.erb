@@ -99,7 +99,7 @@ function runBackupTask {
 
 		echo '* decompress backup'
 		cd $TMP_DIR
-		tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
+		tar xvjf "$BACKUP_ARCHIVE" &> /dev/null | while read -r LINE; do
 			echo "  * $LINE"
 		done
 		DECOMPRESSION_EXIT_CODE=$PIPESTATUS
@@ -118,9 +118,9 @@ function runBackupTask {
 			echo '* compress backup'
 			cd $TMP_DIR
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
-			tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
+			tar xvjf "$BACKUP_ARCHIVE" &> /dev/null | while read -r LINE; do
 				echo "  * $LINE"
-			done > /dev/null
+			done
 			COMPRESSION_EXIT_CODE=$PIPESTATUS
 
 			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
