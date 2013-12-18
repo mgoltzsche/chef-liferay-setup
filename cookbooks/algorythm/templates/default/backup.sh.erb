@@ -28,6 +28,7 @@ function showUsageAndExit {
 	
 	if [ -z $EXIT_STATUS ]; then
 		EXIT_STATUS=1
+	fi
 
 	printf "Usage: backup {list|dump [force]|restore DATE}\nDATE: YY-MM-DD\n"
 	exit $EXIT_STATUS
