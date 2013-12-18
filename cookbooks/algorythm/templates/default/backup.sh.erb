@@ -243,8 +243,8 @@ function runBackup {
 	rm -rf $TMP_DIR
 }
 
-# Write parameters to variables
-while [ "$1" != "" ]; do
+# Apply parameters
+while [ "$1" != '' ]; do
 	case "$1" in
 		restore)
 			ACTION=$1

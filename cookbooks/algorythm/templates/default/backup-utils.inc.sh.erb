@@ -107,6 +107,30 @@ function backupDirectory {
 		dump)
 			mkdir -p $(dirname "$DIRECTORY_BAK") &&
 			cp -r "$DIRECTORY" "$DIRECTORY_BAK"
+			CP_STATUS=$?
+
+			if [ $CP_STATUS != '0' ]; then
+				return 1
+			fi
+
+			while [ "$3" != '-e' ] && [ "$3" != '' ]; do
+				shift
+			done
+			if [ "$3" == '-e' ]; then
+				printf '  * remove sub directories:'
+				while [ "$4" != '' ]; do
+					printf " $4"
+					rm -rf "$DIRECTORY_BAK/$4"
+					RM_STATUS=$?
+
+					if [ $RM_STATUS != '0' ]; then
+						return 1
+					fi
+
+					shift
+				done
+				echo ''
+			fi
 		;;
 		restore)
 			if [ -z "$OWNER" ]; then

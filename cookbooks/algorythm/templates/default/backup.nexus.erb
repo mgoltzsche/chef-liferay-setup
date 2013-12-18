@@ -7,21 +7,17 @@ if [ -z "$NEXUS_SYSTEM_USER" ]; then
 fi
 
 function nexusBackup {
-	backupDirectory "$NEXUS_HOME" '' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER"
+	backupDirectory "$NEXUS_HOME/conf" 'conf' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER" &&
+	backupDirectory "$NEXUS_HOME/storage" 'storage' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER" \
+		-e codehaus-snapshots apache-snapshots central
 }
 
 case "$ACTION" in
 	dump)
-		nexusBackup &&
-		rm -rf "$BACKUP_TMP_DIR/logs" &&
-		rm -rf "$BACKUP_TMP_DIR/indexer" &&
-		rm -rf "$BACKUP_TMP_DIR/timeline" &&
-		rm -rf "$BACKUP_TMP_DIR/storage/codehaus-snapshots" &&
-		rm -rf "$BACKUP_TMP_DIR/storage/apache-snapshots" &&
-		rm -rf "$BACKUP_TMP_DIR/storage/central"
+		nexusBackup
 	;;
 	restore)
-		serviceWrapper liferay stop
+		serviceWrapper liferay stop &&
 		nexusBackup &&
 		serviceWrapper liferay start
 	;;
