@@ -31,13 +31,13 @@ function backupPostgreDB {
 		return 1
 	fi
 
-	if [ -f "$SQL_FILE" ]; then
-		echo "$SQL_FILE already exists"
-		return 1
-	fi
-
 	case "$ACTION" in
 		dump)
+			if [ -f "$SQL_FILE" ]; then
+				echo "$SQL_FILE already exists"
+				return 1
+			fi
+
 			mkdir -p "$SQL_BACKUP_TMP_DIR" &&
 			chown root:postgres "$SQL_BACKUP_TMP_DIR" &&
 			chmod 770 "$SQL_BACKUP_TMP_DIR" &&
@@ -51,7 +51,10 @@ function backupPostgreDB {
 
 			su postgres -c "dropdb '$DB'" >> /dev/null
 			su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
-			su postgres -c "psql -1 '$DB' < '$SQL_FILE'"
+			su postgres -c "psql -1 '$DB' < '$SQL_FILE'" | while read -r LINE; do
+				echo "  * $LINE"
+			done
+			return $PIPESTATUS
 		;;
 	esac
 }
@@ -73,14 +76,13 @@ function backupFile {
 		return 1
 	fi
 
-	if [ -f "$FILE_BAK" ]; then
-		echo "$FILE_BAK already exists"
-		return 1
-	fi
-
-
 	case "$ACTION" in
 		dump)
+			if [ -f "$FILE_BAK" ]; then
+				echo "$FILE_BAK already exists"
+				return 1
+			fi
+
 			mkdir -p $(dirname "$FILE_BAK") &&
 			cp "$FILE" "$FILE_BAK"
 		;;
@@ -114,13 +116,13 @@ function backupDirectory {
 		return 1
 	fi
 
-	if [ -d "$DIRECTORY_BAK" ]; then
-		echo "$DIRECTORY_BAK already exists"
-		return 1
-	fi
-
 	case "$ACTION" in
 		dump)
+			if [ -d "$DIRECTORY_BAK" ]; then
+				echo "$DIRECTORY_BAK already exists"
+				return 1
+			fi
+
 			mkdir -p $(dirname "$DIRECTORY_BAK") &&
 			cp -r "$DIRECTORY" "$DIRECTORY_BAK"
 			CP_STATUS=$?
