@@ -25,9 +25,9 @@ case "$ACTION" in
 	restore)
 		serviceWrapper thin stop
 		redmineBackup &&
-		echo '* migrate database' &&
+		echo '* Migrate database' &&
 		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
-		echo '* reconfigure backlogs plugin' &&
+		echo '* Reconfigure backlogs plugin' &&
 		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake redmine:backlogs:install" &&
 		serviceWrapper thin start
 	;;
