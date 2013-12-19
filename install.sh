@@ -3,10 +3,11 @@
 # This runs as root on the server
 
 RUBY_VERSION=2.0.0-p247
-CHEF_BINARY="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin/chef-solo"
+
+PATH="$PATH:/usr/local/rvm/bin:/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin"
 
 # Are we on a vanilla system?
-if ! test -f "$CHEF_BINARY"; then
+if [ ! -f "$CHEF_BINARY" ]; then
     export DEBIAN_FRONTEND=noninteractive
     echo "\
 ##############################################################################
@@ -24,7 +25,7 @@ if ! test -f "$CHEF_BINARY"; then
 	libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev \
 	libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison &&
     \curl -L https://get.rvm.io | bash -s stable --autolibs=enabled &&
-    source /usr/local/rvm/scripts/rvm &&
+#    source /usr/local/rvm/scripts/rvm &&
     echo "\
 ##############################################################################
 # INSTALLING RUBY ############################################################
@@ -38,12 +39,6 @@ if ! test -f "$CHEF_BINARY"; then
 # INSTALLING CHEF ############################################################
 ##############################################################################" &&
     gem install --no-rdoc --no-ri chef
-else
-    echo "\
-##############################################################################
-# APPLYING RVM SCRIPT ########################################################
-##############################################################################" &&
-    source /usr/local/rvm/scripts/rvm
 fi &&
 
 
@@ -51,4 +46,4 @@ echo "\
 ##############################################################################
 # APPLYING CHEF RECIPES ######################################################
 ##############################################################################" &&
-"$CHEF_BINARY" -c solo.rb -j solo.json
+chef-solo -c solo.rb -j solo.json
