@@ -45,13 +45,13 @@ function backupPostgreDB {
 		;;
 		restore)
 			if [ -z "$DB_OWNER" ]; then
-				echo "Usage: $FN restore DATABASE FILE OWNER"
+				echo "Usage: $FN_NAME restore DATABASE FILE OWNER"
 				return 1
 			fi
 
-			su postgres -c "dropdb '$DB'" >> /dev/null
+			su postgres -c "dropdb '$DB'"
 			su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
-			su postgres -c "psql --set ON_ERROR_STOP= -1 '$DB' -f '$SQL_FILE'"
+			su postgres -c "psql --set ON_ERROR_STOP= -1 -q -f '$SQL_FILE' '$DB'"
 # | while read -r LINE; do
 #				echo "  * $LINE"
 #
