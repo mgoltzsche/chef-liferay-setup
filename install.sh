@@ -3,11 +3,12 @@
 # This runs as root on the server
 
 RUBY_VERSION=2.0.0-p247
-
-PATH="$PATH:/usr/local/rvm/bin:/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin"
+GEM_DIR="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin"
+CHEF_SOLO="$GEM_DIR/chef-solo"
+PATH="$PATH:/usr/local/rvm/bin:$GEM_DIR"
 
 # Are we on a vanilla system?
-if [ ! -f "$CHEF_BINARY" ]; then
+if [ ! -f "$CHEF_SOLO" ]; then
     export DEBIAN_FRONTEND=noninteractive
     echo "\
 ##############################################################################
@@ -46,4 +47,4 @@ echo "\
 ##############################################################################
 # APPLYING CHEF RECIPES ######################################################
 ##############################################################################" &&
-chef-solo -c solo.rb -j solo.json
+"$CHEF_SOLO" -c solo.rb -j solo.json
