@@ -29,9 +29,11 @@ function backupLiferayDBs {
 }
 
 function liferayBackup {
+	serviceWrapper liferay stop
 	backupLiferayDBs &&
 	backupDirectory "$LIFERAY_HOME/data" 'data'                  "$LIFERAY_USER:$LIFERAY_USER" &&
-	backupFile      "$CFG_FILE"          'portal-ext.properties' "$LIFERAY_USER:$LIFERAY_USER"
+	backupFile      "$CFG_FILE"          'portal-ext.properties' "$LIFERAY_USER:$LIFERAY_USER" &&
+	serviceWrapper liferay start
 }
 
 case "$ACTION" in

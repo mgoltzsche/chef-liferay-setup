@@ -49,9 +49,7 @@ function backupPostgreDB {
 				return 1
 			fi
 
-			su postgres -c "dropdb '$DB'"
-			su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
-			su postgres -c "psql --set ON_ERROR_STOP= -1 -q -f '$SQL_FILE' '$DB'"
+			su postgres -c "dropdb '$DB' && createdb '$DB' -O '$DB_OWNER' && (cat '$SQL_FILE' | head -n 7) && psql --set ON_ERROR_STOP= -1 -q -f '$SQL_FILE' '$DB'"
 # | while read -r LINE; do
 #				echo "  * $LINE"
 #
