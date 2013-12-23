@@ -34,8 +34,8 @@ default['postgresql']['version'] = "9.1"
 
 # Liferay installation
 default['liferay']['download_url'] = "http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr"
-default['liferay']['native_connectors_download_url'] = "http://apache.lehtivihrea.org//tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz"
-default['liferay']['apr_download_url'] = "http://mirror.synyx.de/apache/apr/apr-1.4.8.tar.bz2"
+default['liferay']['native_connectors_download_url'] = "ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz"
+default['liferay']['apr_download_url'] = "ftp://ftp.fu-berlin.de/unix/www/apache/apr/apr-1.5.0.tar.bz2"
 default['liferay']['install_directory'] = "/opt"
 default['liferay']['home'] = "/var/opt/liferay"
 default['liferay']['user'] = "liferay"
