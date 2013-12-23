@@ -3,11 +3,7 @@
 # This runs as root on the server
 
 RUBY_VERSION=2.0.0-p247
-RVM_DIR='/usr/local/rvm'
-RUBY_BIN_DIR="$RVM_DIR/rubies/ruby-$RUBY_VERSION/bin"
-GEM_BIN_DIR="$RVM_DIR/gems/ruby-$RUBY_VERSION/bin"
-CHEF_SOLO="$GEM_BIN_DIR/chef-solo"
-PATH="$PATH:$RVM_DIR/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR"
+CHEF_SOLO="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin/chef-solo"
 
 # Are we on a vanilla system?
 if [ ! -f "$CHEF_SOLO" ]; then
@@ -46,6 +42,8 @@ if [ ! -f "$CHEF_SOLO" ]; then
   INSTALLING CHEF
 ==============================================================================" &&
 	gem install --no-rdoc --no-ri chef
+else
+	source /usr/local/rvm/scripts/rvm
 fi &&
 
 echo "\
