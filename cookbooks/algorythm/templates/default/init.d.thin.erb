@@ -14,8 +14,7 @@ THIN_BINARY="$GEM_BIN_DIR/thin"
 RUBY_BIN_DIR="/usr/local/rvm/rubies/default/bin"
 
 run_action() {
-	PATH="$PATH:/usr/local/rvm/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR"
-	su -c "ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
+	su -c "PATH=\"$PATH:/usr/local/rvm/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR\"; ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
 }
 
 case "$1" in
