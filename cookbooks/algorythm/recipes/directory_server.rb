@@ -78,6 +78,7 @@ changetype: modify
 delete: uniqueMember" | ldapmodify #{ldapModifyParams}
   EOH
   action :nothing
+  notifies :restart, 'service[dirsrv]'
 end
 
 # --- Add initial data to instance ---
