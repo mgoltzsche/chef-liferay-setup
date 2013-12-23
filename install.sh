@@ -26,6 +26,8 @@ if [ ! -f "$CHEF_SOLO" ]; then
 		libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison &&
 	echo '* Compiling RVM' &&
 	\curl -L https://get.rvm.io | bash -s stable --autolibs=enabled &&
+	echo '* Sourcing RVM script /usr/local/rvm/scripts/rvm' &&
+	source /usr/local/rvm/scripts/rvm &&
 	echo "\
 ==============================================================================
   INSTALLING RUBY
@@ -35,7 +37,6 @@ if [ ! -f "$CHEF_SOLO" ]; then
 		--with-openssl-dir=$HOME/.rvm/usr \
 		--verify-downloads 1 &&
 	echo '* Setting default Ruby version' &&
-	source /usr/local/rvm/scripts/rvm &&
 	rvm use --default $RUBY_VERSION &&
 	echo "\
 ==============================================================================
@@ -43,6 +44,7 @@ if [ ! -f "$CHEF_SOLO" ]; then
 ==============================================================================" &&
 	gem install --no-rdoc --no-ri chef
 else
+	echo '* Sourcing RVM script /usr/local/rvm/scripts/rvm'
 	source /usr/local/rvm/scripts/rvm
 fi &&
 
