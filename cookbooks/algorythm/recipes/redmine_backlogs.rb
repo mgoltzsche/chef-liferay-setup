@@ -291,6 +291,13 @@ template "#{node['backup']['install_directory']}/tasks/redmine" do
 end
 
 # --- Configure thin application server to run Redmine behind nginx ---
+execute 'Create RVM thin wrapper' do
+  command <<-EOH
+rvm alias create thin $(rvm list rubies | grep -Po '(?<=^=\*\s)[^\s]+') &&
+rvm wrapper thin
+  EOH
+end
+
 template '/etc/init.d/thin' do
   source 'init.d.thin.erb'
   mode 0750
@@ -340,7 +347,6 @@ end
 
 service 'thin' do
   action :restart
-  restart_command 'service thin restart'
 end
 
 ## Example LDAP config:

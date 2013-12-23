@@ -1,20 +1,17 @@
 #!/bin/sh
 
-RVM_BINARY=/usr/local/rvm/bin/rvm
+RVM_INSTALLATION=/usr/local/rvm
 
 # Exit if RVM is not installed
-[ -x "$RVM_BINARY" ] || exit 1
+[ -d "$RVM_INSTALLATION" ] || exit 1
 
-GEM_BIN_DIR=$($RVM_BINARY gemdir)/bin
-THIN_BINARY="$GEM_BIN_DIR/thin"
+THIN_BINARY=$($RVM_INSTALLATION/bin/rvm gemdir)/bin/thin
 
-# Exit if the package is not installed
-[ -x "$THIN_BINARY" ] || exit 1
-
-RUBY_BIN_DIR="/usr/local/rvm/rubies/default/bin"
+# Exit if thin gem is not installed
+[ -x "$THIN_BINARY" ] || exit 2
 
 run_action() {
-	su -c "PATH=\"$PATH:/usr/local/rvm/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR\"; ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
+	su <%=@user%> -c "export RAILS_ENV=production; PATH=\"\$PATH:/usr/local/rvm/wrappers/thin/\"; ruby '$THIN_BINARY' $1 --all /etc/thin"
 }
 
 case "$1" in

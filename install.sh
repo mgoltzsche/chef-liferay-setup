@@ -2,7 +2,7 @@
 
 # This runs as root on the server
 
-RUBY_VERSION=2.0.0-p247
+RUBY_VERSION=2.0.0-p353
 CHEF_SOLO="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin/chef-solo"
 
 # Are we on a vanilla system?
