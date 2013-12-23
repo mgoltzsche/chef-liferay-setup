@@ -9,10 +9,17 @@ if [ -z "$REDMINE_USER" ]; then
 	REDMINE_USER='<%=@user%>'
 fi
 
+RVM_THIN_WRAPPER=/usr/local/rvm/wrappers/thin
+
+if [ ! -d "$RVM_THIN_WRAPPER" ]; then
+	echo "RVM wrapper $RVM_THIN_WRAPPER is missing"
+	exit 2
+fi
+
 DB_CFG_FILE="$REDMINE_INSTALLATION/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
-REDMINE_ENV_CFG='cd "$REDMINE_INSTALLATION"; PATH="$PATH":/usr/local/rvm/wrappers/thin; PATH="$PATH":$(rvm gemdir); export RAILS_ENV=production;'
+REDMINE_ENV_CFG="cd '$REDMINE_INSTALLATION';"' PATH="$PATH":'"$RVM_THIN_WRAPPER"':/usr/local/rvm/bin; export RAILS_ENV=production;'
 
 function redmineBackup {
 	backupPostgreDB "$DB_NAME" "$DB_USER" &&
