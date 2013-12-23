@@ -100,7 +100,7 @@ function runBackupTask {
 		echo '* Decompress backup'
 		cd $TMP_DIR
 		tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
-			echo "  * $LINE"
+			echo "  $LINE"
 		done
 		DECOMPRESSION_EXIT_CODE=$PIPESTATUS
 
@@ -111,14 +111,14 @@ function runBackupTask {
 	fi
 
 	(source "$INSTALL_DIR/tasks/$BACKUP_TYPE")
-	STATUS=$?
+	TASK_EXIT_CODE=$?
 
-	if [ $STATUS -eq 0 ]; then
+	if [ $TASK_EXIT_CODE -eq 0 ]; then
 		if [ $ACTION = 'dump' ]; then
 			echo '* Compress backup'
 			cd $TMP_DIR
 			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID | while read -r LINE; do
-				echo "  * $LINE"
+				echo "  $LINE"
 			done
 			COMPRESSION_EXIT_CODE=$PIPESTATUS
 
@@ -226,7 +226,7 @@ function runBackup {
 		fi
 	done)
 
-	echo $LISTENER_RESULT | grep 'failed' >> /dev/null
+	echo $LISTENER_RESULT | grep 'failed' > /dev/null
 	STATUS=$?
 
 	if [ $STATUS -eq 0 ]; then
@@ -273,7 +273,7 @@ case "$ACTION" in
 		BACKUP_DATE=$(date +'%y-%m-%d')
 
 		if [ -d $BACKUP_DIR ]; then
-			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' >> /dev/null
+			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' > /dev/null
 			BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 			if [ $BACKUP_DATE_SEARCH_EXIT_CODE -eq 0 ]; then
