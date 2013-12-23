@@ -340,6 +340,7 @@ end
 
 service 'thin' do
   action :restart
+  restart_command 'service thin restart'
 end
 
 ## Example LDAP config:
