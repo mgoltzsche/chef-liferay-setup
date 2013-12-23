@@ -9,7 +9,7 @@ default['backup']['install_directory'] = '/opt/backup-scripts'
 default['backup']['backup_directory'] = '/var/backups/managed'
 
 # LDAP configuration
-default['ldap']['listenhost'] = '0.0.0.0'
+default['ldap']['listenhost'] = '127.0.0.1'
 default['ldap']['hostname'] = 'localhost'
 default['ldap']['port'] = 389
 default['ldap']['dirmanager'] = 'dirmanager'
