@@ -335,7 +335,7 @@ service 'nginx' do
 end
 
 service 'thin' do
-  action :restart
+  action :restart :enable
 end
 
 

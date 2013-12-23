@@ -334,7 +334,7 @@ end
 # --- (Re)start Liferay ---
 service 'liferay' do
   supports :restart => true
-  action :nothing
+  action :enable
 end
 
 print <<-EOH
