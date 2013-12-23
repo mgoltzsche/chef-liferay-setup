@@ -55,9 +55,9 @@ function backupPostgreDB {
 				echo '  * Drop'
 				su postgres -c "dropdb '$DB'"
 			fi &&
-			echo '  *  Create' &&
+			echo '  * Create' &&
 			su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
-			echo "  *  Run $DB.sql" &&
+			echo "  * Run $DB.sql" &&
 			su postgres -c "psql --set ON_ERROR_STOP= -1 -q -f '$SQL_FILE' '$DB'" > /dev/null
 		;;
 	esac

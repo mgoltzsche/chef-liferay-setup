@@ -12,6 +12,7 @@ fi
 DB_CFG_FILE="$REDMINE_INSTALLATION/config/database.yml"
 DB_NAME=$(cat $DB_CFG_FILE | grep -Po "(?<=database:\s).*")
 DB_USER=$(cat $DB_CFG_FILE | grep -Po "(?<=username:\s).*")
+REDMINE_ENV_CFG='cd "$REDMINE_INSTALLATION"; PATH="$PATH":/usr/local/rvm/wrappers/thin; PATH="$PATH":$(rvm gemdir); export RAILS_ENV=production;'
 
 function redmineBackup {
 	backupPostgreDB "$DB_NAME" "$DB_USER" &&
@@ -26,9 +27,9 @@ case "$ACTION" in
 		serviceWrapper thin stop
 		redmineBackup &&
 		echo '* Migrate database' &&
-		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake db:migrate" &&
+		su "$REDMINE_USER" -c "$REDMINE_ENV_CFG rake db:migrate" &&
 		echo '* Reconfigure backlogs plugin' &&
-		su "$REDMINE_USER" -c "cd \"$REDMINE_INSTALLATION\"; PATH=$PATH:$(/usr/local/rvm/bin/rvm gemdir)/bin:/usr/local/rvm/bin; export RAILS_ENV=production; rake redmine:backlogs:install" &&
+		su "$REDMINE_USER" -c "$REDMINE_ENV_CFG rake redmine:backlogs:install" &&
 		serviceWrapper thin start
 	;;
 	*)
