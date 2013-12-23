@@ -293,7 +293,7 @@ end
 # --- Configure thin application server to run Redmine behind nginx ---
 execute 'Create RVM thin wrapper' do
   command <<-EOH
-rvm alias create thin $(rvm list rubies | grep -Po '(?<=^=\*\s)[^\s]+') &&
+rvm alias create thin $(rvm list rubies | grep -Po '(?<=^=\\*\\s)[^\\s]+') &&
 rvm wrapper thin
   EOH
 end

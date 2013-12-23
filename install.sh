@@ -40,7 +40,7 @@ if [ ! -f "$CHEF_SOLO" ]; then
 	rvm use --default $RUBY_VERSION &&
 	echo "\
 ==============================================================================
-  INSTALLING CHEF
+  INSTALLING CHEF GEM
 ==============================================================================" &&
 	gem install --no-rdoc --no-ri chef
 else
