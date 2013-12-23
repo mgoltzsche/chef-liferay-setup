@@ -11,7 +11,7 @@ THIN_BINARY=$($RVM_BINARY gemdir)/bin/thin
 [ -x "$THIN_BINARY" ] || exit 0
 
 run_action() {
-	su -c "ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
+	su -c "/usr/local/rvm/rubies/default/bin/ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
 }
 
 case "$1" in
