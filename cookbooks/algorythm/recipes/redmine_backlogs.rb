@@ -296,6 +296,7 @@ execute 'Create RVM thin wrapper' do
 rvm alias create thin $(rvm list rubies | grep -Po '(?<=^=\\*\\s)[^\\s]+') &&
 rvm wrapper thin
   EOH
+  not_if {File.exist?("/usr/local/rvm/wrappers/thin")}
 end
 
 template '/etc/init.d/thin' do
