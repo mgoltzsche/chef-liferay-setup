@@ -5,14 +5,17 @@ RVM_BINARY=/usr/local/rvm/bin/rvm
 # Exit if RVM is not installed
 [ -x "$RVM_BINARY" ] || exit 1
 
-THIN_BINARY=$($RVM_BINARY gemdir)/bin/thin
+GEM_BIN_DIR=$($RVM_BINARY gemdir)/bin
+THIN_BINARY="$GEM_BIN_DIR/thin"
 
 # Exit if the package is not installed
 [ -x "$THIN_BINARY" ] || exit 1
 
+RUBY_BIN_DIR="/usr/local/rvm/rubies/default/bin"
+
 run_action() {
-	source /usr/local/rvm/scripts/rvm &&
-	su -c "ruby thin $1 --all /etc/thin" <%=@user%>
+	PATH="$PATH:/usr/local/rvm/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR"
+	su -c "ruby $THIN_BINARY $1 --all /etc/thin" <%=@user%>
 }
 
 case "$1" in
