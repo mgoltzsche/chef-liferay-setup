@@ -5,7 +5,7 @@
 RUBY_VERSION=2.0.0-p247
 GEM_DIR="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin"
 CHEF_SOLO="$GEM_DIR/chef-solo"
-PATH="$PATH:/usr/local/rvm/bin:$GEM_DIR"
+export PATH="$PATH:/usr/local/rvm/bin:$GEM_DIR"
 
 # Are we on a vanilla system?
 if [ ! -f "$CHEF_SOLO" ]; then
