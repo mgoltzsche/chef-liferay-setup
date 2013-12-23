@@ -335,9 +335,12 @@ service 'nginx' do
 end
 
 service 'thin' do
-  action :restart :enable
+  action :enable
 end
 
+service 'thin' do
+  action :restart
+end
 
 ## Example LDAP config:
 # Name: LDAP (local)
