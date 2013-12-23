@@ -21,22 +21,23 @@ if [ ! -f "$CHEF_SOLO" ]; then
 ==============================================================================
   INSTALLING RVM
 ==============================================================================" &&
-	echo '* Install requirements' &&
+	echo '* Installing requirements' &&
 	apt-get --force-yes -fuy install build-essential openssl libreadline6 \
 		libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev \
 		libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev \
 		libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison &&
-	echo '* Compile RVM' &&
+	echo '* Compiling RVM' &&
 	\curl -L https://get.rvm.io | bash -s stable --autolibs=enabled &&
 	echo "\
 ==============================================================================
   INSTALLING RUBY
 ==============================================================================" &&
-	echo "* Install Ruby $RUBY_VERSION" &&
+	echo "* Installing Ruby $RUBY_VERSION" &&
 	rvm install $RUBY_VERSION \
 		--with-openssl-dir=$HOME/.rvm/usr \
 		--verify-downloads 1 &&
-	echo '* Set default Ruby version' &&
+	echo '* Setting default Ruby version' &&
+	source /usr/local/rvm/scripts/rvm &&
 	rvm use --default $RUBY_VERSION &&
 	echo "\
 ==============================================================================
