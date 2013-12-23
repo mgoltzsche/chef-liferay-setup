@@ -3,9 +3,11 @@
 # This runs as root on the server
 
 RUBY_VERSION=2.0.0-p247
-GEM_DIR="/usr/local/rvm/gems/ruby-$RUBY_VERSION/bin"
-CHEF_SOLO="$GEM_DIR/chef-solo"
-export PATH="$PATH:/usr/local/rvm/bin:$GEM_DIR"
+RVM_DIR='/usr/local/rvm'
+RUBY_BIN_DIR="$RVM_DIR/rubies/ruby-$RUBY_VERSION/bin"
+GEM_BIN_DIR="$RVM_DIR/gems/ruby-$RUBY_VERSION/bin"
+CHEF_SOLO="$GEM_BIN_DIR/chef-solo"
+PATH="$PATH:$RVM_DIR/bin:$RUBY_BIN_DIR:$GEM_BIN_DIR"
 
 # Are we on a vanilla system?
 if [ ! -f "$CHEF_SOLO" ]; then
