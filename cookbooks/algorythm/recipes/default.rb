@@ -1,7 +1,7 @@
 # --- Install prerequisites ---
 package 'imagemagick'
 package 'unzip'
-package 'openjdk-7-jdk'
+package 'openjdk-6-jdk'
 
 hostname = node['hostname']
 domainname = node['domainname']
