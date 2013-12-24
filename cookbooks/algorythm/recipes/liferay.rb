@@ -100,7 +100,7 @@ cd #{liferayDir}/bin &&
 ls | grep '\\.bat$' | xargs rm &&
 cd #{liferayDir}/webapps &&
 mkdir -p ROOT/WEB-INF/classes/de/algorythm
-rm -rf welcome-theme sync-web &&
+rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
 chown -R #{usr}:#{usr} #{liferayDir}
   EOH
   not_if {File.exist?(liferayDir)}
