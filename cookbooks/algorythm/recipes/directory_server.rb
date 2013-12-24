@@ -18,7 +18,7 @@ userPassword = ldapPassword(node['ldap']['admin_password'])
 
 
 # --- Create instance if not exists ---
-execute "Configure single instance" do
+execute 'Create instance' do
   command <<-EOH
 echo "[General]
 FullMachineName= #{node['hostname']}.#{node['domainname']}
