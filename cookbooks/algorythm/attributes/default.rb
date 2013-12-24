@@ -57,7 +57,7 @@ default['liferay']['shards']['dieter']['pg']['user'] = 'dieter'
 default['liferay']['shards']['dieter']['pg']['password'] = 'dieter'
 default['liferay']['ldap']['user'] = default['liferay']['user']
 default['liferay']['ldap']['password'] = 'password'
-default['liferay']['system_mail_prefix'] = 'no-reply'
+default['liferay']['system_mail_prefix'] = 'system'
 default['liferay']['company_default_name'] = 'algorythm'
 default['liferay']['admin']['name'] = 'Max Goltzsche'
 default['liferay']['timezone'] = 'Europe/Berlin'
@@ -70,7 +70,7 @@ default['nexus']['hostname'] = "nexus.#{default['domainname']}"
 default['nexus']['home'] = "/var/opt/nexus"
 default['nexus']['ldap']['user'] = 'nexus'
 default['nexus']['ldap']['password'] = 'password'
-default['nexus']['system_mail_prefix'] = 'no-reply'
+default['nexus']['system_mail_prefix'] = 'system'
 
 # Redmine Backlogs installation
 default['redmine']['install_directory'] = "/opt"
@@ -86,4 +86,4 @@ default['redmine']['postgresql']['user'] = default['redmine']['user']
 default['redmine']['postgresql']['password'] = "redmine"
 default['redmine']['ldap']['user'] = default['redmine']['user']
 default['redmine']['ldap']['password'] = "password"
-default['redmine']['system_mail_prefix'] = 'no-reply'
+default['redmine']['system_mail_prefix'] = 'system'
