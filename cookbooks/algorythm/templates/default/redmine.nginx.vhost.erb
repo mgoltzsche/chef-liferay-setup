@@ -28,8 +28,8 @@ server {
 	server_name <%=@hostname%>;
 	root <%=@home%>/public;
 
-	ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
-	ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+	ssl_certificate     /etc/ssl/certs/server.crt;
+	ssl_certificate_key /etc/ssl/private/server.key;
 
 	include proxy_params;
 
