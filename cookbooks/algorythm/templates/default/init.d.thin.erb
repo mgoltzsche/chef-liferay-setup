@@ -12,7 +12,7 @@ THIN_BINARY="$GEM_BIN_DIR/thin"
 [ -x "$THIN_BINARY" ] || exit 2
 
 run_action() {
-	su <%=@user%> -c 'export RAILS_ENV=production; PATH="$PATH"':/usr/local/rvm/wrappers/thin/:'"$GEM_BIN_DIR'; ruby '$THIN_BINARY' $1 --all /etc/thin"
+	su <%=@user%> -c 'export RAILS_ENV=production; PATH="$PATH":/usr/local/rvm/wrappers/thin/:'"'$GEM_BIN_DIR'; ruby '$THIN_BINARY' $1 --all /etc/thin"
 }
 
 case "$1" in
