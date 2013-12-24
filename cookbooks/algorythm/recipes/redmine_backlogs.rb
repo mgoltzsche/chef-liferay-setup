@@ -138,6 +138,10 @@ execute 'Install required Backlog plugin gems' do
   command 'bundle install --without development test'
 end
 
+execute 'Install latest rubygems' do
+  command 'rvm rubygems latest'
+end
+
 # --- Change file system permissions ---
 execute 'Configure file system permissions' do
   cwd redmineDir
