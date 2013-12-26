@@ -65,7 +65,7 @@ ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,d
 done
 		EOH
 		action :nothing
-		notifies :run, 'execute[Remove dirmanager Directory Administrators group membership from instance #{instanceId}]', :immediately
+		notifies :run, "execute[Remove dirmanager Directory Administrators group membership from instance #{instanceId}]", :immediately
 	end
 
 	execute "Remove dirmanager Directory Administrators group membership from instance #{instanceId}" do # to avoid exception in external systems because dirmanager user does not exist in directory
