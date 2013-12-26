@@ -206,7 +206,7 @@ execute "Compile native connectors source" do
   user 'root'
   group 'root'
   command <<-EOH
-./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-6-openjdk-amd64 &&
+./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64 &&
 make &&
 make install
   EOH
