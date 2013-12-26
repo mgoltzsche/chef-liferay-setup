@@ -34,7 +34,7 @@ country = node['liferay']['country']
 language = node['liferay']['language']
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
-package 'openjdk-7-jdk'
+package 'openjdk-6-jdk'
 package 'libssl-dev'
 package 'imagemagick'
 package 'unzip'
@@ -91,13 +91,13 @@ remote_file "#{downloadDir}/#{liferayZipFile}" do
   action :create_if_missing
 end
 
-execute "Extract Liferay" do
+execute 'Extract Liferay' do
   cwd downloadDir
   command "unzip -qd /tmp #{liferayZipFile}"
   not_if {File.exist?(liferayDir) || File.exist?(liferayExtractionDir)}
 end
 
-execute "Copy Liferay to installation directory" do
+execute 'Copy Liferay to installation directory' do
   command <<-EOH
 cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{liferayDir} &&
 cd #{liferayDir}/bin &&
@@ -173,7 +173,7 @@ remote_file "#{downloadDir}/#{nativeConnectorSourceArchive}" do
   action :create_if_missing
 end
 
-execute "Extract APR source" do
+execute 'Extract APR source' do
   cwd downloadDir
   user 'root'
   group 'root'
@@ -189,7 +189,7 @@ execute "Extract native connectors source" do
   not_if {File.exist?(nativeConnectorSourcePath)}
 end
 
-execute "Compile APR source" do
+execute 'Compile APR source' do
   cwd aprSourcePath
   user 'root'
   group 'root'
@@ -201,12 +201,12 @@ make install
   not_if 'ls /usr/local/apr/lib | grep libapr-'
 end
 
-execute "Compile native connectors source" do
+execute 'Compile native connectors source' do
   cwd "#{nativeConnectorSourcePath}/jni/native"
   user 'root'
   group 'root'
   command <<-EOH
-./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64 &&
+./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-6-openjdk-amd64 &&
 make &&
 make install
   EOH
@@ -217,7 +217,7 @@ end
 template "#{liferayDir}/bin/setenv.sh" do
   owner 'root'
   group usr
-  source "liferay.tomcat.setenv.sh.erb"
+  source 'liferay.tomcat.setenv.sh.erb'
   mode 0754
   variables({
     :catalina_opts => node['liferay']['catalina_opts']
@@ -288,8 +288,8 @@ template "#{liferayHomeDir}/portal-ext.properties" do
 end
 
 # --- Register Liferay as service ---
-template "/etc/init.d/liferay" do
-  source "init.d.liferay.erb"
+template '/etc/init.d/liferay' do
+  source 'init.d.liferay.erb'
   mode 0755
   variables({
     :liferayDir => liferayDirLink,
@@ -298,8 +298,8 @@ template "/etc/init.d/liferay" do
   })
 end
 
-template "/etc/logrotate.d/liferay" do
-  source "logrotate.d.liferay.erb"
+template '/etc/logrotate.d/liferay' do
+  source 'logrotate.d.liferay.erb'
   mode 0755
   variables({
     :liferay_log_home => "#{liferayDirLink}/logs"
