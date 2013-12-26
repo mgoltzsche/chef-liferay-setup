@@ -11,7 +11,7 @@ node['ldap'].each do |serverId, instance|
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
-	adminPassword = instance['admin_password']
+	adminPassword = ldapPassword(instance['admin_password'])
 	ldapModifyParams = "-x -h localhost -p 389 -D cn='#{dirmanager}' -w #{dirmanager_password}"
 
 	# --- Create instance if not exists ---
@@ -116,7 +116,7 @@ cn: #{adminCN}
 sn: #{adminSN}
 givenName: #{adminGivenName}
 mail: #{adminCN}@#{domain}
-userPassword:: #{ldapPassword(adminPassword)}
+userPassword:: #{adminPassword}
 " | ldapmodify #{ldapModifyParams} -a
 		EOH
 		not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
