@@ -63,7 +63,7 @@ default['liferay']['admin']['name'] = 'Max Goltzsche'
 default['liferay']['timezone'] = 'Europe/Berlin'
 default['liferay']['country'] = 'DE'
 default['liferay']['language'] = 'de'
-default['liferay']['tomcat_virtual_hosts']['nexus'] = "nexus.#{default['ldap']['domain']}"
+default['liferay']['tomcat_virtual_hosts']['nexus'] = "repository.#{default['ldap']['domain']}"
 
 # Sonatype Nexus installation
 default['nexus']['version'] = '2.7.0-06'
