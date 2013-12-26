@@ -3,7 +3,7 @@ downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
-nexusDir = "#{node['liferay']['install_directory']}/liferay/webapps/nexus"
+nexusDir = "#{node['nexus']['deploy_directory']}/ROOT"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
@@ -106,12 +106,6 @@ template "#{nexusHome}/conf/ldap.xml" do
     :password => ldapPassword
   })
   notifies :restart, 'service[liferay]'
-end
-
-execute "Print msg" do
-  command {
-	print "sdfhsdfhsdfasdf\n"
-  }
 end
 
 execute "Extract Sonatype Nexus" do

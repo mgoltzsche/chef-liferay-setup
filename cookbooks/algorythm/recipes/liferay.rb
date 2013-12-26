@@ -15,6 +15,7 @@ nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
 liferayHomeDir = node['liferay']['home']
+tomcatVirtualHosts = node['liferay']['tomcat_virtual_hosts']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
 ldapSuffix = ldapSuffix(node['ldap']['domain'])
@@ -227,10 +228,19 @@ template "#{liferayDir}/conf/server.xml" do
   source "liferay.tomcat.server.xml.erb"
   mode 0644
   variables({
-    :http_port => node['liferay']['http_port'],
-    :https_port => node['liferay']['https_port']
+    :httpPort => node['liferay']['http_port'],
+    :httpsPort => node['liferay']['https_port'],
+    :virtualHosts => tomcatVirtualHosts;
   })
   notifies :restart, 'service[liferay]'
+end
+
+virtualHosts.keys.each do |vhost|
+  directory "#{liferayDir}/webapps-#{vhost}" do
+    owner usr
+    group usr
+    mode 0744
+  end
 end
 
 # --- Configure Liferay ---

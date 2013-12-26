@@ -68,14 +68,14 @@
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
     <!-- Proxied HTTP Connector -->
-    <Connector address="127.0.0.1" port="<%=@http_port%>" protocol="HTTP/1.1"
+    <Connector address="127.0.0.1" port="<%=@httpPort%>" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="443"
                URIEncoding="UTF-8"
+               redirectPort="443"
                proxyPort="80"
                />
     <!-- Proxied HTTPS Connector -->
-    <Connector address="127.0.0.1" port="<%=@https_port%>" protocol="HTTP/1.1"
+    <Connector address="127.0.0.1" port="<%=@httpsPort%>" protocol="HTTP/1.1"
                connectionTimeout="20000"
 	       URIEncoding="UTF-8"
                proxyPort="443"
@@ -149,12 +149,14 @@
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
 
       </Host>
-      <Host name="nexus.dev.algorythm.de"  appBase="webapps-nexus"
-            unpackWARs="true" autoDeploy="true">
+      <%@virtualHosts.keys.each do |vhost|%>
+      <Host name="<%=@virtualHosts[vhost]%>"  appBase="webapps-<%=vhost%>"
+            unpackWARs="false" autoDeploy="false">
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
-               prefix="localhost_nexus_access_log." suffix=".txt"
+               prefix="localhost_<%=vhost%>_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
       </Host>
+      <%end%>
     </Engine>
   </Service>
 </Server>
