@@ -149,8 +149,8 @@
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
 
       </Host>
-      <%@virtualHosts.keys.each do |vhost|%>
-      <Host name="<%=@virtualHosts[vhost]%>"  appBase="webapps-<%=vhost%>"
+      <%@virtualHosts.each do |vhost, hostname|%>
+      <Host name="<%=hostname%>"  appBase="webapps-<%=vhost%>"
             unpackWARs="false" autoDeploy="false">
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_<%=vhost%>_access_log." suffix=".txt"
