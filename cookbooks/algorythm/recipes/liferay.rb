@@ -230,7 +230,7 @@ template "#{liferayDir}/conf/server.xml" do
   variables({
     :httpPort => node['liferay']['http_port'],
     :httpsPort => node['liferay']['https_port'],
-    :virtualHosts => tomcatVirtualHosts;
+    :virtualHosts => tomcatVirtualHosts
   })
   notifies :restart, 'service[liferay]'
 end
