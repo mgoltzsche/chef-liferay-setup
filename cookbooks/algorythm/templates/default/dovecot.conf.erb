@@ -27,15 +27,15 @@ service auth {
   }
 }
 
-<% @ldapInstanceNames.each do |ldapInstanceName| %>
+<% @ldapInstances.each do |id| %>
 passdb {
   driver = ldap
-  args = /etc/dovecot/dovecot-ldap-<%=ldapInstanceName%>.conf.ext
+  args = /etc/dovecot/dovecot-ldap-<%=id%>.conf.ext
 }
 
 userdb {
   driver = ldap
-  args = /etc/dovecot/dovecot-ldap-userdb-<%=ldapInstanceName%>.conf.ext
+  args = /etc/dovecot/dovecot-ldap-userdb-<%=id%>.conf.ext
 }
 <% end %>
 

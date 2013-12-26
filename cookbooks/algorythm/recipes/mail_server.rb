@@ -5,7 +5,7 @@ package 'dovecot-ldap'
 machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
-ldapInstanceNames = node['ldap'].keys
+ldapInstances = node['ldap'].keys
 
 # --- Create virtual mail user ---
 user usr do
@@ -41,7 +41,7 @@ template '/etc/postfix/main.cf' do
 	variables({
 		:machineFQN => machineFQN,
 		:vmail_directory => vmailDirectory,
-		:ldapInstanceNames => ldapInstanceNames
+		:ldapInstances => ldapInstances
 	})
 	notifies :restart, 'service[postfix]'
 end
@@ -178,7 +178,7 @@ template '/etc/dovecot/dovecot.conf' do
 	variables({
 		:vmail_directory => vmailDirectory,
 		:vmail_user => usr,
-		:ldapInstanceNames => ldapInstanceNames
+		:ldapInstances => ldapInstances
 	})
   notifies :restart, 'service[dovecot]'
 end
