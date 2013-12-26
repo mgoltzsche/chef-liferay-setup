@@ -14,7 +14,6 @@ node['ldap'].each do |instanceId, instance|
 	adminPassword = ldapPassword(instance['admin_password'])
 	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanager_password}"
 
-	# --- Create instance if not exists ---
 	execute "Create #{instanceId} instance" do
 		command <<-EOH
 echo "[General]
