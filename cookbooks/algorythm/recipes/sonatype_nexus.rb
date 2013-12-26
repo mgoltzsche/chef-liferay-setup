@@ -108,6 +108,12 @@ template "#{nexusHome}/conf/ldap.xml" do
   notifies :restart, 'service[liferay]'
 end
 
+execute "Print msg" do
+  command {
+	print "sdfhsdfhsdfasdf\n"
+  }
+end
+
 execute "Extract Sonatype Nexus" do
   cwd downloadDir
   command "mkdir #{nexusExtractDir} && unzip -qd /tmp/nexus-#{version} #{nexusWarFile}"
