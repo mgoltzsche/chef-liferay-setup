@@ -30,7 +30,7 @@ default['mail_server'] = {
 	'vmail_user' => 'vmail',
 	'vmail_directory' => '/var/vmail',
 	'ldap' => {
-		'user' => default['mail_server']['vmail_user'],
+		'user' => 'vmail',
 		'password' => 'password'
 	}
 }
