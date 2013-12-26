@@ -15,7 +15,7 @@ node['ldap'].each do |instanceId, instance|
 	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanager_password}"
 
 	# --- Create instance if not exists ---
-	execute "Create instance #{instanceId}" do
+	execute "Create #{instanceId} instance" do
 		command <<-EOH
 echo "[General]
 FullMachineName= #{node['hostname']}.#{node['domainname']}
@@ -38,10 +38,10 @@ setup-ds -sf /tmp/ds-config.inf &&
 rm -f /tmp/ds-config.inf
 		EOH
 		not_if {File.exist?("/etc/dirsrv/slapd-#{instanceId}")}
-		notifies :run, "execute[Configure instance #{instanceId}]", :immediately
+		notifies :run, "execute[Configure #{instanceId} instance]", :immediately
 	end
 
-	execute "Configure instance #{instanceId}" do
+	execute "Configure #{instanceId} instance" do
 		command <<-EOH
 echo "dn: cn=config
 changetype: modify
@@ -55,20 +55,20 @@ nsslapd-allow-anonymous-access: off
 " | ldapmodify #{ldapModifyParams}
 		EOH
 		action :nothing
-		notifies :run, "execute[Remove default groups from instance #{instanceId}]", :immediately
+		notifies :run, "execute[Remove default groups from #{instanceId} instance]", :immediately
 	end
 
-	execute "Remove default groups from instance #{instanceId}" do
+	execute "Remove default groups from #{instanceId} instance" do
 		command <<-EOH
 ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,dc=dev,dc=algorythm,dc=de' '(cn=*)' | grep -P '^dn:\\s' | while read -r groupDN; do
   echo $groupDN"\\nchangetype: delete" | ldapmodify #{ldapModifyParams}
 done
 		EOH
 		action :nothing
-		notifies :run, "execute[Remove dirmanager Directory Administrators group membership from instance #{instanceId}]", :immediately
+		notifies :run, "execute[Remove dirmanager Directory Administrators group membership from #{instanceId} instance]", :immediately
 	end
 
-	execute "Remove dirmanager Directory Administrators group membership from instance #{instanceId}" do # to avoid exception in external systems because dirmanager user does not exist in directory
+	execute "Remove dirmanager Directory Administrators group membership from #{instanceId} instance" do # to avoid exception in external systems because dirmanager user does not exist in directory
 		command <<-EOH
 echo "dn: cn=Directory Administrators,#{suffix}
 changetype: modify
@@ -79,7 +79,7 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 	end
 
 	# --- Add initial data to instance ---
-	execute "Register domain unit for instance #{instanceId}" do
+	execute "Register domain unit for #{instanceId} instance" do
 		command <<-EOH
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
@@ -90,7 +90,7 @@ ou: Domains
 		not_if "ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
 	end
 
-	execute "Register domain #{domain} for instance #{instanceId}" do
+	execute "Register domain #{domain} for #{instanceId} instance" do
 		command <<-EOH
 echo "dn: ou=#{domain},ou=Domains,#{suffix}
 objectClass: domainRelatedObject
@@ -103,7 +103,7 @@ associatedDomain: #{domain}
 		not_if "ldapsearch #{ldapModifyParams} -b 'ou=#{domain},ou=Domains,#{suffix}'"
 	end
 
-	execute "Register admin person for instance #{instanceId}" do
+	execute "Register admin person for #{instanceId} instance" do
 		command <<-EOH
 echo "dn: cn=#{adminCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject
