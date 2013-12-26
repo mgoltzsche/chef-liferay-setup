@@ -24,6 +24,8 @@ systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
 anonymousEmailAddress = "anonymous@#{hostname}"
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
+package 'unzip'
+
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
   source "http://www.sonatype.org/downloads/nexus-#{version}.war"
@@ -58,8 +60,8 @@ template nexusCfg do
 end
 
 execute "Configure baseUrl" do
-  command "sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/nexus<\\/baseUrl>/g' #{nexusCfg}"
-  not_if "cat #{nexusCfg} | grep '<baseUrl>https://#{hostname}/nexus</baseUrl>'"
+  command "sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/<\\/baseUrl>/g' #{nexusCfg}"
+  not_if "cat #{nexusCfg} | grep '<baseUrl>https://#{hostname}/</baseUrl>'"
 end
 
 template "#{nexusHome}/conf/security-configuration.xml" do
@@ -103,7 +105,7 @@ template "#{nexusHome}/conf/ldap.xml" do
     :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
-    :password => ldapPassword
+    :password => Base64.encode64(ldapPassword)
   })
   notifies :restart, 'service[liferay]'
 end
@@ -204,7 +206,8 @@ template "/etc/nginx/sites-available/#{hostname}" do
   mode 00700
   variables({
     :hostname => hostname,
-    :port => node['liferay']['https_port']
+    :httpPort => node['liferay']['http_port'],
+    :httpsPort => node['liferay']['https_port']
   })
   notifies :restart, 'service[nginx]'
 end

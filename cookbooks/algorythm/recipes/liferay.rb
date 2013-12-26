@@ -34,7 +34,10 @@ country = node['liferay']['country']
 language = node['liferay']['language']
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
+package 'openjdk-7-jdk'
 package 'libssl-dev'
+package 'imagemagick'
+package 'unzip'
 
 # --- Create Liferay system user ---
 user usr do
@@ -203,7 +206,7 @@ execute "Compile native connectors source" do
   user 'root'
   group 'root'
   command <<-EOH
-./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-7-openjdk-amd64 &&
+./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-6-openjdk-amd64 &&
 make &&
 make install
   EOH

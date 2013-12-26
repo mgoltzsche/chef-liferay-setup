@@ -1,8 +1,3 @@
-# --- Install prerequisites ---
-package 'imagemagick'
-package 'unzip'
-package 'openjdk-7-jdk'
-
 hostname = node['hostname']
 domainname = node['domainname']
 maxOpenFiles = node['max_open_files']

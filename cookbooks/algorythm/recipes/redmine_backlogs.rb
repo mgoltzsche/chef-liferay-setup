@@ -26,10 +26,11 @@ adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
+package 'git'
+package 'imagemagick'
 package 'libpq-dev'
 package 'libmagick-dev'
 package 'libmagickwand-dev'
-package 'git'
 
 # --- Create Redmine system user ---
 user usr do
