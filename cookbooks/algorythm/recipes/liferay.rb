@@ -235,7 +235,7 @@ template "#{liferayDir}/conf/server.xml" do
   notifies :restart, 'service[liferay]'
 end
 
-virtualHosts.keys.each do |vhost|
+tomcatVirtualHosts.keys.each do |vhost|
   directory "#{liferayDir}/webapps-#{vhost}" do
     owner usr
     group usr
