@@ -37,7 +37,7 @@ default['mail_server'] = {
 
 # Postgresql installation
 default['postgresql'] = {
-	'address' => "localhost",
+	'address' => 'localhost',
 	'port' => 5432,
 	'version' => '9.1'
 }
@@ -93,7 +93,7 @@ default['liferay'] = {
 # Sonatype Nexus installation
 default['nexus'] = {
 	'version' => '2.7.0-06',
-	'hostname' => "repository.#{default['domainname']}",
+	'hostname' => "repository.#{default['ldap']['domain']}",
 	'system_mail_prefix' => 'system',
 	'deploy_directory' => "#{default['liferay']['install_directory']}/liferay/webapps-nexus",
 	'home' => '/var/opt/nexus',
@@ -111,7 +111,7 @@ default['redmine'] = {
 	'version' => '2.3.3',
 	'backlogs_version' => 'v1.0.6',
 
-	'hostname' => "redmine.#{default['domainname']}",
+	'hostname' => "redmine.#{default['ldap']['domain']}",
 	'system_mail_prefix' => 'system',
 	'postgresql' => {
 		'database' => 'redmine',
@@ -119,7 +119,7 @@ default['redmine'] = {
 		'password' => 'password'
 	},
 	'ldap' => {
-		'user' => default['redmine']['user'],
+		'user' => 'redmine',
 		'password' => 'password'
 	}
 }

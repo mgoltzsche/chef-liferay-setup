@@ -141,7 +141,6 @@ end
 # --- Create Liferay postgres user and database
 node['liferay']['shards'].each do |name, shard|
   pgUser = shard['pg']['user']
-print "### PGUSER: #{pgUser} ###\n"
   pgPassword = shard['pg']['password']
   pgDB = shard['pg']['database']
 
