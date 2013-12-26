@@ -27,15 +27,17 @@ service auth {
   }
 }
 
+<% @ldapInstanceNames.each do |ldapInstanceName| %>
 passdb {
   driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
+  args = /etc/dovecot/dovecot-ldap-<%=ldapInstanceName%>.conf.ext
 }
 
 userdb {
   driver = ldap
-  args = /etc/dovecot/dovecot-ldap-userdb.conf.ext
+  args = /etc/dovecot/dovecot-ldap-userdb-<%=ldapInstanceName%>.conf.ext
 }
+<% end %>
 
 service imap-login {
   chroot = login
