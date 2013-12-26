@@ -70,16 +70,16 @@ default['liferay'] = {
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
-				'user' => default['liferay']['user'],
-				'password' => 'liferay'
+				'user' => 'liferay',
+				'password' => 'password'
 			}
 		},
 		'dieter-goltzsche' => {
 			'hostname' => 'dieter-goltzsche.de',
 			'pg' => {
 				'port' => 5432,
-				'database' => 'liferay-dieter-goltzsche',
-				'user' => 'dieter-goltzsche',
+				'database' => 'liferay_dieter_goltzsche',
+				'user' => 'dieter_goltzsche',
 				'password' => 'password'
 			}
 		}
