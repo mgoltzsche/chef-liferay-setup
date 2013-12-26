@@ -7,7 +7,7 @@ usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
 ldapUser = node['mail_server']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['mail_server']['ldap']['password']
@@ -143,7 +143,7 @@ file '/etc/aliases' do
   mode 0644
   content <<-EOH
 postmaster: root
-root: #{node['ldap']['admin_cn']}@#{node['ldap']['domain']}
+root: #{node['ldap']['admin_cn']}@#{node['ldap']['default']['domain']}
   EOH
   notifies :run, 'execute[newaliases]', :immediately
 end

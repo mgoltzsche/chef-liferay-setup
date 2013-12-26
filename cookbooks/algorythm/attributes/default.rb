@@ -11,9 +11,8 @@ default['backup'] = {
 }
 
 # LDAP configuration
-default['ldap'] = {
+default['ldap']['default'] = {
 	'listenhost' => '127.0.0.1',
-	'hostname' => 'localhost',
 	'port' => 389,
 	'dirmanager' => 'dirmanager',
 	'dirmanager_password' => 'password',
@@ -54,19 +53,19 @@ default['liferay'] = {
 	'http_port' => 7080,
 	'https_port' => 7443,
 
-	'company_default_name' => default['ldap']['domain'],
+	'company_default_name' => default['ldap']['default']['domain'],
 	'system_mail_prefix' => 'system',
 	'admin' => {'name' => 'Max Goltzsche'},
 	'timezone' => 'Europe/Berlin',
 	'country' => 'DE',
 	'language' => 'de',
 	'tomcat_virtual_hosts' => {
-		'nexus' => "repository.#{default['ldap']['domain']}"
+		'nexus' => "repository.#{default['ldap']['default']['domain']}"
 	},
 	'defaultshard' => 'default',
 	'shards' => {
 		'default' => {
-			'hostname' => default['ldap']['domain'],
+			'hostname' => default['ldap']['default']['domain'],
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
@@ -85,15 +84,18 @@ default['liferay'] = {
 		}
 	},
 	'ldap' => {
+		'hostname' => 'localhost',
+		'port' => 389,
 		'user' => 'liferay',
-		'password' => 'password'
+		'password' => 'password',
+		'domain' => default['ldap']['default']['domain']
 	}
 }
 
 # Sonatype Nexus installation
 default['nexus'] = {
 	'version' => '2.7.0-06',
-	'hostname' => "repository.#{default['ldap']['domain']}",
+	'hostname' => "repository.#{default['ldap']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'deploy_directory' => "#{default['liferay']['install_directory']}/liferay/webapps-nexus",
 	'home' => '/var/opt/nexus',
@@ -111,7 +113,7 @@ default['redmine'] = {
 	'version' => '2.3.3',
 	'backlogs_version' => 'v1.0.6',
 
-	'hostname' => "redmine.#{default['ldap']['domain']}",
+	'hostname' => "redmine.#{default['ldap']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'postgresql' => {
 		'database' => 'redmine',

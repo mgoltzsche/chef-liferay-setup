@@ -12,7 +12,7 @@ mailServerHost = node['mail_server']['hostname']
 ldapAuthSourceName = 'Local LDAP Server'
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
 ldapUser = node['redmine']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['redmine']['ldap']['password']
@@ -22,7 +22,7 @@ systemMailPrefix = node['redmine']['system_mail_prefix']
 adminCN = node['ldap']['admin_cn']
 adminLastname = node['ldap']['admin_sn']
 adminFirstname = node['ldap']['admin_givenName']
-adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
+adminEmail = "#{adminCN}@#{node['ldap']['default']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 

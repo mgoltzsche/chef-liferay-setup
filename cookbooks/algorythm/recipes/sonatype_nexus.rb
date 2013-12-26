@@ -10,7 +10,7 @@ nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['port']
-ldapSuffix = ldapSuffix(node['ldap']['domain'])
+ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
 ldapUser = node['nexus']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['nexus']['ldap']['password']
@@ -18,7 +18,7 @@ ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
 adminCN = node['ldap']['admin_cn']
-adminEmail = "#{adminCN}@#{node['ldap']['domain']}"
+adminEmail = "#{adminCN}@#{node['ldap']['default']['domain']}"
 mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
 anonymousEmailAddress = "anonymous@#{hostname}"
