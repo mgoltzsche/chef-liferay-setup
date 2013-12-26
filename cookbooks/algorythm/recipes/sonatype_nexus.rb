@@ -105,7 +105,7 @@ template "#{nexusHome}/conf/ldap.xml" do
     :port => ldapPort,
     :suffix => ldapSuffix,
     :user => ldapUser,
-    :password => Base64.encode64(ldapPassword)
+    :password => ldapPassword
   })
   notifies :restart, 'service[liferay]'
 end
