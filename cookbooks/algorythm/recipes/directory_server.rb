@@ -12,7 +12,8 @@ node['ldap'].each do |instanceId, instance|
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
 	adminPassword = ldapPassword(instance['admin_password'])
-	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanager_password}"
+	ldapModifyParams = "-x -h localhost -p #{port} -D '#{adminDN}' -w #{instance['admin_password']}"
+	adminDN = "cn=#{adminCN},ou=People,#{suffix}"
 
 	execute "Create #{instanceId} instance" do
 		command <<-EOH
@@ -29,8 +30,7 @@ AdminDomain= #{node['domainname']}
 ServerIdentifier= #{instanceId}
 ServerPort= #{port}
 Suffix= #{suffix}
-RootDN= cn=#{dirmanager}
-RootDNPwd= #{dirmanager_password}
+RootDN= #{adminDN}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
@@ -104,7 +104,7 @@ associatedDomain: #{domain}
 
 	execute "Register admin person for #{instanceId} instance" do
 		command <<-EOH
-echo "dn: cn=#{adminCN},ou=People,#{suffix}
+echo "dn: #{adminDN}
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: person
