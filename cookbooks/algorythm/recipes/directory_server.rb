@@ -138,7 +138,7 @@ userPassword:: #{adminPassword}
 
 	file "Set #{instanceId} instance manager password" do
 		path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
-		contents File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+		content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
 		backup false
 		action :nothing
 		notifies :run, 'service[dirsrv]'
