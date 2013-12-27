@@ -31,8 +31,10 @@ RootDN= cn=#{dirmanager}
 RootDNPwd= #{dirmanagerPasswordPlain}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
-setup-ds -sf /tmp/ds-config.inf &&
+setup-ds -sf /tmp/ds-config.inf
+STATUS=$?
 rm -f /tmp/ds-config.inf
+exit $?
 		EOH
 		not_if {File.exist?("/etc/dirsrv/slapd-#{instanceId}")}
 		notifies :run, "execute[Configure #{instanceId} instance]", :immediately
