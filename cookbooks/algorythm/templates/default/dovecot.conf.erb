@@ -54,11 +54,11 @@ service auth {
 passdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap-<%=id%>.conf.ext
-  mail = maildir:<%=@vmail_directory%>/<%=id%>/%u/
 }
 
 userdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap-userdb-<%=id%>.conf.ext
+  mail = maildir:<%=@vmail_directory%>/<%=id%>/%u/
 }
 <% end %>
