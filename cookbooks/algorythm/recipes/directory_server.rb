@@ -7,7 +7,7 @@ node['ldap'].each do |instanceId, instance|
 	domain = instance['domain']
 	suffix = ldapSuffix(domain)
 	dirmanager = instance['dirmanager']
-	dirmanagerPasswordPlain = instance['dirmanagerPassword']
+	dirmanagerPasswordPlain = instance['dirmanager_password']
 	dirmanagerPassword = ldapPassword(dirmanagerPasswordPlain)
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
