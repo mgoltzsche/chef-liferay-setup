@@ -7,6 +7,7 @@ base_dir = /var/run/dovecot/
 info_log_path = /var/log/dovecot.info
 log_path = /var/log/dovecot
 log_timestamp = "%Y-%m-%d %H:%M:%S "
+# mail_location = maildir:<%=@vmail_directory%>/%u/
 mail_uid=<%=@vmail_user%>
 mail_gid=<%=@vmail_user%>
 protocols = imap pop3
@@ -50,15 +51,13 @@ service auth {
   }
 }
 
+userdb static {
+  args = uid=5000 gid=5000 home=maildir:<%=@vmail_directory%>/%d/%n allow_all_users=yes
+}
+
 <% @ldapInstances.each do |id| %>
 passdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap-<%=id%>.conf.ext
-}
-
-userdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap-userdb-<%=id%>.conf.ext
-  mail = maildir:<%=@vmail_directory%>/<%=id%>/%u/
 }
 <% end %>
