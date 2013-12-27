@@ -2,7 +2,7 @@ server_host = <%=@host%>
 server_port = <%=@port%>
 search_base = <%=@suffix%>
 query_filter = (&(objectClass=mailRecipient)(|(mail=%s)(mailAlternateAddress=%s)))
-result_attribute = <%=@result_attribute%>
+result_attribute = <%=@resultAttribute%>
 bind = yes
 bind_dn = cn=<%=@user%>,ou=Special Users,<%=@suffix%>
 bind_pw = <%=@password%>
