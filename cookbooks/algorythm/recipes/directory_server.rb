@@ -7,7 +7,7 @@ node['ldap'].each do |instanceId, instance|
 	domain = instance['domain']
 	suffix = ldapSuffix(domain)
 	dirmanager = instance['dirmanager']
-	dirmanager_password = instance['dirmanager_password']
+	dirmanager_password = ldapPassword(instance['dirmanager_password'])
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
@@ -48,6 +48,16 @@ dn: cn=config
 changetype: modify
 replace: nsslapd-allow-anonymous-access
 nsslapd-allow-anonymous-access: off
+
+dn: cn=config
+changetype: modify
+replace: passwordStorageScheme
+passwordStorageScheme: SSHA512
+
+dn: cn=config
+changetype: modify
+replace: nsslapd-rootpwstoragescheme
+nsslapd-rootpwstoragescheme: SSHA512
 " | ldapmodify #{ldapModifyParams}
 		EOH
 		action :nothing
@@ -116,6 +126,19 @@ userPassword:: #{adminPassword}
 " | ldapmodify #{ldapModifyParams} -a
 		EOH
 		not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
+	end
+
+	execute "Set #{instanceId} instance manager password" do
+		command <<-EOH
+echo "
+dn: cn=config
+changetype: modify
+replace: nsslapd-rootpw
+nsslapd-rootpw: #{dirmanager_password}
+" | ldapmodify #{ldapModifyParams}
+		EOH
+		action :nothing
+		notifies :run, "execute[Remove default groups from #{instanceId} instance]", :immediately
 	end
 end
 
