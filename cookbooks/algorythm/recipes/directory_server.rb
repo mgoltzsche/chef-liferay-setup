@@ -141,7 +141,7 @@ userPassword:: #{adminPassword}
 			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
 			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
 			backup false
-			notifies :restart, 'service[dirsrv]'
+			notifies :restart, 'service[dirsrv]', :immediately
 		end
 	end
 end
