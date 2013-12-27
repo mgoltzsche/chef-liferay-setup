@@ -13,6 +13,7 @@ default['backup'] = {
 # LDAP configuration
 default['ldap']['default'] = {
 	'listenhost' => '127.0.0.1',
+	'hostname' => 'localhost',
 	'port' => 389,
 	'dirmanager' => 'dirmanager',
 	'dirmanager_password' => 'password',
@@ -29,7 +30,6 @@ default['mail_server'] = {
 	'vmail_user' => 'vmail',
 	'vmail_directory' => '/var/vmail',
 	'ldap' => {
-		'hostname' => 'localhost',
 		'user' => 'vmail',
 		'password' => 'password'
 	}
@@ -85,11 +85,8 @@ default['liferay'] = {
 		}
 	},
 	'ldap' => {
-		'hostname' => 'localhost',
-		'port' => 389,
 		'user' => 'liferay',
-		'password' => 'password',
-		'domain' => default['ldap']['default']['domain']
+		'password' => 'password'
 	}
 }
 

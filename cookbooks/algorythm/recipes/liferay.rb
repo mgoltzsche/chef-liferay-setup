@@ -16,9 +16,9 @@ liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
 liferayHomeDir = node['liferay']['home']
 tomcatVirtualHosts = node['liferay']['tomcat_virtual_hosts']
-ldapHost = node['liferay']['ldap']['hostname']
-ldapPort = node['liferay']['ldap']['port']
-ldapSuffix = ldapSuffix(node['liferay']['ldap']['domain'])
+ldapHost = node['ldap']['default']['hostname']
+ldapPort = node['ldap']['default']['port']
+ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
 ldapUser = node['liferay']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
