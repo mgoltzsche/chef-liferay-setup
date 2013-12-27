@@ -92,6 +92,16 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 		notifies :restart, 'service[dirsrv]'
 	end
 
+	# --- (Re)set directory manager password ---
+	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
+		file "Set #{instanceId} instance manager password" do
+			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
+			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+			backup false
+			notifies :restart, 'service[dirsrv]', :immediately
+		end
+	end
+
 	# --- Add initial data to instance ---
 	execute "Register domain unit for #{instanceId} instance" do
 		command <<-EOH
@@ -134,15 +144,6 @@ userPassword:: #{adminPassword}
 " | ldapmodify #{ldapModifyParams} -a
 		EOH
 		not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
-	end
-
-	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
-		file "Set #{instanceId} instance manager password" do
-			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
-			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
-			backup false
-			notifies :restart, 'service[dirsrv]', :immediately
-		end
 	end
 end
 
