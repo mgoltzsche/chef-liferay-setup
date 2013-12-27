@@ -133,7 +133,7 @@ userPassword:: #{ldapPasswordHashed}
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:resultAttribute => "cn\nresult_filter = %s/"
+			:resultAttribute => "cn\nresult_filter = #{instanceId}/%s/"
 		})
 		notifies :restart, 'service[postfix]'
 	end
