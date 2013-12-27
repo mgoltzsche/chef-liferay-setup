@@ -17,7 +17,7 @@ ldapPassword = node['nexus']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['nexus']['system_mail_prefix']
-adminCN = node['ldap']['admin_cn']
+adminCN = node['ldap']['default']['admin_cn']
 adminEmail = "#{adminCN}@#{node['ldap']['default']['domain']}"
 mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
