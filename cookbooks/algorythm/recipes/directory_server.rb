@@ -96,7 +96,7 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
 		file "Set #{instanceId} instance manager password" do
 			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
-			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([a-zA-Z0-9\/+]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
 			backup false
 			notifies :restart, 'service[dirsrv]', :immediately
 		end
