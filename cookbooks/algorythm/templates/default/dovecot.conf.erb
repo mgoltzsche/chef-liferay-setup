@@ -56,9 +56,4 @@ passdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap-<%=id%>.conf.ext
 }
-
-userdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap-userdb-<%=id%>.conf.ext
-}
 <% end %>
