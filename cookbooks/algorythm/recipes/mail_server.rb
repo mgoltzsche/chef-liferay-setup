@@ -84,38 +84,8 @@ userPassword:: #{ldapPasswordHashed}
 		not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 	end
 
-	template "/etc/postfix/ldap/#{instanceId}/virtual_aliases.cf" do
-		source 'postfix.virtual_mailbox_query.cf.erb'
-		owner 'root'
-		group 'postfix'
-		mode 0640
-		variables({
-			:host => ldapHost,
-			:port => ldapPort,
-			:suffix => ldapSuffix,
-			:user => ldapUser,
-			:password => ldapPassword
-		})
-		notifies :restart, 'service[postfix]'
-	end
-
 	template "/etc/postfix/ldap/#{instanceId}/virtual_mailboxes.cf" do
-		source 'postfix.virtual_mailbox_query.cf.erb'
-		owner 'root'
-		group 'postfix'
-		mode 0640
-		variables({
-			:host => ldapHost,
-			:port => ldapPort,
-			:suffix => ldapSuffix,
-			:user => ldapUser,
-			:password => ldapPassword
-		})
-		notifies :restart, 'service[postfix]'
-	end
-
-	template "/etc/postfix/ldap/#{instanceId}/virtual_senders.cf" do
-		source 'postfix.virtual_mailbox_query.cf.erb'
+		source 'postfix.virtual_mailboxes.cf.erb'
 		owner 'root'
 		group 'postfix'
 		mode 0640

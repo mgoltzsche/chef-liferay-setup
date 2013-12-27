@@ -22,7 +22,7 @@ inet_interfaces = all
 inet_protocols = all
 home_mailbox = Maildir/
 
-virtual_alias_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_aliases.cf"}.join(',')%>
+virtual_alias_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_mailboxes.cf"}.join(',')%>
 virtual_mailbox_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_mailboxes.cf"}.join(',')%>
 virtual_mailbox_base = <%=@vmail_directory%>
 virtual_uid_maps = static:5000
@@ -54,6 +54,6 @@ smtpd_sasl_local_domain = $myhostname
 broken_sasl_auth_clients = yes
 
  # Set SMTP permissions/restrictions
-smtpd_sender_login_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_senders.cf"}.join(',')%>
+smtpd_sender_login_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_mailboxes.cf"}.join(',')%>
 smtpd_sender_restrictions = reject_unknown_sender_domain, reject_sender_login_mismatch
 smtpd_recipient_restrictions = reject_unknown_sender_domain, reject_unknown_recipient_domain, reject_non_fqdn_recipient, reject_unauth_pipelining, permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
