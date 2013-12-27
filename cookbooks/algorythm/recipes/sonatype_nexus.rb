@@ -22,7 +22,7 @@ adminEmail = "#{adminCN}@#{node['ldap']['default']['domain']}"
 mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
 anonymousEmailAddress = "anonymous@#{hostname}"
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['default']['dirmanager']}' -w #{node['ldap']['default']['dirmanager_password']}"
 
 package 'unzip'
 
