@@ -101,7 +101,7 @@ associatedDomain: #{domain}
 
 	execute "Register admin person for #{instanceId} instance" do
 		command <<-EOH
-echo "dn: #{adminDN}
+echo "dn: cn=#{adminCN},ou=People,#{suffix}
 objectClass: simpleSecurityObject
 objectClass: top
 objectClass: person
