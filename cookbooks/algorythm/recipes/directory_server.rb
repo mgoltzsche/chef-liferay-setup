@@ -28,7 +28,7 @@ ServerIdentifier= #{instanceId}
 ServerPort= #{port}
 Suffix= #{suffix}
 RootDN= cn=#{dirmanager}
-RootDNPwd= #{dirmanagerPassword}
+RootDNPwd= #{dirmanagerPasswordPlain}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
