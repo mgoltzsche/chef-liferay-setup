@@ -17,7 +17,7 @@ proxy_buffers              4 32k;
 proxy_busy_buffers_size    64k;
 proxy_temp_file_write_size 64k;
 
-proxy_cache_key   $host$request_uri;
+proxy_cache_key   $scheme:$host$request_uri;
 proxy_cache       main-cache;
 proxy_cache_valid 302 96h;
 

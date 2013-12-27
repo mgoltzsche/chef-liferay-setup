@@ -7,7 +7,7 @@ upstream thin_cluster { # simple load balancing
 
 server {
 	listen 80;
-	server_name *.<%=@hostname%>;
+	server_name <%=@hostname%>;
 	root <%=@home%>/public;
 
 	include proxy_params;
@@ -25,7 +25,7 @@ server {
 
 server {
 	listen 443 ssl;
-	server_name *.<%=@hostname%>;
+	server_name <%=@hostname%>;
 	root <%=@home%>/public;
 
 	ssl_certificate     /etc/ssl/certs/server.crt;
