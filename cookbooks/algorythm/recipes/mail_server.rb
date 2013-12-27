@@ -133,7 +133,7 @@ userPassword:: #{ldapPasswordHashed}
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:resultAttribute => "cn\nresult_filter = #{instanceId}/%s/"
+			:resultAttribute => "cn\nresult_format = %d/%u/"
 		})
 		notifies :restart, 'service[postfix]'
 	end
@@ -215,6 +215,11 @@ node['ldap'].each do |instanceId, instance|
 			:user => ldapUser,
 			:password => ldapPassword
 		})
+		notifies :restart, 'service[dovecot]'
+	end
+
+	link "/etc/dovecot/dovecot-ldap-userdb-#{instanceId}.conf.ext" do
+		to "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext"
 		notifies :restart, 'service[dovecot]'
 	end
 end
