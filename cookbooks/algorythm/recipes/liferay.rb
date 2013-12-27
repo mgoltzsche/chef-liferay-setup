@@ -32,7 +32,7 @@ adminEmail = "#{admin}@#{node['ldap']['default']['domain']}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['default']['dirmanager']}' -w #{node['ldap']['default']['dirmanager_password']}"
 
 package 'openjdk-6-jdk'
 package 'libssl-dev'
