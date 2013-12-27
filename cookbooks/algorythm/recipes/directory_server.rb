@@ -7,12 +7,13 @@ node['ldap'].each do |instanceId, instance|
 	domain = instance['domain']
 	suffix = ldapSuffix(domain)
 	dirmanager = instance['dirmanager']
-	dirmanager_password = ldapPassword(instance['dirmanager_password'])
+	dirmanagerPasswordPlain = instance['dirmanagerPassword']
+	dirmanagerPassword = ldapPassword(dirmanagerPasswordPlain)
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
 	adminPassword = ldapPassword(instance['admin_password'])
-	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanager_password}"
+	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanagerPasswordPlain}"
 
 	execute "Create #{instanceId} instance" do
 		command <<-EOH
@@ -27,7 +28,7 @@ ServerIdentifier= #{instanceId}
 ServerPort= #{port}
 Suffix= #{suffix}
 RootDN= cn=#{dirmanager}
-RootDNPwd= #{dirmanager_password}
+RootDNPwd= #{dirmanagerPassword}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
@@ -134,7 +135,7 @@ echo "
 dn: cn=config
 changetype: modify
 replace: nsslapd-rootpw
-nsslapd-rootpw: #{dirmanager_password}
+nsslapd-rootpw: #{dirmanagerPassword}
 " | ldapmodify #{ldapModifyParams}
 		EOH
 		action :nothing
