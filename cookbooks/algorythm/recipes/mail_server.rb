@@ -5,6 +5,7 @@ package 'dovecot-ldap'
 machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
+ldapHost = node['mail_server']['ldap']['host']
 ldapInstances = node['ldap'].keys
 
 # --- Create virtual mail user ---
@@ -54,7 +55,6 @@ directory '/etc/postfix/ldap' do
 end
 
 node['ldap'].each do |instanceId, instance|
-	ldapHost = instance['hostname']
 	ldapPort = instance['port']
 	ldapSuffix = ldapSuffix(instance['domain'])
 	ldapUser = node['mail_server']['ldap']['user']
@@ -63,14 +63,14 @@ node['ldap'].each do |instanceId, instance|
 	ldapPasswordHashed = ldapPassword(ldapPassword)
 	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{instance['dirmanager']}' -w #{instance['dirmanager_password']}"
 
-	directory '/etc/postfix/ldap/#{instanceId}' do
+	directory "/etc/postfix/ldap/#{instanceId}" do
 		owner 'root'
 		group 'root'
 		mode 00755
 		action :create
 	end
 
-	execute 'Register mailer account for #{instanceId} LDAP instance' do
+	execute "Register mailer account for #{instanceId} LDAP instance" do
 		command <<-EOH
 echo "dn: #{ldapUserDN}
 objectClass: applicationProcess
@@ -84,7 +84,7 @@ userPassword:: #{ldapPasswordHashed}
 		not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 	end
 
-	template '/etc/postfix/ldap/#{instanceId}/virtual_domains.cf' do
+	template "/etc/postfix/ldap/#{instanceId}/virtual_domains.cf" do
 		source 'postfix.virtual_domains.cf.erb'
 		owner 'root'
 		group 'postfix'
@@ -99,7 +99,7 @@ userPassword:: #{ldapPasswordHashed}
 		notifies :restart, 'service[postfix]'
 	end
 
-	template '/etc/postfix/ldap/#{instanceId}/virtual_aliases.cf' do
+	template "/etc/postfix/ldap/#{instanceId}/virtual_aliases.cf" do
 		source 'postfix.virtual_mailbox_query.cf.erb'
 		owner 'root'
 		group 'postfix'
@@ -114,7 +114,7 @@ userPassword:: #{ldapPasswordHashed}
 		notifies :restart, 'service[postfix]'
 	end
 
-	template '/etc/postfix/ldap/#{instanceId}/virtual_mailboxes.cf' do
+	template "/etc/postfix/ldap/#{instanceId}/virtual_mailboxes.cf" do
 		source 'postfix.virtual_mailbox_query.cf.erb'
 		owner 'root'
 		group 'postfix'
@@ -129,7 +129,7 @@ userPassword:: #{ldapPasswordHashed}
 		notifies :restart, 'service[postfix]'
 	end
 
-	template '/etc/postfix/ldap/#{instanceId}/virtual_senders.cf' do
+	template "/etc/postfix/ldap/#{instanceId}/virtual_senders.cf" do
 		source 'postfix.virtual_mailbox_query.cf.erb'
 		owner 'root'
 		group 'postfix'
@@ -193,7 +193,7 @@ node['ldap'].each do |instanceId, instance|
 	ldapPasswordHashed = ldapPassword(ldapPassword)
 	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{instance['dirmanager']}' -w #{instance['dirmanager_password']}"
 
-	template '/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext' do
+	template "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext" do
 		source 'dovecot-ldap.conf.ext.erb'
 		owner 'root'
 		group 'root'
@@ -208,8 +208,8 @@ node['ldap'].each do |instanceId, instance|
 		notifies :restart, 'service[dovecot]'
 	end
 
-	link '/etc/dovecot/dovecot-ldap-userdb-#{instanceId}.conf.ext' do
-		to '/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext'
+	link "/etc/dovecot/dovecot-ldap-userdb-#{instanceId}.conf.ext" do
+		to "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext"
 		notifies :restart, 'service[dovecot]'
 	end
 end

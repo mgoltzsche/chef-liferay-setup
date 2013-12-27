@@ -29,6 +29,7 @@ default['mail_server'] = {
 	'vmail_user' => 'vmail',
 	'vmail_directory' => '/var/vmail',
 	'ldap' => {
+		'hostname' => 'localhost',
 		'user' => 'vmail',
 		'password' => 'password'
 	}
