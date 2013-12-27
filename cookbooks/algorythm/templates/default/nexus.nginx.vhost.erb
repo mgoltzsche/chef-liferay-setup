@@ -1,6 +1,6 @@
 server {
 	listen 80;
-	server_name <%=@hostname%> www.<%=@hostname%>;
+	server_name *.<%=@hostname%>;
 	root /usr/share/nginx/www;
 
 	include proxy_params;
@@ -12,7 +12,7 @@ server {
 
 server {
 	listen 443 ssl;
-	server_name <%=@hostname%> www.<%=@hostname%>;
+	server_name *.<%=@hostname%>;
 	root /usr/share/nginx/www;
 
 	ssl_certificate     /etc/ssl/certs/server.crt;
