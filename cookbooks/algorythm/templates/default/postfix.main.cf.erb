@@ -23,6 +23,7 @@ inet_protocols = all
 home_mailbox = Maildir/
 
 virtual_alias_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_aliases.cf"}.join(',')%>
+virtual_mailbox_domains = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_domains.cf"}.join(',')%>
 virtual_mailbox_maps = <%=@ldapInstances.map {|id| "ldap:/etc/postfix/ldap/#{id}/virtual_mailboxes.cf"}.join(',')%>
 virtual_mailbox_base = <%=@vmail_directory%>
 virtual_uid_maps = static:5000

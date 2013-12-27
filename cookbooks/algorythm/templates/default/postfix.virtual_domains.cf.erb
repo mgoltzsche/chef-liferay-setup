@@ -1,0 +1,8 @@
+server_host = <%=@host%>
+server_port = <%=@port%>
+search_base = ou=Domains,<%=@suffix%>
+query_filter = (associatedDomain=%s)
+result_attribute = associatedDomain
+bind = yes
+bind_dn = cn=<%=@user%>,ou=Special Users,<%=@suffix%>
+bind_pw = <%=@password%>

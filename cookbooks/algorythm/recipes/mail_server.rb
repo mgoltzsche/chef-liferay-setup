@@ -17,6 +17,13 @@ user usr do
 	supports :manage_home => true
 end
 
+directory vmailDirectory do
+	owner usr
+	group usr
+	mode 00750
+	action :create
+end
+
 # --- Configure postfix ---
 template '/etc/postfix/master.cf' do
 	source 'postfix.master.cf.erb'
@@ -82,6 +89,21 @@ userPassword:: #{ldapPasswordHashed}
 " | ldapmodify #{ldapModifyParams} -a
 		EOH
 		not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
+	end
+
+	template "/etc/postfix/ldap/#{instanceId}/virtual_domains.cf" do
+		source 'postfix.virtual_domains.cf.erb'
+		owner 'root'
+		group 'postfix'
+		mode 0640
+		variables({
+			:host => ldapHost,
+			:port => ldapPort,
+			:suffix => ldapSuffix,
+			:user => ldapUser,
+			:password => ldapPassword
+		})
+		notifies :restart, 'service[postfix]'
 	end
 
 	template "/etc/postfix/ldap/#{instanceId}/virtual_aliases.cf" do
