@@ -136,11 +136,13 @@ userPassword:: #{adminPassword}
 		not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
 	end
 
-	file "Set #{instanceId} instance manager password" do
-		path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
-		content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
-		backup false
-		notifies :run, 'service[dirsrv]'
+	if File.exists "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
+		file "Set #{instanceId} instance manager password" do
+			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
+			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+			backup false
+			notifies :run, 'service[dirsrv]'
+		end
 	end
 end
 
