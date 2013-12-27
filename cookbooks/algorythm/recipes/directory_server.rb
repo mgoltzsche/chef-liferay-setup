@@ -56,7 +56,7 @@ nsslapd-allow-anonymous-access: off
 
 	execute "Remove default groups from #{instanceId} instance" do
 		command <<-EOH
-ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,dc=dev,dc=algorythm,dc=de' '(cn=*)' | grep -P '^dn:\\s' | while read -r groupDN; do
+ldapsearch -x -h localhost -p 389 -D cn='dirmanager' -w password -b 'ou=Groups,#{suffix}' '(cn=*)' | grep -P '^dn:\\s' | while read -r groupDN; do
   echo $groupDN"\\nchangetype: delete" | ldapmodify #{ldapModifyParams}
 done
 		EOH
