@@ -8,8 +8,8 @@ nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
 hostname = node['nexus']['hostname']
-ldapHost = node['ldap']['hostname']
-ldapPort = node['ldap']['port']
+ldapHost = node['ldap']['default']['hostname']
+ldapPort = node['ldap']['default']['port']
 ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
 ldapUser = node['nexus']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
