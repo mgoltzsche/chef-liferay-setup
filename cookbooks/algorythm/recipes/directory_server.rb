@@ -1,6 +1,11 @@
 package '389-ds-base'
 package 'ldap-utils'
 
+# --- Stop dirsrv ---
+service 'dirsrv' do
+	action :stop
+end
+
 node['ldap'].each do |instanceId, instance|
 	listenhost = instance['listenhost']
 	port = instance['port']
@@ -8,7 +13,7 @@ node['ldap'].each do |instanceId, instance|
 	suffix = ldapSuffix(domain)
 	dirmanager = instance['dirmanager']
 	dirmanagerPasswordPlain = instance['dirmanager_password']
-	dirmanagerPassword = ldapPassword(dirmanagerPasswordPlain)
+	dirmanagerPassword = Base64.decode64(ldapPassword(dirmanagerPasswordPlain))
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
@@ -28,7 +33,7 @@ ServerIdentifier= #{instanceId}
 ServerPort= #{port}
 Suffix= #{suffix}
 RootDN= cn=#{dirmanager}
-RootDNPwd= #{Base64.decode64(dirmanagerPassword)}
+RootDNPwd= #{dirmanagerPassword}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf
@@ -84,7 +89,7 @@ changetype: modify
 delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 		EOH
 		action :nothing
-		notifies :restart, 'service[dirsrv]'
+		notifies :run, 'service[dirsrv]'
 	end
 
 	# --- Add initial data to instance ---
@@ -131,17 +136,12 @@ userPassword:: #{adminPassword}
 		not_if "ldapsearch #{ldapModifyParams} -b 'cn=#{adminCN},ou=People,#{suffix}'"
 	end
 
-	execute "Set #{instanceId} instance manager password" do
-		command <<-EOH
-echo "
-dn: cn=config
-changetype: modify
-replace: nsslapd-rootpw
-nsslapd-rootpw: #{dirmanagerPassword}
-" | ldapmodify #{ldapModifyParams}
-		EOH
+	file "Set #{instanceId} instance manager password" do
+		path "/etc/dirsrv/slapd-#{instanceId}"
+		contents File.read("/etc/dirsrv/slapd-#{instanceId}").gsub!(/(nsslapd-rootpw:\s{[\w]*}([\w]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+		backup false
 		action :nothing
-		notifies :run, "execute[Remove default groups from #{instanceId} instance]", :immediately
+		notifies :run, 'service[dirsrv]'
 	end
 end
 

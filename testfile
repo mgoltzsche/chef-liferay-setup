@@ -1,0 +1,5 @@
+nsslapd-rootpwstoragescheme: SSHA512
+nsslapd-rootpw: {ssha512}FprpYzRaWCV1l5n9EoEx6JuytPABHS3unZKw1tNIl9oZFIbFbnhkv
+ kHLOz8lghUBOctObCu8xHzk2xQ9ARlAFzJ0dWl0dDJv
+numSubordinates: 9
+
