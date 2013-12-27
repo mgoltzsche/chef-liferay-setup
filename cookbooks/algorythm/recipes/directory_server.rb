@@ -12,8 +12,7 @@ node['ldap'].each do |instanceId, instance|
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']
 	adminPassword = ldapPassword(instance['admin_password'])
-	adminDN = "cn=#{adminCN},ou=People,#{suffix}"
-	ldapModifyParams = "-x -h localhost -p #{port} -D '#{adminDN}' -w #{instance['admin_password']}"
+	ldapModifyParams = "-x -h localhost -p #{port} -D cn='#{dirmanager}' -w #{dirmanager_password}"
 
 	execute "Create #{instanceId} instance" do
 		command <<-EOH
@@ -21,16 +20,14 @@ echo "[General]
 FullMachineName= #{node['hostname']}.#{node['domainname']}
 SuiteSpotUserID= dirsrv
 SuiteSpotGroup= dirsrv
-ConfigDirectoryLdapURL= ldap://localhost:#{port}/o=NetscapeRoot
-ConfigDirectoryAdminID= admin
-ConfigDirectoryAdminPwd= thepassword
 AdminDomain= #{node['domainname']}
 
 [slapd]
 ServerIdentifier= #{instanceId}
 ServerPort= #{port}
 Suffix= #{suffix}
-RootDN= #{adminDN}
+RootDN= cn=#{dirmanager}
+RootDNPwd= #{dirmanager_password}
 " > /tmp/ds-config.inf &&
 ulimit -n #{node['max_open_files']} &&
 setup-ds -sf /tmp/ds-config.inf &&
