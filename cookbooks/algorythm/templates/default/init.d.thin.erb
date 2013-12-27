@@ -6,7 +6,7 @@ THIN_BINARY=$($RVM_BINARY gemdir)/bin/thin
 [ -x "$THIN_BINARY" ] || exit 2
 
 runAction() {
-	su <%=@user%> -c "source /usr/local/rvm/scripts/rvm; export RAILS_ENV=production; ruby '$THIN_BINARY' $1 --all /etc/thin"
+	su '<%=@user%>' -c "source /usr/local/rvm/scripts/rvm; export RAILS_ENV=production; ruby '$THIN_BINARY' $1 --all /etc/thin"
 }
 
 case "$1" in
