@@ -5,7 +5,7 @@ package 'dovecot-ldap'
 machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
-ldapHost = node['mail_server']['ldap']['host']
+ldapHost = node['mail_server']['ldap']['hostname']
 ldapInstances = node['ldap'].keys
 
 # --- Create virtual mail user ---
