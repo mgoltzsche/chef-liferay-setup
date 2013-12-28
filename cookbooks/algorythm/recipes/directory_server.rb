@@ -1,11 +1,6 @@
 package '389-ds-base'
 package 'ldap-utils'
 
-# --- Stop dirsrv ---
-service 'dirsrv' do
-	action :stop
-end
-
 node['ldap'].each do |instanceId, instance|
 	listenhost = instance['listenhost']
 	port = instance['port']
