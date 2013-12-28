@@ -1,14 +1,15 @@
 package '389-ds-base'
 package 'ldap-utils'
 
-node['ldap'].each do |instanceId, instance|
+dirmanager = node['ldap']['dirmanager']
+dirmanagerPasswordPlain = node['ldap']['dirmanager_password']
+dirmanagerPassword = Base64.decode64(ldapPassword(dirmanagerPasswordPlain))
+
+node['ldap']['instances'].each do |instanceId, instance|
 	listenhost = instance['listenhost']
 	port = instance['port']
 	domain = instance['domain']
 	suffix = ldapSuffix(domain)
-	dirmanager = instance['dirmanager']
-	dirmanagerPasswordPlain = instance['dirmanager_password']
-	dirmanagerPassword = Base64.decode64(ldapPassword(dirmanagerPasswordPlain))
 	adminCN = instance['admin_cn']
 	adminSN = instance['admin_sn']
 	adminGivenName = instance['admin_givenName']

@@ -5,7 +5,7 @@ package 'dovecot-ldap'
 machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
-ldapHost = node['ldap']['default']['hostname']
+ldapHost = node['ldap']['hostname']
 ldapInstances = node['ldap'].keys
 
 # --- Create virtual mail user ---
@@ -161,7 +161,7 @@ file '/etc/aliases' do
 	mode 0644
 	content <<-EOH
 postmaster: root
-root: #{node['ldap']['default']['admin_cn']}@#{node['ldap']['default']['domain']}
+root: #{node['ldap']['instances']['default']['admin_cn']}@#{node['ldap']['instances']['default']['domain']}
 	EOH
 	notifies :run, 'execute[newaliases]', :immediately
 end
@@ -193,7 +193,7 @@ template '/etc/dovecot/dovecot.conf' do
   notifies :restart, 'service[dovecot]'
 end
 
-node['ldap'].each do |instanceId, instance|
+node['ldap']['instances'].each do |instanceId, instance|
 	ldapHost = instance['hostname']
 	ldapPort = instance['port']
 	ldapSuffix = ldapSuffix(instance['domain'])
@@ -201,7 +201,7 @@ node['ldap'].each do |instanceId, instance|
 	ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 	ldapPassword = node['mail_server']['ldap']['password']
 	ldapPasswordHashed = ldapPassword(ldapPassword)
-	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{instance['dirmanager']}' -w #{instance['dirmanager_password']}"
+	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 	template "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext" do
 		source 'dovecot-ldap.conf.ext.erb'

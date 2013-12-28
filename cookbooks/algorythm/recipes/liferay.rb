@@ -16,9 +16,9 @@ liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
 liferayHomeDir = node['liferay']['home']
 tomcatVirtualHosts = node['liferay']['tomcat_virtual_hosts']
-ldapHost = node['ldap']['default']['hostname']
-ldapPort = node['ldap']['default']['port']
-ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['instances']['default']['port']
+ldapSuffix = ldapSuffix(node['ldap']['instances']['default']['domain'])
 ldapUser = node['liferay']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
@@ -26,13 +26,13 @@ ldapPasswordHashed = ldapPassword(ldapPassword)
 systemMailPrefix = node['liferay']['system_mail_prefix']
 systemEmail = "#{systemMailPrefix}@#{hostname}"
 mailServerHost = node['mail_server']['hostname']
-admin = node['ldap']['default']['admin_cn']
-adminPassword = node['ldap']['default']['admin_password']
-adminEmail = "#{admin}@#{node['ldap']['default']['domain']}"
+admin = node['ldap']['instances']['default']['admin_cn']
+adminPassword = node['ldap']['instances']['default']['admin_password']
+adminEmail = "#{admin}@#{node['ldap']['instances']['default']['domain']}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['default']['dirmanager']}' -w #{node['ldap']['default']['dirmanager_password']}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 package 'openjdk-6-jdk'
 package 'libssl-dev'

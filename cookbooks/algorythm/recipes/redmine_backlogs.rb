@@ -10,21 +10,21 @@ backlogsDir = "#{redmineDir}/plugins/redmine_backlogs"
 backlogsVersion = node['redmine']['backlogs_version']
 mailServerHost = node['mail_server']['hostname']
 ldapAuthSourceName = 'Local LDAP Server'
-ldapHost = node['ldap']['default']['hostname']
-ldapPort = node['ldap']['default']['port']
-ldapSuffix = ldapSuffix(node['ldap']['default']['domain'])
+ldapHost = node['ldap']['hostname']
+ldapPort = node['ldap']['instances']['default']['port']
+ldapSuffix = ldapSuffix(node['ldap']['instances']['default']['domain'])
 ldapUser = node['redmine']['ldap']['user']
 ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['redmine']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 ldapDomainDN = "ou=#{hostname},ou=Domains,#{ldapSuffix}"
 systemMailPrefix = node['redmine']['system_mail_prefix']
-adminCN = node['ldap']['default']['admin_cn']
-adminLastname = node['ldap']['default']['admin_sn']
-adminFirstname = node['ldap']['default']['admin_givenName']
-adminEmail = "#{adminCN}@#{node['ldap']['default']['domain']}"
+adminCN = node['ldap']['instances']['default']['admin_cn']
+adminLastname = node['ldap']['instances']['default']['admin_sn']
+adminFirstname = node['ldap']['instances']['default']['admin_givenName']
+adminEmail = "#{adminCN}@#{node['ldap']['instances']['default']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['default']['dirmanager']}' -w #{node['ldap']['default']['dirmanager_password']}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
 
 package 'git'
 package 'imagemagick'

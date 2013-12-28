@@ -11,12 +11,12 @@ default['backup'] = {
 }
 
 # LDAP configuration
-default['ldap']['default'] = {
+default['ldap']['dirmanager'] = 'dirmanager'
+default['ldap']['dirmanager_password'] = 'password'
+default['ldap']['hostname'] = 'localhost'
+default['ldap']['instances']['default'] = {
 	'listenhost' => '127.0.0.1',
-	'hostname' => 'localhost',
 	'port' => 389,
-	'dirmanager' => 'dirmanager',
-	'dirmanager_password' => 'password',
 	'domain' => 'dev.algorythm.de',
 	'admin_cn' => 'admin',
 	'admin_sn' => 'Goltzsche',
