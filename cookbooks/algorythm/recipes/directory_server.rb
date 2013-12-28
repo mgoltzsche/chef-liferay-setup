@@ -107,6 +107,7 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 	# --- Add initial data to instance ---
 	execute "Register domain unit for #{instanceId} instance" do
 		command <<-EOH
+sleep 3
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
 objectClass: top
