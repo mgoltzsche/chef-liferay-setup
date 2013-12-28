@@ -68,7 +68,7 @@ node['ldap']['instances'].each do |instanceId, instance|
 	ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 	ldapPassword = node['mail_server']['ldap']['password']
 	ldapPasswordHashed = ldapPassword(ldapPassword)
-	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{instance['dirmanager']}' -w #{instance['dirmanager_password']}"
+	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{instance['dirmanager']}' -w '#{instance['dirmanager_password']}'"
 
 	directory "/etc/postfix/ldap/#{instanceId}" do
 		owner 'root'
@@ -201,7 +201,7 @@ node['ldap']['instances'].each do |instanceId, instance|
 	ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 	ldapPassword = node['mail_server']['ldap']['password']
 	ldapPasswordHashed = ldapPassword(ldapPassword)
-	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
+	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 
 	template "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext" do
 		source 'dovecot-ldap.conf.ext.erb'

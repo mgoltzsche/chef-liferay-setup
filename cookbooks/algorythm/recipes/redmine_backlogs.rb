@@ -24,7 +24,7 @@ adminLastname = node['ldap']['instances']['default']['admin_sn']
 adminFirstname = node['ldap']['instances']['default']['admin_givenName']
 adminEmail = "#{adminCN}@#{node['ldap']['instances']['default']['domain']}"
 systemEmail = "#{systemMailPrefix}@#{hostname}"
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w #{node['ldap']['dirmanager_password']}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 
 package 'git'
 package 'imagemagick'
