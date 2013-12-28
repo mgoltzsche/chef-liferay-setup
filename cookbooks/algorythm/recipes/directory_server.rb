@@ -97,7 +97,7 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 			block do
 				dirCfgFile = "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
 				dirCfg = File.read(dirCfgFile)
-				dirCfg = dirCfg.gsub!(/(nsslapd-rootpw:\s([^\s]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+				dirCfg = dirCfg.gsub!(/(nsslapd-rootpw:\s([^\s]|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
 				File.write(dirCfgFile, dirCfg)
 			end
 			notifies :restart, 'service[dirsrv]', :immediately
