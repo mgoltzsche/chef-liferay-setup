@@ -91,7 +91,7 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 		action :nothing
 		notifies :restart, 'service[dirsrv]'
 	end
-
+print "##\n#{dirmanagerPassword}\n##\n"
 	# --- (Re)set directory manager password ---
 	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
 		file "Set #{instanceId} instance manager password" do
