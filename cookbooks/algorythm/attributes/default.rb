@@ -73,15 +73,6 @@ default['liferay'] = {
 				'user' => 'liferay',
 				'password' => 'password'
 			}
-		},
-		'dieter-goltzsche' => {
-			'hostname' => 'dieter-goltzsche.de',
-			'pg' => {
-				'port' => 5432,
-				'database' => 'liferay_dieter_goltzsche',
-				'user' => 'dieter_goltzsche',
-				'password' => 'password'
-			}
 		}
 	},
 	'ldap' => {
