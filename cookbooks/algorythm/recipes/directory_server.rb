@@ -107,14 +107,13 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 	# --- Add initial data to instance ---
 	execute "Register domain unit for #{instanceId} instance" do
 		command <<-EOH
-sleep 3
 echo "dn: ou=Domains,#{suffix}
 objectClass: organizationalUnit
 objectClass: top
 ou: Domains
 " | ldapmodify #{ldapModifyParams} -a
 		EOH
-		not_if "ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
+		not_if "sleep 3; ldapsearch #{ldapModifyParams} -b 'ou=Domains,#{suffix}'"
 	end
 
 	execute "Register domain #{domain} for #{instanceId} instance" do
