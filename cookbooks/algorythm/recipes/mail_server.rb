@@ -61,7 +61,7 @@ directory '/etc/postfix/ldap' do
 	action :create
 end
 
-node['ldap'].each do |instanceId, instance|
+node['ldap']['instances'].each do |instanceId, instance|
 	ldapPort = instance['port']
 	ldapSuffix = ldapSuffix(instance['domain'])
 	ldapUser = node['mail_server']['ldap']['user']
