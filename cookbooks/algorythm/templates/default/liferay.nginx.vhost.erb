@@ -3,6 +3,9 @@ server {
 	listen 443 ssl;
 	server_name www.<%=@hostname%>;
 	rewrite ^ $scheme://<%=@hostname%>$request_uri? permanent;
+
+	ssl_certificate     /etc/ssl/certs/server.crt;
+	ssl_certificate_key /etc/ssl/private/server.key;
 }
 
 server {
