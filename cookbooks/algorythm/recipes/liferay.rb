@@ -119,29 +119,34 @@ end
 cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
   owner usr
   group usr
+  backup false
   action :create_if_missing
 end
 
 cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
   owner usr
   group usr
+  backup false
 end
 
 cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/control_panel/images/favicon.ico" do
   owner usr
   group usr
+  backup false
 end
 
 
 cookbook_file "#{liferayHomeDir}/deploy/contact-form.war" do
   owner usr
   group usr
+  backup false
   not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
 end
 
 cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
   owner usr
   group usr
+  backup false
   not_if {File.exist?("#{liferayDir}/webapps/algorythm-theme")}
 end
 
