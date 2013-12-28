@@ -89,14 +89,20 @@ delete: uniqueMember" | ldapmodify #{ldapModifyParams}
 	end
 
 	# --- (Re)set directory manager password ---
-#	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
-#		file "Set #{instanceId} instance manager password" do
-#			path "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
-#			content File.read("/etc/dirsrv/slapd-#{instanceId}/dse.ldif").gsub!(/(nsslapd-rootpw:\s{[\w]*}([^\s]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
-#			backup false
-#			notifies :restart, 'service[dirsrv]', :immediately
-#		end
-#	end
+	if File.exist?("/etc/dirsrv/slapd-#{instanceId}/dse.ldif")
+		service 'dirsrv' do
+			action :stop
+		end
+		ruby_block "Reset directory manager password for #{instanceId} instance" do
+			block do
+				dirCfgFile = "/etc/dirsrv/slapd-#{instanceId}/dse.ldif"
+				dirCfg = File.read(dirCfgFile)
+				dirCfg = dirCfg.gsub!(/(nsslapd-rootpw:\s{[\w]*}([^\s]+|\n\s)+)/, "nsslapd-rootpw: #{dirmanagerPassword}")
+				File.write(dirCfgFile, dirCfg)
+			end
+			notifies :restart, 'service[dirsrv]', :immediately
+		end
+	end
 
 	# --- Add initial data to instance ---
 	execute "Register domain unit for #{instanceId} instance" do
