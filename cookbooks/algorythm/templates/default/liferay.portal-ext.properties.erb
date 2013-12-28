@@ -41,7 +41,7 @@ default.admin.last.name=Goltzsche
 ### Company
 company.default.name=<%=@company_name%>
 company.default.web.id=<%=@hostname%>
-company.default.home.url=/web/guest/home
+company.default.home.url=/home
 company.default.locale=en_US
 company.default.time.zone=<%=@timezone%>
 company.login.prepopulate.domain=false
@@ -94,9 +94,9 @@ system.site.roles=Developer,Manager,Redakteur
 # allows only administrator to edit user account details (to prevent user from editing screenname due to LDAP inconsistency)
 field.editable.user.types=administrator
 
-### Login: TODO: include in life env
-#passwords.default.policy.lockout=true
-#passwords.default.policy.lockout.duration=15
+### Login
+passwords.default.policy.lockout=true
+passwords.default.policy.lockout.duration=15
 
 ### Auth: LDAP (assuming Fedora DS)
 ldap.auth.enabled=true
@@ -115,9 +115,9 @@ ldap.user.impl=com.liferay.portal.security.ldap.LDAPUser
 ldap.user.mappings=screenName=cn\npassword=userPassword\nemailAddress=mail\nfirstName=givenName\nlastName=sn\njobTitle=title
 ldap.group.mappings=groupName=cn\ndescription=description\nuser=uniqueMember
 
-ldap.import.enabled=true
-ldap.import.on.startup=true
-ldap.import.interval=20
+ldap.import.enabled=false
+ldap.import.on.startup=false
+ldap.import.interval=30
 ldap.import.method=group
 ldap.import.create.role.per.group=false
 ldap.import.user.search.filter=(objectClass=inetOrgPerson)

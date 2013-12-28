@@ -50,7 +50,7 @@ end
 directory liferayHomeDir do
   owner usr
   group usr
-  mode 0700
+  mode 0750
 end
 
 # --- Create Liferay LDAP user ---
@@ -121,6 +121,17 @@ cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png"
   group usr
   action :create_if_missing
 end
+
+cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
+  owner usr
+  group usr
+end
+
+cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/control_panel/images/favicon.ico" do
+  owner usr
+  group usr
+end
+
 
 cookbook_file "#{liferayHomeDir}/deploy/contact-form.war" do
   owner usr

@@ -40,6 +40,12 @@ user usr do
   supports :manage_home => true
 end
 
+directory redmineHomeDir do
+  owner usr
+  group usr
+  mode 0750
+end
+
 # --- Create Redmine LDAP user ---
 execute 'Register Redmine LDAP account' do
   command <<-EOH

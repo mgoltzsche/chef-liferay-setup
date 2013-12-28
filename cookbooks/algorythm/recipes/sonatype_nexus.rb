@@ -35,13 +35,13 @@ end
 directory nexusHome do
   owner usr
   group usr
-  mode 0755
+  mode 0750
 end
 
 directory "#{nexusHome}/conf" do
   owner usr
   group usr
-  mode 0755
+  mode 0750
 end
 
 template nexusCfg do
