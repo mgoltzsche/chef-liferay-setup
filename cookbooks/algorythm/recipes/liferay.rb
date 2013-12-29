@@ -209,7 +209,14 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
     not_if {File.exist?("#{webappsDir}/contact-form")}
   end
 
-  template "#{webappsDir}/ROOT/portal-ext.properties" do
+  file "#{webappsDir}/ROOT/WEB-INF/classes/portal-ext.properties" do
+    owner usr
+    usr usr
+    mode 0644
+    content "liferay.home=#{homeDir}"
+  end
+
+  template "#{homeDir}/portal-ext.properties" do
     owner 'root'
     group usr
     source 'liferay.portal-ext.properties.erb'
