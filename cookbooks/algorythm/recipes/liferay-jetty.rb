@@ -22,7 +22,6 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
 	usr = instance['user'] || instanceId
-	print "### #{usr} ###\n"
 	liferayDir = "#{installDir}/#{instanceId}"
 	liferayRootWebappDir = "#{liferayDir}/webapps/root"
 	homeDir = instance['home'] || "/var/opt/#{instanceId}"

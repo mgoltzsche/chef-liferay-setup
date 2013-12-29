@@ -47,11 +47,11 @@ default['liferay-jetty']['install_directory'] = '/opt'
 default['liferay-jetty']['timezone'] = 'Europe/Berlin'
 default['liferay-jetty']['country'] = 'DE'
 default['liferay-jetty']['language'] = 'de'
-default['liferay-jetty']['mail_server_hostname'] = ''
+default['liferay-jetty']['mail_server_hostname'] = nil
 default['liferay-jetty']['admin'] = {
-	'screen_name' => '',
-	'full_name' => '',
-	'email' => '',
+	'screen_name' => nil,
+	'full_name' => nil,
+	'email' => nil,
 	'password' => 'password'
 }
 default['liferay-jetty']['instances']['default'] = {
