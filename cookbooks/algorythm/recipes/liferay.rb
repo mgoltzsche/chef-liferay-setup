@@ -94,7 +94,7 @@ cd "$TMP_TOMCAT_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_TOMCAT_DIR/webapps" &&
 rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
-mkdir -p ROOT/WEB-INF/classes/de/algorythm &&
+mkdir -p ROOT/WEB-INF/classes/de/algorythm
   EOH
   not_if {File.exist?(liferayExtractionDir)}
 end
