@@ -92,7 +92,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 			:ldapUser => ldapUser,
 			:ldapPassword => ldapPassword
 		})
-		notifies :restart, 'service[liferay]'
+#		notifies :restart, 'service[liferay]'
 	end
 	
 	# --- Download & install Liferay ---
@@ -197,6 +197,17 @@ userPassword:: #{ldapPasswordHashed}
 			not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 		end
 	end
+
+	# --- Register Liferay as service ---
+#	template "/etc/init.d/#{instanceId}" do
+#		source 'init.d.liferay.erb'
+#		mode 0755
+#		variables({
+#			:name => name,
+#			:liferayDir => liferayDir,
+#			:user => usr
+#		})
+#	end
 
     # --- Configure nginx vhost ---
 	template "/etc/nginx/sites-available/#{nginxVhostFileName}" do
