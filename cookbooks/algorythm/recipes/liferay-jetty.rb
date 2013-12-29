@@ -228,4 +228,16 @@ userPassword:: #{ldapPasswordHashed}
 		to "/etc/nginx/sites-available/#{nginxVhostFileName}"
 		notifies :restart, 'service[nginx]'
 	end
+	
+	# --- (Re)start Liferay ---
+#	service instanceId do
+#		supports :restart => true
+#		action :enable
+#	end
+end
+
+# --- Restart nginx ---
+service 'nginx' do
+	supports :restart => true
+	action :nothing
 end
