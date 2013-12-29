@@ -109,7 +109,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 		action :create_if_missing
 	end
 	
-	execute 'Extract Liferay' do
+	execute "Extract vanilla #{name} Liferay instance" do
 		cwd downloadDir
 		command <<-EOH
 mkdir -p '/tmp/#{javaServer}-installation' &&
@@ -219,8 +219,8 @@ userPassword:: #{ldapPasswordHashed}
 		mode 0744
 		variables({
 			:hostname => hostname,
-			:http_port => node['liferay']['http_port'],
-			:https_port => node['liferay']['https_port']
+			:http_port => 8080,
+			:https_port => 8080
 		})
 		notifies :restart, 'service[nginx]'
 	end

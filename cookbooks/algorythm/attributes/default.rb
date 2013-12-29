@@ -57,7 +57,7 @@ default['liferay-jetty']['admin'] = {
 default['liferay-jetty']['instances']['default'] = {
 	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
 	'java_server' => 'jetty',
-	'hostname' => default['ldap']['default']['domain'],
+	'hostname' => default['ldap']['instances']['default']['domain'],
 	'company_name' => nil,
 	'system_mail_prefix' => 'system',
 	'user' => nil,
@@ -90,12 +90,12 @@ default['liferay'] = {
 	'country' => 'DE',
 	'language' => 'de',
 	'tomcat_virtual_hosts' => {
-		'nexus' => "repository.#{default['ldap']['default']['domain']}"
+		'nexus' => "repository.#{default['ldap']['instances']['default']['domain']}"
 	},
 	'instances' => {
 		'default' => {
-			'hostname' => default['ldap']['default']['domain'],
-			'company_default_name' => default['ldap']['default']['domain'],
+			'hostname' => default['ldap']['instances']['default']['domain'],
+			'company_default_name' => default['ldap']['instances']['default']['domain'],
 			'system_mail_prefix' => 'system',
             'admin_password' => nil,
 			'pg' => {
@@ -114,7 +114,7 @@ default['liferay'] = {
 # Sonatype Nexus installation
 default['nexus'] = {
 	'version' => '2.7.0-06',
-	'hostname' => "repository.#{default['ldap']['default']['domain']}",
+	'hostname' => "repository.#{default['ldap']['instances']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'deploy_directory' => "#{default['liferay']['install_directory']}/liferay/webapps-nexus",
 	'home' => '/var/opt/nexus',
@@ -132,7 +132,7 @@ default['redmine'] = {
 	'version' => '2.3.3',
 	'backlogs_version' => 'v1.0.6',
 
-	'hostname' => "redmine.#{default['ldap']['default']['domain']}",
+	'hostname' => "redmine.#{default['ldap']['instances']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'postgresql' => {
 		'database' => 'redmine',
