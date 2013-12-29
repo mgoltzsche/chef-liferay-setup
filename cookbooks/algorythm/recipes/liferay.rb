@@ -88,17 +88,18 @@ end
 execute 'Extract Liferay' do
   cwd downloadDir
   command "unzip -qd /tmp #{liferayZipFile}"
-  not_if {File.exist?(liferayDir) || File.exist?(liferayExtractionDir)}
+  not_if {File.exist?(liferayExtractionDir)}
 end
 
 execute 'Copy Liferay to installation directory' do
   command <<-EOH
-cp -R #{liferayExtractionDir}/$(ls #{liferayExtractionDir} | grep tomcat) #{liferayDir} &&
-cd #{liferayDir}/bin &&
+TMP_TOMCAT_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)
+cd "$TMP_TOMCAT_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
-cd #{liferayDir}/webapps &&
-mkdir -p ROOT/WEB-INF/classes/de/algorythm &&
+cd "$TMP_TOMCAT_DIR/webapps" &&
 rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
+mkdir -p ROOT/WEB-INF/classes/de/algorythm &&
+cp -R "$TMP_TOMCAT_DIR" #{liferayDir} &&
 chown -R #{usr}:#{usr} #{liferayDir}
   EOH
   not_if {File.exist?(liferayDir)}
@@ -124,6 +125,14 @@ liferayInstances.each do |name, instance|
     owner usr
     group usr
     mode 0750
+  end
+
+  execute 'Copy Liferay to installation directory' do
+    command <<-EOH
+VANILLA_LIFERAY_WEBAPP='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps/ROOT
+cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT'
+    EOH
+    not_if {File.exist?(liferayDir)}
   end
 
   directory homeDir do
@@ -167,20 +176,20 @@ liferayInstances.each do |name, instance|
     not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{pgDB}';\" | grep '#{pgDB}'", :user => 'postgres')
   end
 
-  cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
+  cookbook_file "#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
     owner usr
     group usr
     backup false
     action :create_if_missing
   end
 
-  cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
+  cookbook_file "#{webappsDir}/ROOT/favicon.ico" do
     owner usr
     group usr
     backup false
   end
 
-  cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/control_panel/images/favicon.ico" do
+  cookbook_file "#{webappsDir}/ROOT/html/themes/control_panel/images/favicon.ico" do
     owner usr
     group usr
     backup false
