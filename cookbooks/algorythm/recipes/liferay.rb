@@ -127,12 +127,14 @@ liferayInstances.each do |name, instance|
     mode 0750
   end
 
-  execute 'Copy Liferay to installation directory' do
-    command <<-EOH
+  if (name != 'default')
+    execute 'Copy Liferay ROOT to #{name} instance webapps directory' do
+      command <<-EOH
 VANILLA_LIFERAY_WEBAPP='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps/ROOT
 cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT'
-    EOH
-    not_if {File.exist?(liferayDir)}
+      EOH
+      not_if {File.exist?(liferayDir)}
+    end
   end
 
   directory homeDir do
@@ -159,7 +161,7 @@ cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT'
     end    
   end
 
-  execute "Create liferay postgres user '#{pgUser}' for #{name} instance" do
+  execute "Create liferay postgres user '#{pgUser}'" do
     user 'postgres'
     command "psql -U postgres -c \"CREATE USER #{pgUser};\""
     not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{pgUser}';\" | grep #{pgUser}", :user => 'postgres')
