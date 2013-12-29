@@ -67,16 +67,18 @@ default['liferay'] = {
 		'default' => {
 			'hostname' => default['ldap']['default']['domain'],
 			'company_default_name' => default['ldap']['default']['domain'],
+			'system_mail_prefix' => 'system',
+                        'admin_password' => '',
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
 				'password' => 'password'
+			},
+                        'ldap' => {
+				'user' => 'liferay',
+				'password' => 'password'
 			}
 		}
-	},
-	'ldap' => {
-		'user' => 'liferay',
-		'password' => 'password'
 	}
 }
 

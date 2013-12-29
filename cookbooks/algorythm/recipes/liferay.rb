@@ -19,12 +19,7 @@ liferayInstances = node['liferay']['instances']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['instances']['default']['port']
 ldapSuffix = ldapSuffix(node['ldap']['instances']['default']['domain'])
-ldapUser = node['liferay']['ldap']['user']
-ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
-ldapPassword = node['liferay']['ldap']['password']
-ldapPasswordHashed = ldapPassword(ldapPassword)
-systemMailPrefix = node['liferay']['system_mail_prefix']
-systemEmail = "#{systemMailPrefix}@#{node['liferay']['instances']['default']['hostname']}"
+ldapMasterUserDN = "cn=#{node['liferay']['instances']['default']['ldap']['user']},ou=Special Users,#{ldapSuffix}"
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['instances']['default']['admin_cn']
 adminPassword = node['ldap']['instances']['default']['admin_password']
@@ -45,34 +40,6 @@ user usr do
   shell '/bin/bash'
   home "#{liferayHomeDir}/#{usr}"
   supports :manage_home => true
-end
-
-# --- Create Liferay LDAP user ---
-execute "Register Liferay LDAP account" do
-  command <<-EOH
-echo "dn: #{ldapUserDN}
-objectClass: javaContainer
-objectClass: simpleSecurityObject
-objectClass: top
-objectClass: mailRecipient
-cn: #{ldapUser}
-mail: #{systemEmail}
-mailForwardingAddress: #{adminEmail}
-userPassword:: #{ldapPasswordHashed}
-" | ldapmodify #{ldapModifyParams} -a
-  EOH
-  not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
-end
-
-execute "Grant Directory Administrator privileges to Liferay LDAP account" do
-  command <<-EOH
-echo "dn: cn=Directory Administrators,#{ldapSuffix}
-changetype: modify
-add: uniqueMember
-uniqueMember: #{ldapUserDN}
-" | ldapmodify #{ldapModifyParams}
-  EOH
-  not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})' | grep -P '^# numEntries: [\\d]+$'"
 end
 
 # --- Download and install Liferay ---
@@ -112,7 +79,7 @@ link liferayDirLink do
   to liferayDir
 end
 
-# --- Create Liferay instance webapps dir, home dir, configuration, nginx vhost, postgres user and database
+# --- Create per Liferay instance: webapps dir, home dir, configuration, nginx vhost, postgres user and database ---
 liferayInstances.each do |name, instance|
   nginxVhostFileName = name == 'default' ? 'default' : instance['hostname']
   webappsDir = name == 'default' ? "#{liferayDir}/webapps" : "#{liferayDir}/webapps-#{name}"
@@ -121,6 +88,13 @@ liferayInstances.each do |name, instance|
   pgDB = instance['pg']['database']
   pgUser = instance['pg']['user'] ? instance['pg']['user'] : pgDB
   pgPassword = instance['pg']['password']
+  ldapUser = instance['ldap']['user'] || "liferay-#{name}"
+  ldapUserDN="#{ldapUser},ou=Special Users,#{ldapSuffix}"
+  ldapPassword = instance['ldap']['password']
+  ldapPasswordHashed = ldapPassword(ldapPassword)
+  adminPassword = instance['admin_password'] || node['ldap']['instances']['default']['admin_password'] || 'password'
+  systemMailPrefix = instance['system_mail_prefix'] || 'system'
+  systemEmail = "#{systemMailPrefix}@#{instance['hostname']}"
   defaultThemeWar = instance['default_theme_war']
   defaultThemeId = ''
 
@@ -140,6 +114,8 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
       EOH
       not_if {File.exist?("#{webappsDir}/ROOT")}
     end
+  else
+
   end
 
   directory homeDir do
@@ -209,6 +185,24 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
     not_if {File.exist?("#{webappsDir}/contact-form")}
   end
 
+  # --- Register LDAP system account ---
+  execute "Register Liferay LDAP account #{ldapUser}" do
+    command <<-EOH
+echo "dn: #{ldapUserDN}
+objectClass: javaContainer
+objectClass: simpleSecurityObject
+objectClass: top
+objectClass: mailRecipient
+cn: #{ldapUser}
+mail: #{systemEmail}
+mailForwardingAddress: #{adminEmail}
+userPassword:: #{ldapPasswordHashed}
+" | ldapmodify #{ldapModifyParams} -a
+    EOH
+    not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
+  end
+
+  # --- Write liferay configuration ---
   file "#{webappsDir}/ROOT/WEB-INF/classes/portal-ext.properties" do
     owner 'root'
     group usr
@@ -250,6 +244,7 @@ include-and-override=#{homeDir}/portal-ext.properties
     notifies :restart, 'service[liferay]'
   end
 
+  # --- Create nginx vhost ---
   template "/etc/nginx/sites-available/#{nginxVhostFileName}" do
     source 'liferay.nginx.vhost.erb'
     mode 0744
@@ -265,6 +260,17 @@ include-and-override=#{homeDir}/portal-ext.properties
     to "/etc/nginx/sites-available/#{nginxVhostFileName}"
     notifies :restart, 'service[nginx]'
   end
+end
+
+execute 'Grant Directory Administrator privileges to default Liferay LDAP account' do
+  command <<-EOH
+echo "dn: cn=Directory Administrators,#{ldapSuffix}
+changetype: modify
+add: uniqueMember
+uniqueMember: #{ldapMasterUserDN}
+" | ldapmodify #{ldapModifyParams}
+  EOH
+  not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapMasterUserDN})' | grep -P '^# numEntries: [\\d]+$'"
 end
 
 # --- Download & install native APR library ---
