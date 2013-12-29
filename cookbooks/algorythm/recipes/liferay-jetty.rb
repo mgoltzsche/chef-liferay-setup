@@ -17,13 +17,14 @@ language = node['liferay-jetty']['language']
 node['liferay-jetty']['instances'].each do |name, instance|
 	instanceId = "liferay_#{name}"
 	javaServer = instance['java_server'] || 'jetty'
+	rootWebappName = javaServer == 'jetty' ? 'root' : 'ROOT'
 	liferayDownloadUrl = instance['download_url'] || node['liferay-jetty']['instances']['default']['download_url']
 	liferayZipFile = File.basename(URI.parse(liferayDownloadUrl).path)
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
 	usr = instance['user'] || instanceId
 	liferayDir = "#{installDir}/#{instanceId}"
-	liferayRootWebappDir = "#{liferayDir}/webapps/root"
+	liferayRootWebappDir = "#{liferayDir}/webapps/#{rootWebappName}"
 	homeDir = instance['home'] || "/var/opt/#{instanceId}"
 	deployDir = "#{homeDir}/deploy"
 	hostname = instance['hostname']
@@ -118,7 +119,7 @@ cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
 rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
-mkdir -p ROOT/WEB-INF/classes/de/algorythm
+mkdir -p #{rootWebappName}/WEB-INF/classes/de/algorythm
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
   rm -rf '#{extractionDir}'
