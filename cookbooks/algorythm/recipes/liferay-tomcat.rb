@@ -20,6 +20,7 @@ ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['instances']['default']['port']
 ldapSuffix = ldapSuffix(node['ldap']['instances']['default']['domain'])
 ldapMasterUserDN = "cn=#{node['liferay']['instances']['default']['ldap']['user']},ou=Special Users,#{ldapSuffix}"
+ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['instances']['default']['admin_cn']
 adminPassword = node['ldap']['instances']['default']['admin_password']
@@ -27,7 +28,6 @@ adminEmail = "#{admin}@#{node['ldap']['instances']['default']['domain']}"
 timezone = node['liferay']['timezone']
 country = node['liferay']['country']
 language = node['liferay']['language']
-ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 
 package 'openjdk-6-jdk'
 package 'libssl-dev'
@@ -62,15 +62,12 @@ execute 'Extract Liferay' do
   cwd downloadDir
   command <<-EOH
 unzip -qd /tmp #{liferayZipFile} &&
-TMP_TOMCAT_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat) &&
-cd "$TMP_TOMCAT_DIR/bin" &&
+TMP_SERVER_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat) &&
+cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
-cd "$TMP_TOMCAT_DIR/webapps" &&
+cd "$TMP_SERVER_DIR/webapps" &&
 rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
-mkdir -p ROOT/WEB-INF/classes/de/algorythm &&
-cd ROOT/WEB-INF/classes/ &&
-jar xf "$TMP_TOMCAT_DIR/webapps/ROOT/WEB-INF/lib/portal-impl.jar" ehcache/liferay-multi-vm-clustered.xml &&
-mv ehcache ehcache-custom
+mkdir -p ROOT/WEB-INF/classes/de/algorythm
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
   rm -rf '#{liferayExtractionDir}'
@@ -100,7 +97,7 @@ liferayInstances.each do |name, instance|
   instanceHomeDir = "#{liferayHomeDir}/instances/#{name}"
   pgPort = instance['pg']['port']
   pgDB = instance['pg']['database']
-  pgUser = instance['pg']['user'] ? instance['pg']['user'] : pgDB
+  pgUser = instance['pg']['user'] || pgDB
   pgPassword = instance['pg']['password']
   ldapUser = instance['ldap']['user'] || "liferay-#{name}"
   ldapUserDN="cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
@@ -118,7 +115,6 @@ liferayInstances.each do |name, instance|
 VANILLA_LIFERAY_WEBAPPS='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps
 cp -R "$VANILLA_LIFERAY_WEBAPPS" '#{webappsDir}' &&
 mkdir -p '#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm' &&
-sed -i 's/name="liferay-multi-vm-clustered"/name="liferay-multi-vm-clustered-#{name}"/g' '#{webappsDir}/ROOT/WEB-INF/classes/ehcache-custom/liferay-multi-vm-clustered.xml' &&
 chown -R #{usr}:#{usr} '#{webappsDir}'
       EOH
       not_if {File.exist?("#{webappsDir}/ROOT")}
@@ -148,9 +144,10 @@ chown -R #{usr}:#{usr} '#{webappsDir}'
       group usr
       command "cp '#{defaultThemeWar}' '#{instanceHomeDir}/deploy'"
       not_if {File.exist?("#{webappsDir}/#{warName}")}
-    end    
+    end
   end
-
+  
+  # --- Create postgres user & DB ---
   execute "Create liferay postgres user '#{pgUser}'" do
     user 'postgres'
     command "psql -U postgres -c \"CREATE USER #{pgUser};\""
@@ -168,6 +165,7 @@ chown -R #{usr}:#{usr} '#{webappsDir}'
     not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{pgDB}';\" | grep '#{pgDB}'", :user => 'postgres')
   end
 
+  # --- Set logos & add contact form portlet ---
   cookbook_file "#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
     owner usr
     group usr

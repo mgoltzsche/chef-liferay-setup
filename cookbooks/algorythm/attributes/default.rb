@@ -43,6 +43,33 @@ default['postgresql'] = {
 }
 
 # Liferay installation
+default['liferay-jetty']['install_directory'] = '/opt'
+default['liferay-jetty']['timezone'] = 'Europe/Berlin'
+default['liferay-jetty']['country'] = 'DE'
+default['liferay-jetty']['language'] = 'de'
+default['liferay-jetty']['mail_server_hostname'] = ''
+default['liferay-jetty']['admin'] = {
+	'screen_name' => '',
+	'full_name' => '',
+	'email' => '',
+	'password' => 'password'
+}
+default['liferay-jetty']['instances']['default'] = {
+	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
+	'java_server' => 'jetty',
+	'hostname' => default['ldap']['default']['domain'],
+	'company_name' => '',
+	'system_mail_prefix' => 'system',
+	'pg' => {
+		'port' => 5432,
+		'database' => 'liferay',
+		'password' => 'password'
+	},
+	'ldap' => {
+		'user' => 'liferay',
+		'password' => 'password'
+	}
+}
 default['liferay'] = {
 	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr',
 	'native_connectors_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz',
@@ -67,13 +94,13 @@ default['liferay'] = {
 			'hostname' => default['ldap']['default']['domain'],
 			'company_default_name' => default['ldap']['default']['domain'],
 			'system_mail_prefix' => 'system',
-                        'admin_password' => '',
+            'admin_password' => '',
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
 				'password' => 'password'
 			},
-                        'ldap' => {
+			'ldap' => {
 				'user' => 'liferay',
 				'password' => 'password'
 			}
