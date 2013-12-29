@@ -158,7 +158,7 @@
       </Host>
       <%end%>
       <%@liferayInstances.each do |name,instance|%>
-      <Host name="<%=instances['hostname']%>" appBase="webapps-<%=name%>"
+      <Host name="<%=instance['hostname']%>" appBase="webapps-<%=name%>"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_<%=name%>_access_log." suffix=".txt"
