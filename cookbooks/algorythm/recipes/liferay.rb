@@ -118,7 +118,7 @@ liferayInstances.each do |name, instance|
 VANILLA_LIFERAY_WEBAPPS='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps
 cp -R "$VANILLA_LIFERAY_WEBAPPS" '#{webappsDir}' &&
 mkdir -p '#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm' &&
-sed -i 's/name="liferay-multi-vm-clustered"/name="liferay-multi-vm-clustered-#{name}"/g' ehcache-custom/liferay-multi-vm-clustered.xml &&
+sed -i 's/name="liferay-multi-vm-clustered"/name="liferay-multi-vm-clustered-#{name}"/g' '#{webappsDir}/ROOT/WEB-INF/classes/ehcache-custom/liferay-multi-vm-clustered.xml' &&
 chown -R #{usr}:#{usr} '#{webappsDir}'
       EOH
       not_if {File.exist?("#{webappsDir}/ROOT")}
