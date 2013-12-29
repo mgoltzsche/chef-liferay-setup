@@ -60,13 +60,16 @@ default['liferay-jetty']['instances']['default'] = {
 	'hostname' => default['ldap']['default']['domain'],
 	'company_name' => '',
 	'system_mail_prefix' => 'system',
+	'user' => '',
 	'pg' => {
 		'port' => 5432,
-		'database' => 'liferay',
+		'database' => '',
 		'password' => 'password'
 	},
 	'ldap' => {
-		'user' => 'liferay',
+		'hostname' => '',
+		'port' => '',
+		'user' => '',
 		'password' => 'password'
 	}
 }

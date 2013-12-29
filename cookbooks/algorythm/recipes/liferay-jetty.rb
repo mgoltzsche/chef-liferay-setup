@@ -21,10 +21,10 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	liferayZipFile = File.basename(URI.parse(liferayDownloadUrl).path)
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
-	usr = instance['user']
+	usr = instance['user'] || instanceId
 	liferayDir = "#{installDir}/#{instanceId}"
 	liferayRootWebappDir = "#{liferayDir}/webapps/root"
-	homeDir = instance['home'] || "/var/opt/#{usr}"
+	homeDir = instance['home'] || "/var/opt/#{instanceId}"
 	deployDir = "#{homeDir}/deploy"
 	hostname = instance['hostname']
 	companyName = instance['company_name'] || hostname
@@ -32,14 +32,14 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	systemMailPrefix = instance['system_mail_prefix'] || 'system'
     systemEmail = "#{systemMailPrefix}@#{hostname}"
 	adminPassword = instance['admin_password'] || node['ldap']['instances']['default']['admin_password'] || 'password'
-	pgPort = instance['pg']['port']
+	pgPort = instance['pg']['port'] || 5432
 	pgDB = instance['pg']['database'] || instanceId
-	pgUser = instance['pg']['user'] || instanceId
+	pgUser = instance['pg']['user'] || usr
 	pgPassword = instance['pg']['password']
 	ldapHost = instance['ldap']['hostname'] || node['ldap']['hostname']
 	ldapPort = instance['ldap']['port'] || node['ldap']['instances'][name]['port'] || node['ldap']['instances']['default']['port']
 	ldapSuffix = ldapSuffix(instance['ldap']['domain'] || node['ldap']['instances'][name]['domain'] || node['ldap']['instances']['default']['domain'])
-	ldapUser = instance['ldap']['user'] || instanceId
+	ldapUser = instance['ldap']['user'] || usr
 	ldapUserDN="cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 	ldapPassword = instance['ldap']['password']
 	ldapPasswordHashed = ldapPassword(ldapPassword)
