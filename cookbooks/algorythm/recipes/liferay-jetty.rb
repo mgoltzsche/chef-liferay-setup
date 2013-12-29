@@ -67,38 +67,6 @@ node['liferay-jetty']['instances'].each do |name, instance|
 		mode 00755
 	end
 	
-	# --- Write configuration ---
-	template "#{homeDir}/portal-ext.properties" do
-		owner 'root'
-		group usr
-		source 'liferay.portal-ext.properties.erb'
-		mode 0640
-		variables({
-			:defaultThemeId => defaultThemeId,
-			:timezone => timezone,
-			:country => country,
-			:language => language,
-			:company_name => companyName,
-			:hostname => hostname,
-			:admin_full_name => adminFullName,
-			:admin_screen_name => adminScreenName,
-			:admin_email => adminEmail,
-			:admin_password => adminPassword,
-			:system_email => systemEmail,
-			:mailServerHost => mailServerHost,
-			:pgPort => pgPort,
-			:pgDB => pgDB,
-			:pgUser => pgUser,
-			:pgPassword => pgPassword,
-			:ldapHost => ldapHost,
-			:ldapPort => ldapPort,
-			:ldapSuffix => ldapSuffix,
-			:ldapUser => ldapUser,
-			:ldapPassword => ldapPassword
-		})
-#		notifies :restart, 'service[liferay]'
-	end
-	
 	# --- Download & install Liferay ---
 	directory downloadDir do
 		mode 0755
@@ -163,6 +131,48 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		group usr
 		backup false
 		not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
+	end
+	
+	# --- Write configuration ---
+	file "#{liferayRootWebappDir}/WEB-INF/classes/portal-ext.properties" do
+		owner 'root'
+		group usr
+		mode 0644
+		content <<-EOH
+liferay.home=#{homeDir}
+include-and-override=#{homeDir}/portal-ext.properties
+		EOH
+	end
+
+	template "#{homeDir}/portal-ext.properties" do
+		owner 'root'
+		group usr
+		source 'liferay.portal-ext.properties.erb'
+		mode 0640
+		variables({
+			:defaultThemeId => defaultThemeId,
+			:timezone => timezone,
+			:country => country,
+			:language => language,
+			:company_name => companyName,
+			:hostname => hostname,
+			:admin_full_name => adminFullName,
+			:admin_screen_name => adminScreenName,
+			:admin_email => adminEmail,
+			:admin_password => adminPassword,
+			:system_email => systemEmail,
+			:mailServerHost => mailServerHost,
+			:pgPort => pgPort,
+			:pgDB => pgDB,
+			:pgUser => pgUser,
+			:pgPassword => pgPassword,
+			:ldapHost => ldapHost,
+			:ldapPort => ldapPort,
+			:ldapSuffix => ldapSuffix,
+			:ldapUser => ldapUser,
+			:ldapPassword => ldapPassword
+		})
+#		notifies :restart, 'service[liferay]'
 	end
 	
 	# --- Create postgres user & DB ---
