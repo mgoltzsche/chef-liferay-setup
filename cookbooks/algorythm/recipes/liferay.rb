@@ -101,6 +101,7 @@ end
 
 execute 'Copy Liferay to installation directory' do
   command <<-EOH
+TMP_TOMCAT_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)
 cp -R "$TMP_TOMCAT_DIR" #{liferayDir} &&
 chown -R #{usr}:#{usr} #{liferayDir}
   EOH
