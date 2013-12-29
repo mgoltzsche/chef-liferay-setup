@@ -22,6 +22,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
 	usr = instance['user'] || instanceId
+	print "### #{usr} ###\n"
 	liferayDir = "#{installDir}/#{instanceId}"
 	liferayRootWebappDir = "#{liferayDir}/webapps/root"
 	homeDir = instance['home'] || "/var/opt/#{instanceId}"
@@ -45,7 +46,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	ldapPasswordHashed = ldapPassword(ldapPassword)
 	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 	defaultThemeId = 'classic'
-print "### #{usr} ###\n"
+
 	# --- Create Liferay system user ---
 	user usr do
 		comment 'Liferay User'
