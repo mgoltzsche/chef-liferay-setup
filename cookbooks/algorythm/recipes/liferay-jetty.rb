@@ -118,8 +118,7 @@ TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-
 cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
-rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
-mkdir -p #{rootWebappName}/WEB-INF/classes/de/algorythm
+rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
   rm -rf '#{extractionDir}'
@@ -133,6 +132,7 @@ exit $STATUS
 		command <<-EOH
 TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-')
 cp -R "$TMP_SERVER_DIR" '#{liferayDir}' &&
+mkdir -p #{liferayRootWebappDir}/WEB-INF/classes/de/algorythm &&
 chown -R #{usr}:#{usr} '#{liferayDir}'
 		EOH
 		not_if {File.exist?(liferayDir)}
