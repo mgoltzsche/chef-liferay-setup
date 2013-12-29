@@ -48,13 +48,13 @@ default['liferay'] = {
 	'native_connectors_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz',
 	'apr_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/apr/apr-1.5.0.tar.bz2',
 	'install_directory' => '/opt',
+	'home_directory' => '/var/opt',
 	'home' => '/var/opt/liferay',
 	'user' => 'liferay',
 	'catalina_opts' => '-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m',
 	'http_port' => 7080,
 	'https_port' => 7443,
 
-	'company_default_name' => default['ldap']['default']['domain'],
 	'system_mail_prefix' => 'system',
 	'admin' => {'name' => 'Max Goltzsche'},
 	'timezone' => 'Europe/Berlin',
@@ -63,14 +63,13 @@ default['liferay'] = {
 	'tomcat_virtual_hosts' => {
 		'nexus' => "repository.#{default['ldap']['default']['domain']}"
 	},
-	'defaultshard' => 'default',
-	'shards' => {
+	'instances' => {
 		'default' => {
 			'hostname' => default['ldap']['default']['domain'],
+			'company_default_name' => default['ldap']['default']['domain'],
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
-				'user' => 'liferay',
 				'password' => 'password'
 			}
 		}

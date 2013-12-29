@@ -1,6 +1,5 @@
 require 'uri'
 
-hostname = node['liferay']['shards'][node['liferay']['defaultshard']]['hostname']
 usr = node['liferay']['user']
 downloadDir = "/Downloads"
 liferayZipFile = File.basename(URI.parse(node['liferay']['download_url']).path)
@@ -14,8 +13,9 @@ nativeConnectorSourceFolder = nativeConnectorSourceArchive.gsub(/(.*?)\.tar\.gz/
 nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
-liferayHomeDir = node['liferay']['home']
+liferayHomeDir = node['liferay']['home_directory']
 tomcatVirtualHosts = node['liferay']['tomcat_virtual_hosts']
+liferayInstances = node['liferay']['instances']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['instances']['default']['port']
 ldapSuffix = ldapSuffix(node['ldap']['instances']['default']['domain'])
@@ -24,7 +24,7 @@ ldapUserDN = "cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 ldapPassword = node['liferay']['ldap']['password']
 ldapPasswordHashed = ldapPassword(ldapPassword)
 systemMailPrefix = node['liferay']['system_mail_prefix']
-systemEmail = "#{systemMailPrefix}@#{hostname}"
+systemEmail = "#{systemMailPrefix}@#{node['liferay']['instances']['default']['hostname']}"
 mailServerHost = node['mail_server']['hostname']
 admin = node['ldap']['instances']['default']['admin_cn']
 adminPassword = node['ldap']['instances']['default']['admin_password']
@@ -43,14 +43,8 @@ package 'unzip'
 user usr do
   comment 'Liferay User'
   shell '/bin/bash'
-  home liferayHomeDir
+  home "#{liferayHomeDir}/#{usr}"
   supports :manage_home => true
-end
-
-directory liferayHomeDir do
-  owner usr
-  group usr
-  mode 0750
 end
 
 # --- Create Liferay LDAP user ---
@@ -110,57 +104,53 @@ chown -R #{usr}:#{usr} #{liferayDir}
   not_if {File.exist?(liferayDir)}
 end
 
-directory "#{liferayHomeDir}/deploy" do
-  owner usr
-  group usr
-  mode 00755
-end
-
-cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
-  owner usr
-  group usr
-  backup false
-  action :create_if_missing
-end
-
-cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
-  owner usr
-  group usr
-  backup false
-end
-
-cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/control_panel/images/favicon.ico" do
-  owner usr
-  group usr
-  backup false
-end
-
-
-cookbook_file "#{liferayHomeDir}/deploy/contact-form.war" do
-  owner usr
-  group usr
-  backup false
-  not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
-end
-
-cookbook_file "#{liferayHomeDir}/deploy/algorythm-theme.war" do
-  owner usr
-  group usr
-  backup false
-  not_if {File.exist?("#{liferayDir}/webapps/algorythm-theme")}
-end
-
 link liferayDirLink do
   to liferayDir
 end
 
-# --- Create Liferay postgres user and database
-node['liferay']['shards'].each do |name, shard|
-  pgUser = shard['pg']['user']
-  pgPassword = shard['pg']['password']
-  pgDB = shard['pg']['database']
+# --- Create Liferay instance webapps dir, home dir, configuration, nginx vhost, postgres user and database
+liferayInstances.each do |name, instance|
+  nginxVhostFileName = name == 'default' ? 'default' : instance['hostname']
+  webappsDir = name == 'default' ? "#{liferayDir}/webapps" : "#{liferayDir}/webapps-#{name}"
+  homeDir = "#{liferayHomeDir}/liferay-#{name}"
+  pgPort = instance['pg']['port']
+  pgDB = instance['pg']['database']
+  pgUser = instance['pg']['user'] ? instance['pg']['user'] : pgDB
+  pgPassword = instance['pg']['password']
+  defaultThemeWar = instance['default_theme_war']
+  defaultThemeId = ''
 
-  execute "Create liferay postgres user '#{pgUser}'" do
+  directory "#{liferayDir}/webapps-#{name}" do
+    owner usr
+    group usr
+    mode 0750
+  end
+
+  directory homeDir do
+    owner usr
+    group usr
+    mode 0750
+  end
+
+  directory "#{homeDir}/deploy" do
+    owner usr
+    group usr
+    mode 00755
+  end
+
+  if defaultThemeWar
+    warName = File.basename(URI.parse(defaultThemeWar).path).gsub!(/(.*).war$/, '\1')
+    defaultThemeIdPart = warName.gsub!(/-_ /, '')
+    defaultThemeId = "#{defaultThemeIdPart}_WAR_#{defaultThemeIdPart}"
+    execute "Deploy default theme for #{name} instance" do
+      user usr
+      group usr
+      command "cp '#{defaultThemeWar}' '#{homeDir}/deploy'"
+      not_if {File.exist?("#{webappsDir}/#{warName}")}
+    end    
+  end
+
+  execute "Create liferay postgres user '#{pgUser}' for #{name} instance" do
     user 'postgres'
     command "psql -U postgres -c \"CREATE USER #{pgUser};\""
     not_if("psql -U postgres -c \"SELECT * FROM pg_user WHERE usename='#{pgUser}';\" | grep #{pgUser}", :user => 'postgres')
@@ -175,6 +165,80 @@ node['liferay']['shards'].each do |name, shard|
     user 'postgres'
     command "createdb '#{pgDB}' -O #{pgUser} -E UTF8 -T template0"
     not_if("psql -c \"SELECT datname FROM pg_catalog.pg_database WHERE datname='#{pgDB}';\" | grep '#{pgDB}'", :user => 'postgres')
+  end
+
+  cookbook_file "#{liferayDir}/webapps/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
+    owner usr
+    group usr
+    backup false
+    action :create_if_missing
+  end
+
+  cookbook_file "#{liferayDir}/webapps/ROOT/favicon.ico" do
+    owner usr
+    group usr
+    backup false
+  end
+
+  cookbook_file "#{liferayDir}/webapps/ROOT/html/themes/control_panel/images/favicon.ico" do
+    owner usr
+    group usr
+    backup false
+  end
+
+  cookbook_file "#{homeDir}/deploy/contact-form.war" do
+    owner usr
+    group usr
+    backup false
+    not_if {File.exist?("#{webappsDir}/contact-form")}
+  end
+
+  template "#{webappsDir}/ROOT/portal-ext.properties" do
+    owner 'root'
+    group usr
+    source 'liferay.portal-ext.properties.erb'
+    mode 0640
+    variables({
+      :liferayHome => homeDir,
+      :defaultThemeId => defaultThemeId,
+      :timezone => timezone,
+      :country => country,
+      :language => language,
+      :company_name => instance['company_default_name'],
+      :hostname => instance['hostname'],
+      :admin_full_name => node['liferay']['admin']['name'],
+      :admin_screen_name => admin,
+      :admin_email => adminEmail,
+      :admin_password => adminPassword,
+      :system_email => systemEmail,
+      :mailServerHost => mailServerHost,
+      :pgPort => pgPort,
+      :pgDB => pgDB,
+      :pgUser => pgUser,
+      :pgPassword => pgPassword,
+      :ldapHost => ldapHost,
+      :ldapPort => ldapPort,
+      :ldapSuffix => ldapSuffix,
+      :ldapUser => ldapUser,
+      :ldapPassword => ldapPassword
+    })
+    notifies :restart, 'service[liferay]'
+  end
+
+  template "/etc/nginx/sites-available/#{nginxVhostFileName}" do
+    source 'liferay.nginx.vhost.erb'
+    mode 0744
+    variables({
+      :hostname => instance['hostname'],
+      :http_port => node['liferay']['http_port'],
+      :https_port => node['liferay']['https_port']
+    })
+    notifies :restart, 'service[nginx]'
+  end
+
+  link "/etc/nginx/sites-enabled/#{nginxVhostFileName}" do
+    to "/etc/nginx/sites-available/#{nginxVhostFileName}"
+    notifies :restart, 'service[nginx]'
   end
 end
 
@@ -230,6 +294,14 @@ make install
 end
 
 # --- Configure Liferay tomcat ---
+tomcatVirtualHosts.keys.each do |vhost|
+  directory "#{liferayDir}/webapps-#{vhost}" do
+    owner usr
+    group usr
+    mode 0750
+  end
+end
+
 template "#{liferayDir}/bin/setenv.sh" do
   owner 'root'
   group usr
@@ -244,61 +316,13 @@ end
 template "#{liferayDir}/conf/server.xml" do
   owner 'root'
   group usr
-  source "liferay.tomcat.server.xml.erb"
+  source 'liferay.tomcat.server.xml.erb'
   mode 0644
   variables({
     :httpPort => node['liferay']['http_port'],
     :httpsPort => node['liferay']['https_port'],
+    :liferayInstances => liferayInstances,
     :virtualHosts => tomcatVirtualHosts
-  })
-  notifies :restart, 'service[liferay]'
-end
-
-tomcatVirtualHosts.keys.each do |vhost|
-  directory "#{liferayDir}/webapps-#{vhost}" do
-    owner usr
-    group usr
-    mode 0744
-  end
-end
-
-# --- Configure Liferay ---
-template "#{liferayDir}/webapps/ROOT/WEB-INF/classes/ext-shard-data-source-spring.xml" do
-  owner 'root'
-  group usr
-  source 'liferay.ext-shard-data-source-spring.xml.erb'
-  mode 0640
-  variables({
-    :shard_names => node['liferay']['shards'].keys
-  })
-  notifies :restart, 'service[liferay]'
-end
-
-template "#{liferayHomeDir}/portal-ext.properties" do
-  owner 'root'
-  group usr
-  source 'liferay.portal-ext.properties.erb'
-  mode 0640
-  variables({
-    :liferay_home => liferayHomeDir,
-    :timezone => timezone,
-    :country => country,
-    :language => language,
-    :shards => node['liferay']['shards'],
-    :defaultshard => node['liferay']['defaultshard'],
-    :company_name => node['liferay']['company_default_name'],
-    :hostname => hostname,
-    :admin_full_name => node['liferay']['admin']['name'],
-    :admin_screen_name => admin,
-    :admin_email => adminEmail,
-    :admin_password => adminPassword,
-    :system_email => systemEmail,
-    :mailServerHost => mailServerHost,
-    :ldapHost => ldapHost,
-    :ldapPort => ldapPort,
-    :ldapSuffix => ldapSuffix,
-    :ldapUser => ldapUser,
-    :ldapPassword => ldapPassword
   })
   notifies :restart, 'service[liferay]'
 end
@@ -309,7 +333,6 @@ template '/etc/init.d/liferay' do
   mode 0755
   variables({
     :liferayDir => liferayDirLink,
-    :liferayHomeDir => liferayHomeDir,
     :user => usr
   })
 end
@@ -332,26 +355,6 @@ template "#{node['backup']['install_directory']}/tasks/liferay" do
     :home => liferayHomeDir,
     :user => usr
   })
-end
-
-# --- Configure default nginx vhost ---
-node['liferay']['shards'].each do |name, shard|
-  vhostFileName = name == node['liferay']['defaultshard'] ? 'default' : shard['hostname']
-  template "/etc/nginx/sites-available/#{vhostFileName}" do
-    source 'liferay.nginx.vhost.erb'
-    mode 0744
-    variables({
-      :hostname => shard['hostname'],
-      :http_port => node['liferay']['http_port'],
-      :https_port => node['liferay']['https_port']
-    })
-    notifies :restart, 'service[nginx]'
-  end
-
-  link "/etc/nginx/sites-enabled/#{vhostFileName}" do
-    to "/etc/nginx/sites-available/#{vhostFileName}"
-    notifies :restart, 'service[nginx]'
-  end
 end
 
 # --- Restart nginx ---

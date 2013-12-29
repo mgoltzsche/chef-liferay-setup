@@ -1,8 +1,8 @@
 ### General
 setup.wizard.enabled=false
 browser.launcher.url= # disable browser launcher
-liferay.home=<%=@liferay_home%>
-default.regular.theme.id=algorythmtheme_WAR_algorythmtheme
+liferay.home=<%=@liferayHome%>
+default.regular.theme.id=<%=@defaultThemeId%>
 theme.portlet.decorate.default=false
 portlet.css.enabled=false
 theme.shortcut.icon=favicon.ico
@@ -10,16 +10,10 @@ imagemagick.enabled=true
 dl.file.max.size=52428800
 
 ### Database shards
-hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-shard.selector=com.liferay.portal.dao.shard.ManualShardSelector
-shard.default.name=<%=@defaultshard%>
-
-<%@shards.each do |name, shard|%>
-jdbc.<%=name%>.driverClassName=org.postgresql.Driver
-jdbc.<%=name%>.url=jdbc:postgresql://localhost:<%=shard['pg']['port']%>/<%=shard['pg']['database']%>
-jdbc.<%=name%>.username=<%=shard['pg']['user']%>
-jdbc.<%=name%>.password=<%=shard['pg']['password']%>
-<%end%>
+jdbc.default.driverClassName=org.postgresql.Driver
+jdbc.default.url=jdbc:postgresql://localhost:<%=@pgPort%>/<%=@pgDB%>
+jdbc.default.username=<%=@pgUser%>
+jdbc.default.password=<%=@pgPassword%>
 
 ### Locale & timezone
 locales=en_US,de_DE
@@ -142,47 +136,3 @@ mail.session.mail.smtp.port=25
 mail.session.mail.smtp.user=<%=@ldapUser%>
 mail.session.mail.smtp.password=<%=@ldapPassword%>
 
-### Spring
-    spring.configs=\
-        META-INF/base-spring.xml,\
-        \
-        META-INF/hibernate-spring.xml,\
-        META-INF/infrastructure-spring.xml,\
-        META-INF/management-spring.xml,\
-        \
-        META-INF/util-spring.xml,\
-        \
-        META-INF/jpa-spring.xml,\
-        \
-        META-INF/executor-spring.xml,\
-        \
-        META-INF/audit-spring.xml,\
-        META-INF/cluster-spring.xml,\
-        META-INF/editor-spring.xml,\
-        META-INF/jcr-spring.xml,\
-        META-INF/ldap-spring.xml,\
-        META-INF/messaging-core-spring.xml,\
-        META-INF/messaging-misc-spring.xml,\
-        META-INF/mobile-device-spring.xml,\
-        META-INF/notifications-spring.xml,\
-        META-INF/poller-spring.xml,\
-        META-INF/rules-spring.xml,\
-        META-INF/scheduler-spring.xml,\
-        META-INF/search-spring.xml,\
-        META-INF/workflow-spring.xml,\
-        \
-        META-INF/counter-spring.xml,\
-        META-INF/mail-spring.xml,\
-        META-INF/portal-spring.xml,\
-        META-INF/portlet-container-spring.xml,\
-        META-INF/staging-spring.xml,\
-        META-INF/virtual-layouts-spring.xml,\
-        \
-        META-INF/monitoring-spring.xml,\
-        \
-        #META-INF/dynamic-data-source-spring.xml,\
-        META-INF/shard-data-source-spring.xml,\
-        #META-INF/memcached-spring.xml,\
-        \
-        classpath*:META-INF/ext-spring.xml,\
-        ext-shard-data-source-spring.xml
