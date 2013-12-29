@@ -45,7 +45,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	ldapPasswordHashed = ldapPassword(ldapPassword)
 	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
 	defaultThemeId = 'classic'
-
+print "### #{usr} ###\n"
 	# --- Create Liferay system user ---
 	user usr do
 		comment 'Liferay User'
