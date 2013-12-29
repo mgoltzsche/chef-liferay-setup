@@ -20,10 +20,12 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	liferayDownloadUrl = instance['download_url'] || node['liferay-jetty']['instances']['default']['download_url']
 	liferayZipFile = File.basename(URI.parse(liferayDownloadUrl).path)
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
-	liferayExtractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
+	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
 	usr = instance['user']
 	liferayDir = "#{installDir}/#{instanceId}"
+	liferayRootWebappDir = "#{liferayDir}/webapps/root"
 	homeDir = instance['home'] || "/var/opt/#{usr}"
+	deployDir = "#{homeDir}/deploy"
 	hostname = instance['hostname']
 	companyName = instance['company_name'] || hostname
 	nginxVhostFileName = name == 'default' ? 'default' : hostname
@@ -58,7 +60,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 		mode 0750
 	end
 	
-	directory "#{homeDir}/deploy" do
+	directory deployDir do
 		owner usr
 		group usr
 		mode 00755
@@ -111,7 +113,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 		command <<-EOH
 mkdir -p '/tmp/#{javaServer}-installation' &&
 unzip -qd '/tmp/#{javaServer}-installation' '#{liferayZipFile}' &&
-TMP_SERVER_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep '#{javaServer}-') &&
+TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-') &&
 cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
@@ -119,16 +121,16 @@ rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web
 mkdir -p ROOT/WEB-INF/classes/de/algorythm
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
-  rm -rf '#{liferayExtractionDir}'
+  rm -rf '#{extractionDir}'
 fi
 exit $STATUS
 		EOH
-		not_if {File.exist?(liferayExtractionDir)}
+		not_if {File.exist?(extractionDir)}
 	end
 	
 	execute "Copy Liferay #{name} instance to installation directory" do
 		command <<-EOH
-TMP_SERVER_DIR='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep '#{javaServer}-')
+TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-')
 cp -R "$TMP_SERVER_DIR" '#{liferayDir}' &&
 chown -R #{usr}:#{usr} '#{liferayDir}'
 		EOH
@@ -136,30 +138,30 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 	end
 	
 	# --- Set logos & add contact form portlet ---
-	cookbook_file "#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm/logo.png" do
+	cookbook_file "#{liferayRootWebappDir}/WEB-INF/classes/de/algorythm/logo.png" do
 		owner usr
 		group usr
 		backup false
 		action :create_if_missing
 	end
 
-	cookbook_file "#{webappsDir}/ROOT/favicon.ico" do
+	cookbook_file "#{liferayRootWebappDir}/favicon.ico" do
 		owner usr
 		group usr
 		backup false
 	end
 
-	cookbook_file "#{webappsDir}/ROOT/html/themes/control_panel/images/favicon.ico" do
+	cookbook_file "#{liferayRootWebappDir}/html/themes/control_panel/images/favicon.ico" do
 		owner usr
 		group usr
 		backup false
 	end
 
-	cookbook_file "#{instanceHomeDir}/deploy/contact-form.war" do
+	cookbook_file "#{deployDir}/contact-form.war" do
 		owner usr
 		group usr
 		backup false
-		not_if {File.exist?("#{webappsDir}/contact-form")}
+		not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
 	end
 	
 	# --- Create postgres user & DB ---
