@@ -58,18 +58,18 @@ default['liferay-jetty']['instances']['default'] = {
 	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
 	'java_server' => 'jetty',
 	'hostname' => default['ldap']['default']['domain'],
-	'company_name' => '',
+	'company_name' => Nil,
 	'system_mail_prefix' => 'system',
-	'user' => '',
+	'user' => Nil,
 	'pg' => {
 		'port' => 5432,
-		'database' => '',
+		'database' => Nil,
 		'password' => 'password'
 	},
 	'ldap' => {
-		'hostname' => '',
-		'port' => '',
-		'user' => '',
+		'hostname' => Nil,
+		'port' => Nil,
+		'user' => Nil,
 		'password' => 'password'
 	}
 }
@@ -97,7 +97,7 @@ default['liferay'] = {
 			'hostname' => default['ldap']['default']['domain'],
 			'company_default_name' => default['ldap']['default']['domain'],
 			'system_mail_prefix' => 'system',
-            'admin_password' => '',
+            'admin_password' => Nil,
 			'pg' => {
 				'port' => 5432,
 				'database' => 'liferay',
