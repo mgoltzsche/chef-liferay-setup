@@ -3,6 +3,7 @@ package 'libssl-dev'
 package 'imagemagick'
 package 'unzip'
 
+downloadDir = '/Downloads'
 installDir = node['liferay-jetty']['install_directory']
 mailServerHost = node['liferay-jetty']['mail_server_hostname'] || node['mail_server']['hostname']
 adminScreenName = node['liferay-jetty']['admin']['screen_name'] || node['ldap']['instances']['default']['admin_cn'] || 'admin'
