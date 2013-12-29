@@ -89,7 +89,7 @@ liferayInstances.each do |name, instance|
   pgUser = instance['pg']['user'] ? instance['pg']['user'] : pgDB
   pgPassword = instance['pg']['password']
   ldapUser = instance['ldap']['user'] || "liferay-#{name}"
-  ldapUserDN="#{ldapUser},ou=Special Users,#{ldapSuffix}"
+  ldapUserDN="cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
   ldapPassword = instance['ldap']['password']
   ldapPasswordHashed = ldapPassword(ldapPassword)
   adminPassword = instance['admin_password'] || node['ldap']['instances']['default']['admin_password'] || 'password'
