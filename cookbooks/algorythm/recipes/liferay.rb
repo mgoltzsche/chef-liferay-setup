@@ -67,7 +67,15 @@ cd "$TMP_TOMCAT_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_TOMCAT_DIR/webapps" &&
 rm -rf welcome-theme sync-web opensocial-portlet notifications-portlet kaleo-web web-form-portlet &&
-mkdir -p ROOT/WEB-INF/classes/de/algorythm
+mkdir -p ROOT/WEB-INF/classes/de/algorythm &&
+cd ROOT/WEB-INF/classes/ &&
+jar xf "$TMP_TOMCAT_DIR/webapps/ROOT/WEB-INF/lib/portal-impl.jar" ehcache/liferay-multi-vm-clustered.xml &&
+mv ehcache ehcache-custom
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+  rm -rf '#{liferayExtractionDir}'
+fi
+exit $STATUS
   EOH
   not_if {File.exist?(liferayExtractionDir)}
 end
@@ -110,6 +118,7 @@ liferayInstances.each do |name, instance|
 VANILLA_LIFERAY_WEBAPPS='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps
 cp -R "$VANILLA_LIFERAY_WEBAPPS" '#{webappsDir}' &&
 mkdir -p '#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm' &&
+sed -i 's/name="liferay-multi-vm-clustered"/name="liferay-multi-vm-clustered-#{name}"/g' ehcache-custom/liferay-multi-vm-clustered.xml &&
 chown -R #{usr}:#{usr} '#{webappsDir}'
       EOH
       not_if {File.exist?("#{webappsDir}/ROOT")}
