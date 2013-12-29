@@ -13,7 +13,7 @@ nativeConnectorSourceFolder = nativeConnectorSourceArchive.gsub(/(.*?)\.tar\.gz/
 nativeConnectorSourcePath = "#{downloadDir}/#{nativeConnectorSourceFolder}"
 liferayDir = "#{node['liferay']['install_directory']}/#{liferayFullName}"
 liferayDirLink = "#{node['liferay']['install_directory']}/liferay"
-liferayHomeDir = node['liferay']['home_directory']
+liferayHomeDir = node['liferay']['home']
 tomcatVirtualHosts = node['liferay']['tomcat_virtual_hosts']
 liferayInstances = node['liferay']['instances']
 ldapHost = node['ldap']['hostname']
@@ -38,8 +38,14 @@ package 'unzip'
 user usr do
   comment 'Liferay User'
   shell '/bin/bash'
-  home "#{liferayHomeDir}/#{usr}"
+  home liferayHomeDir
   supports :manage_home => true
+end
+
+directory "#{liferayHomeDir}/instances" do
+  owner usr
+  group usr
+  mode 0750
 end
 
 # --- Download and install Liferay ---
@@ -83,7 +89,7 @@ end
 liferayInstances.each do |name, instance|
   nginxVhostFileName = name == 'default' ? 'default' : instance['hostname']
   webappsDir = name == 'default' ? "#{liferayDir}/webapps" : "#{liferayDir}/webapps-#{name}"
-  homeDir = "#{liferayHomeDir}/liferay-#{name}"
+  instanceHomeDir = "#{liferayHomeDir}/instances/#{name}"
   pgPort = instance['pg']['port']
   pgDB = instance['pg']['database']
   pgUser = instance['pg']['user'] ? instance['pg']['user'] : pgDB
@@ -96,21 +102,15 @@ liferayInstances.each do |name, instance|
   systemMailPrefix = instance['system_mail_prefix'] || 'system'
   systemEmail = "#{systemMailPrefix}@#{instance['hostname']}"
   defaultThemeWar = instance['default_theme_war']
-  defaultThemeId = ''
-
-  directory "#{liferayDir}/webapps-#{name}" do
-    owner usr
-    group usr
-    mode 0750
-  end
+  defaultThemeId = 'classic'
 
   if (name != 'default')
-    execute "Copy Liferay webapp to webapps-#{name}" do
+    execute "Copy Liferay webapps to webapps-#{name}" do
       command <<-EOH
-VANILLA_LIFERAY_WEBAPP='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps/ROOT
-cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT' &&
+VANILLA_LIFERAY_WEBAPPS='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps
+cp -R "$VANILLA_LIFERAY_WEBAPPS" '#{webappsDir}' &&
 mkdir -p '#{webappsDir}/ROOT/WEB-INF/classes/de/algorythm' &&
-chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
+chown -R #{usr}:#{usr} '#{webappsDir}'
       EOH
       not_if {File.exist?("#{webappsDir}/ROOT")}
     end
@@ -118,13 +118,13 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
 
   end
 
-  directory homeDir do
+  directory instanceHomeDir do
     owner usr
     group usr
     mode 0750
   end
 
-  directory "#{homeDir}/deploy" do
+  directory "#{instanceHomeDir}/deploy" do
     owner usr
     group usr
     mode 00755
@@ -137,7 +137,7 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
     execute "Deploy default theme for #{name} instance" do
       user usr
       group usr
-      command "cp '#{defaultThemeWar}' '#{homeDir}/deploy'"
+      command "cp '#{defaultThemeWar}' '#{instanceHomeDir}/deploy'"
       not_if {File.exist?("#{webappsDir}/#{warName}")}
     end    
   end
@@ -178,7 +178,7 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
     backup false
   end
 
-  cookbook_file "#{homeDir}/deploy/contact-form.war" do
+  cookbook_file "#{instanceHomeDir}/deploy/contact-form.war" do
     owner usr
     group usr
     backup false
@@ -208,12 +208,12 @@ userPassword:: #{ldapPasswordHashed}
     group usr
     mode 0644
     content <<-EOH
-liferay.home=#{homeDir}
-include-and-override=#{homeDir}/portal-ext.properties
+liferay.home=#{instanceHomeDir}
+include-and-override=#{instanceHomeDir}/portal-ext.properties
     EOH
   end
 
-  template "#{homeDir}/portal-ext.properties" do
+  template "#{instanceHomeDir}/portal-ext.properties" do
     owner 'root'
     group usr
     source 'liferay.portal-ext.properties.erb'

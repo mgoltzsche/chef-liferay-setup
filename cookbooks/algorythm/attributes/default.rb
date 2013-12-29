@@ -48,7 +48,6 @@ default['liferay'] = {
 	'native_connectors_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz',
 	'apr_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/apr/apr-1.5.0.tar.bz2',
 	'install_directory' => '/opt',
-	'home_directory' => '/var/opt',
 	'home' => '/var/opt/liferay',
 	'user' => 'liferay',
 	'catalina_opts' => '-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m',
