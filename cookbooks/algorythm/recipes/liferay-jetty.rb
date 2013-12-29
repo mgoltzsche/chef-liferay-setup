@@ -64,7 +64,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	end
 	
 	# --- Write configuration ---
-	template "#{instanceHomeDir}/portal-ext.properties" do
+	template "#{homeDir}/portal-ext.properties" do
 		owner 'root'
 		group usr
 		source 'liferay.portal-ext.properties.erb'
