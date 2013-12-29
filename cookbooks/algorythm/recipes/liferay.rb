@@ -210,10 +210,13 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
   end
 
   file "#{webappsDir}/ROOT/WEB-INF/classes/portal-ext.properties" do
-    owner usr
+    owner 'root'
     group usr
     mode 0644
-    content "liferay.home=#{homeDir}"
+    content <<-EOH
+liferay.home=#{homeDir}
+include-and-override=#{homeDir}/portal-ext.properties
+    EOH
   end
 
   template "#{homeDir}/portal-ext.properties" do
@@ -222,7 +225,6 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
     source 'liferay.portal-ext.properties.erb'
     mode 0640
     variables({
-      :liferayHome => homeDir,
       :defaultThemeId => defaultThemeId,
       :timezone => timezone,
       :country => country,
