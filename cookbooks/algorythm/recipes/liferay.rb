@@ -128,12 +128,13 @@ liferayInstances.each do |name, instance|
   end
 
   if (name != 'default')
-    execute 'Copy Liferay ROOT to #{name} instance webapps directory' do
+    execute "Copy Liferay webapp to #{name} instance webapps directory" do
       command <<-EOH
 VANILLA_LIFERAY_WEBAPP='#{liferayExtractionDir}/'$(ls '#{liferayExtractionDir}' | grep tomcat)/webapps/ROOT
-cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT'
+cp -R "$VANILLA_LIFERAY_WEBAPP" '#{webappsDir}/ROOT' &&
+chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
       EOH
-      not_if {File.exist?(liferayDir)}
+      not_if {File.exist?("#{webappsDir}/ROOT")}
     end
   end
 
