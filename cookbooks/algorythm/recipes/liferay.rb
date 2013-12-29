@@ -211,7 +211,7 @@ chown -R #{usr}:#{usr} '#{webappsDir}/ROOT'
 
   file "#{webappsDir}/ROOT/WEB-INF/classes/portal-ext.properties" do
     owner usr
-    usr usr
+    group usr
     mode 0644
     content "liferay.home=#{homeDir}"
   end
