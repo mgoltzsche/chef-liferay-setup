@@ -1,7 +1,7 @@
 # Hostname
 default['hostname'] = 'dev-master'
 default['domainname'] = 'dev.algorythm.de'
-default['max_open_files'] = 16384 # Should be > 1024
+default['max_open_files'] = 100000 # Should be > 1024
 default['tcp_timeout'] = 600 # Should be lower to free worker threads earlier
 
 # backup
