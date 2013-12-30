@@ -78,8 +78,8 @@ function start {
 	RUN_CMD="$RUN_CMD export JETTY_HOME='$JETTY_HOME';"
 	RUN_CMD="$RUN_CMD export JAVA_OPTS='$JAVA_OPTS';"
 	RUN_CMD="$RUN_CMD"' (cd $JETTY_HOME/bin &&'
-	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar &>> "$LOG_FILE") &'
-	RUN_CMD="$RUN_CMD"' echo $! > $PID_FILE'
+	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar &>> '"'$LOG_FILE') &"
+	RUN_CMD="$RUN_CMD echo \$! > $PID_FILE"
 	
 	su $USER -c  "$RUN_CMD"
 }
