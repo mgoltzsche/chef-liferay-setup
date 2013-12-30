@@ -158,7 +158,7 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		variables({
 			:port => port
 		})
-		notifies :restart, 'service[liferay]'
+		notifies :restart, "service[#{instanceId}]"
 	end
 	
 	file "#{liferayRootWebappDir}/WEB-INF/classes/portal-ext.properties" do
