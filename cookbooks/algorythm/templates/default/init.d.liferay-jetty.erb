@@ -45,26 +45,35 @@ if [ $LOG_DIR_CREATION_STATUS -ne 0 ]; then
 	exit 2
 fi
 
-touch $LOG_FILE &&
-chmod 644 $LOG_FILE
-LOG_FILE_TOUCH_STATUS=$?
+function prepareLogFile {
+	touch $LOG_FILE &&
+	chown root:$USER $LOG_FILE &&
+	chmod 660 $LOG_FILE
+	LOG_FILE_TOUCH_STATUS=$?
 
-if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
-	echo "failed: Cannot write log file $LOG_FILE!"
-	exit 2
-fi
+	if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
+		echo "failed: Cannot write log file $LOG_FILE!"
+		exit 2
+	fi
+}
 
-touch $PID_FILE &&
-chmod 644 $PID_FILE
-PID_FILE_TOUCH_STATUS=$?
+function preparePidFile {
+	touch $PID_FILE &&
+	chown root:$USER $PID_FILE &&
+	chmod 660 $PID_FILE
+	PID_FILE_TOUCH_STATUS=$?
 
-if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
-	echo "failed: Cannot write PID file $PID_FILE!"
-	exit 2
-fi
+	if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
+		echo "failed: Cannot write PID file $PID_FILE!"
+		exit 2
+	fi
+}
 
 function start {
 	echo "Starting $APP_NAME Jetty"
+
+	preparePidFile
+	prepareLogFile
 
 	PID=$(cat $PID_FILE) &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
@@ -73,15 +82,13 @@ function start {
 	fi
 
 	rm -rf "$JETTY_HOME/temp/*"
-
-	su $USER -c  "cd '$JETTY_HOME/bin'; '$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar" &>> "$LOG_FILE" &
-	PID=$!
-	echo "### $PID  "$(ps -e | grep $PID)
-	echo $PID > $PID_FILE
+	su $USER -c  "cd '$JETTY_HOME/bin'; '$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar &>> '$LOG_FILE' & echo \$! > $PID_FILE"
 }
 
 function stop {
 	printf "Stopping $APP_NAME Jetty"
+
+	preparePidFile
 
 	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
 		printf "\nfailed: not running or invalid PID file $PID_FILE\n"
@@ -92,7 +99,7 @@ function stop {
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
 		printf "\nInvalid PID. Process does not exist. Cleaning PID file\n"
-		printf '' > $PID_FILE
+		rm -f $PID_FILE
 		return 1
 	fi
 
@@ -113,7 +120,7 @@ function stop {
 	done
 	
 	printf "\n"
-	printf '' > $PID_FILE
+	rm -f $PID_FILE
 }
 
 function restart {
