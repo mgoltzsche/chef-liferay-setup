@@ -48,8 +48,9 @@ function prepareLogFile {
 		exit 2
 	fi
 	
-	su $USER -c "touch $LOG_FILE" &&
-	chmod 660 $LOG_FILE
+	su $USER -c "touch '$LOG_FILE'" &&
+	chown -R root:$USER "$LOG_FILE" &&
+	chmod 660 "$LOG_FILE"
 	LOG_FILE_TOUCH_STATUS=$?
 
 	if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
