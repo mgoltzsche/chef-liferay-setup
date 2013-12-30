@@ -58,6 +58,7 @@ default['liferay-jetty']['instances']['default'] = {
 	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
 	'java_server' => 'jetty',
 	'hostname' => default['ldap']['instances']['default']['domain'],
+	'port' => 7080,
 	'company_name' => nil,
 	'system_mail_prefix' => 'system',
 	'user' => nil,

@@ -23,6 +23,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
 	usr = instance['user'] || instanceId
+	port = instance['port']
 	liferayDir = "#{installDir}/#{instanceId}"
 	liferayRootWebappDir = "#{liferayDir}/webapps/#{rootWebappName}"
 	homeDir = instance['home'] || "/var/opt/#{instanceId}"
@@ -149,6 +150,17 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 	end
 	
 	# --- Write configuration ---
+	template "#{liferayDir}/etc/jetty.xml" do
+		owner 'root'
+		group usr
+		source 'liferay.jetty.xml.erb'
+		mode 0644
+		variables({
+			:port => port
+		})
+		notifies :restart, 'service[liferay]'
+	end
+	
 	file "#{liferayRootWebappDir}/WEB-INF/classes/portal-ext.properties" do
 		owner 'root'
 		group usr
@@ -244,8 +256,7 @@ userPassword:: #{ldapPasswordHashed}
 		mode 0744
 		variables({
 			:hostname => hostname,
-			:http_port => 8080,
-			:https_port => 8080
+			:port => port
 		})
 		notifies :restart, 'service[nginx]'
 	end
