@@ -47,7 +47,7 @@ function prepareLogFile {
 		exit 2
 	fi
 	
-	su $USER -c "touch '$LOG_FILE'" &> /dev/null &&
+	touch "$LOG_FILE" &> /dev/null &&
 	chown root:$USER "$LOG_FILE" &&
 	chmod 660 "$LOG_FILE"
 	LOG_FILE_TOUCH_STATUS=$?
@@ -59,9 +59,9 @@ function prepareLogFile {
 }
 
 function preparePidFile {
-	touch $PID_FILE &> /dev/null &&
-	chown root:$USER $PID_FILE &&
-	chmod 660 $PID_FILE
+	touch "$PID_FILE" &> /dev/null &&
+	chown root:$USER "$PID_FILE" &&
+	chmod 660 "$PID_FILE"
 	PID_FILE_TOUCH_STATUS=$?
 
 	if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
@@ -76,7 +76,7 @@ function start {
 	preparePidFile
 	prepareLogFile
 
-	PID=$(cat $PID_FILE) &> /dev/null
+	PID=$(cat "$PID_FILE") &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
 		echo "  failed: $APP_NAME Jetty is already running!" >&2
 		return 1
@@ -87,7 +87,7 @@ function start {
 		ulimit -n 100000; \
 		cd '$JETTY_HOME/bin'; \
 		'$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar \
-		&>> '$LOG_FILE' & echo \$! > $PID_FILE"
+		&>> '$LOG_FILE' & echo \$! > '$PID_FILE'"
 }
 
 function stop {
@@ -95,18 +95,18 @@ function stop {
 
 	preparePidFile
 
-	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
+	if [ ! -f "$PID_FILE" ] || [ ! -s "$PID_FILE" ]; then
 		printf '\n'
 		echo "  failed: $APP_NAME Jetty not running or invalid PID file $PID_FILE" >&2
 		return 1
 	fi
 
-	PID=$(cat $PID_FILE)
+	PID=$(cat "$PID_FILE")
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
 		printf '\n'
 		echo "  Invalid PID. Removing PID file $PID_FILE" >&2
-		rm -f $PID_FILE
+		rm -f "$PID_FILE"
 		return 1
 	fi
 
@@ -129,7 +129,7 @@ function stop {
 	done
 	
 	printf '\n'
-	rm -f $PID_FILE
+	rm -f "$PID_FILE"
 }
 
 function restart {
@@ -138,7 +138,7 @@ function restart {
 }
 
 function status {
-	PID=$(cat $PID_FILE) &> /dev/null
+	PID=$(cat "$PID_FILE") &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
 		echo "$APP_NAME running with PID $PID"
 	else
