@@ -217,7 +217,7 @@ userPassword:: #{ldapPasswordHashed}
 		source 'init.d.liferay-jetty.erb'
 		mode 0755
 		variables({
-			:name => name,
+			:name => instanceId,
 			:installDir => liferayDir,
 			:user => usr
 		})

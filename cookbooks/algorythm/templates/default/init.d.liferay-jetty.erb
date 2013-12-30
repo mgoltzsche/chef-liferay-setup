@@ -15,7 +15,9 @@ USER=<%=@user%>
 export JETTY_HOME='<%=@installDir%>'
 export JAVA_HOME='/usr/lib/jvm/java-6-openjdk-amd64'
 export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx768m -XX:MaxPermSize=256m'
-PID_FILE="/var/run/jetty-$APP_NAME.pid"
+LOG_DIR=/var/log/jetty
+LOG_FILE="$LOG_DIR/$APP_NAME"
+PID_FILE="/var/run/$APP_NAME.pid"
 SHUTDOWN_TIMEOUT=45
 SHUTDOWN_CHECK_INTERVAL=1
 
@@ -26,21 +28,38 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ ! -x "$JAVA_HOME/bin/java" ]; then
-	echo "Java not installed in '$JAVA_HOME'!"
+	echo "Java not installed in $JAVA_HOME!"
 	exit 2
 fi
 
-if [ ! -f "$JETTY_HOME/start.jar" ]; then
-	echo "Jetty not installed in '$JETTY_HOME'!"
+if [ ! -f "$JETTY_HOME/start.jar" ] || [ ! -d "$JETTY_HOME/bin" ]; then
+	echo "$APP_NAME Jetty not installed correctly in $JETTY_HOME!"
+	exit 2
+fi
+
+mkdir -p $LOG_DIR
+LOG_DIR_CREATION_STATUS=$?
+
+if [ $LOG_DIR_CREATION_STATUS -ne 0 ]; then
+	echo "Cannot create directory $LOG_DIR!"
+	exit 2
+fi
+
+touch $LOG_FILE 2> /dev/null &&
+chmod 644 $LOG_FILE
+LOG_FILE_TOUCH_STATUS=$?
+
+if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
+	echo "failed: Cannot write log file $LOG_FILE!"
 	exit 2
 fi
 
 touch $PID_FILE 2> /dev/null &&
-chmod ugo=rw "$PID_FILE"
+chmod 644 $PID_FILE
 PID_FILE_TOUCH_STATUS=$?
 
 if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
-	echo "failed: Cannot write pid file '$PID_FILE'!"
+	echo "failed: Cannot write PID file $PID_FILE!"
 	exit 2
 fi
 
@@ -62,10 +81,9 @@ function start {
 	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar'
 	RUN_CMD="$RUN_CMD"
 	
-	su $USER -c  "$RUN_CMD" &
+	su $USER -c  "$RUN_CMD" >> "$LOG_FILE" &
 	PID=$!
-	echo "### $PID ###"
-	echo $PID > $PID_FILE
+	echo $! > $PID_FILE
 }
 
 function stop {
@@ -112,9 +130,9 @@ function restart {
 function status {
 	PID=$(cat $PID_FILE) &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
-		echo "$APP_NAME Jetty running with PID $PID"
+		echo "$APP_NAME running with PID $PID"
 	else
-		echo "$APP_NAME Jetty not running (or $PID_FILE is missing)"
+		echo "$APP_NAME not running (or $PID_FILE is missing)"
 	fi
 }
 
