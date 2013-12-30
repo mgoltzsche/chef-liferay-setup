@@ -15,7 +15,7 @@ country = node['liferay-jetty']['country']
 language = node['liferay-jetty']['language']
 
 node['liferay-jetty']['instances'].each do |name, instance|
-	instanceId = "liferay_#{name}"
+	instanceId = "lfy_#{name}"
 	javaServer = instance['java_server'] || 'jetty'
 	rootWebappName = javaServer == 'jetty' ? 'root' : 'ROOT'
 	liferayDownloadUrl = instance['download_url'] || node['liferay-jetty']['instances']['default']['download_url']
@@ -84,6 +84,8 @@ node['liferay-jetty']['instances'].each do |name, instance|
 mkdir -p '/tmp/#{javaServer}-installation' &&
 unzip -qd '/tmp/#{javaServer}-installation' '#{liferayZipFile}' &&
 TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-') &&
+cd "$TMP_SERVER_DIR/etc" &&
+rm jetty-ajp.xml jetty-rewrite.xml &&
 cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
