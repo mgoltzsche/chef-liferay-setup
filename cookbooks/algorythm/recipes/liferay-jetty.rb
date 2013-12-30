@@ -86,7 +86,7 @@ mkdir -p '/tmp/#{javaServer}-installation' &&
 unzip -qd '/tmp/#{javaServer}-installation' '#{liferayZipFile}' &&
 TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-') &&
 cd "$TMP_SERVER_DIR/etc" &&
-rm -f jdbcRealm.properties jetty-plus.xml jetty-ajp.xml jetty-bio.xml jetty-requestlog.xml jetty-contexts.xml jetty-overlay.xml jetty-xinetd.xml jetty-jmx.xml jetty-annotations.xml jetty-ipaccess.xml jetty-bio-ssl.xml jetty-ssl.xml jetty-spdy.xml jetty-spdy-proxy.xml jetty-proxy.xml jetty-rewrite.xml jetty-testrealm.xml realm.properties README.spnego spnego.conf spnego.properties krb5.ini keystore &&
+rm -f jdbcRealm.properties jetty-plus.xml jetty-ajp.xml jetty-bio.xml jetty-requestlog.xml jetty-overlay.xml jetty-xinetd.xml jetty-jmx.xml jetty-annotations.xml jetty-ipaccess.xml jetty-bio-ssl.xml jetty-ssl.xml jetty-spdy.xml jetty-spdy-proxy.xml jetty-proxy.xml jetty-rewrite.xml jetty-testrealm.xml realm.properties README.spnego spnego.conf spnego.properties krb5.ini keystore &&
 cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
