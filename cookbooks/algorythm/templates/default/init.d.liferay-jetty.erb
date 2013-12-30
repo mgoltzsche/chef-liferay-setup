@@ -81,8 +81,7 @@ function start {
 	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar'
 	RUN_CMD="$RUN_CMD"
 	
-	su $USER -c  "$RUN_CMD" >> "$LOG_FILE" &
-	PID=$!
+	su $USER -c  "$RUN_CMD" &>> "$LOG_FILE" &
 	echo $! > $PID_FILE
 }
 
