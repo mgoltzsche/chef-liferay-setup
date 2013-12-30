@@ -6,7 +6,7 @@
 ### END INIT INFO
 
 if [ $(id -u) != '0' ]; then
-	echo 'You need root privileges to run this script!'
+	echo 'You need root privileges to run this script!' >&2
 	exit 1
 fi
 
@@ -23,17 +23,17 @@ SHUTDOWN_CHECK_INTERVAL=1
 
 id $USER > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo "User '$USER' does not exist!"
+	echo "User '$USER' does not exist!" >&2
 	exit 2
 fi
 
 if [ ! -x "$JAVA_HOME/bin/java" ]; then
-	echo "Java not installed in $JAVA_HOME!"
+	echo "Java not installed in $JAVA_HOME!" >&2
 	exit 2
 fi
 
 if [ ! -f "$JETTY_HOME/start.jar" ] || [ ! -d "$JETTY_HOME/bin" ]; then
-	echo "$APP_NAME Jetty not installed correctly in $JETTY_HOME!"
+	echo "$APP_NAME Jetty not installed correctly in $JETTY_HOME!" >&2
 	exit 2
 fi
 
@@ -44,7 +44,7 @@ function prepareLogFile {
 	LOG_DIR_CREATION_STATUS=$?
 
 	if [ $LOG_DIR_CREATION_STATUS -ne 0 ]; then
-		echo "failed: Cannot write $LOG_DIR!"
+		echo "  failed: Cannot write $LOG_DIR!" >&2
 		exit 2
 	fi
 	
@@ -54,7 +54,7 @@ function prepareLogFile {
 	LOG_FILE_TOUCH_STATUS=$?
 
 	if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
-		echo "failed: Cannot write $LOG_FILE!"
+		echo "  failed: Cannot write $LOG_FILE!" >&2
 		exit 2
 	fi
 }
@@ -66,7 +66,7 @@ function preparePidFile {
 	PID_FILE_TOUCH_STATUS=$?
 
 	if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
-		echo "failed: Cannot write PID file $PID_FILE!"
+		echo "  failed: Cannot write PID file $PID_FILE!" >&2
 		exit 2
 	fi
 }
@@ -79,7 +79,7 @@ function start {
 
 	PID=$(cat $PID_FILE) &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
-		echo "failed: $APP_NAME is already running!"
+		echo "  failed: $APP_NAME Jetty is already running!" >&2
 		return 1
 	fi
 
@@ -96,14 +96,16 @@ function stop {
 	preparePidFile
 
 	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
-		printf "\nfailed: not running or invalid PID file $PID_FILE\n"
+		printf '\n'
+		echo "  failed: $APP_NAME Jetty not running or invalid PID file $PID_FILE" >&2
 		return 1
 	fi
 
 	PID=$(cat $PID_FILE)
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
-		printf "\nInvalid PID. Removing PID file\n"
+		printf '\n'
+		echo "  Invalid PID. Removing PID file $PID_FILE" >&2
 		rm -f $PID_FILE
 		return 1
 	fi
@@ -118,7 +120,8 @@ function stop {
 		WAITED=$(expr $WAITED_TIME + $SHUTDOWN_CHECK_INTERVAL);
 
 		if [ $WAITED_TIME -ge $SHUTDOWN_TIMEOUT ]; then
-			printf "\nSending SIGKILL after $SHUTDOWN_TIMEOUTs timeout"
+			printf '\n'
+			printf "  Sending SIGKILL after $SHUTDOWN_TIMEOUTs timeout " >&2
 			kill -SIGKILL $PID
 			sleep 1
 			echo "=== SENT SIGKILL ===" >> "$LOG_FILE"
@@ -144,7 +147,7 @@ function status {
 }
 
 function showUsageAndExit {
-	echo "Usage: service $APP_NAME {start|stop|restart|status}"
+	echo "Usage: service $APP_NAME {start|stop|restart|status}" >&2
 	exit 1
 }
 

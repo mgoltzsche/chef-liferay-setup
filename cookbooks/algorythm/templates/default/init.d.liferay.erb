@@ -25,9 +25,9 @@ SHUTDOWN_TIMEOUT=45
 SHUTDOWN_CHECK_INTERVAL=5
 
 #verify that the user that will run the daemon exists
-id "$USER" > /dev/null 2>&1
+id "$USER" > /dev/null >&2
 if [ $? != '0' ]; then
-	echo "User '$USER' does not exist!" 2>&1
+	echo "User '$USER' does not exist!" >&2
 	exit 1
 fi
 
@@ -44,7 +44,7 @@ function start {
 	status=$?
 
 	if [ $status -ne 0 ]; then
-		echo 'failed' 2>&1
+		echo 'failed' >&2
 	fi
 
 	return $status
@@ -54,14 +54,14 @@ function stop {
 	echo "Stopping $APP_NAME..."
 
 	if [ ! -f $CATALINA_PID ] || [ ! -s $CATALINA_PID ]; then
-		echo "failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
+		echo "failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" >&2
 		return 1
 	fi
 
 	pid=$(cat $CATALINA_PID)
 	waited_time=0
 
-	su $USER -c "$CATALINA_HOME/bin/catalina.sh stop" 2>&1 | grep -P '^java\.net\.ConnectException:' &> /dev/null
+	su $USER -c "$CATALINA_HOME/bin/catalina.sh stop" >&2 | grep -P '^java\.net\.ConnectException:' &> /dev/null
 	GREP_ERROR_STATUS=$?
 	
 	if [ $GREP_ERROR_STATUS = '0' ]; then
@@ -77,7 +77,7 @@ function stop {
 	done
 
 	if [ $waited_time -ge $SHUTDOWN_TIMEOUT ]; then
-		echo "Killing process after a timeout of $SHUTDOWN_TIMEOUT seconds"
+		echo "Killing process after a timeout of $SHUTDOWN_TIMEOUT seconds" >&2
 		kill -9 $pid
 		sleep 1
 	fi
@@ -103,7 +103,7 @@ case "$1" in
         $1
     ;;
     *)
-        echo "Usage: service liferay {start|stop|restart|status}"
+        echo "Usage: service liferay {start|stop|restart|status}" >&2
         exit 1
     ;;
 esac
