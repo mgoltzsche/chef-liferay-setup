@@ -50,7 +50,7 @@ function start {
 
 	PID=$(cat $PID_FILE) &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
-		echo "failed: $APP_NAME Jetty is already running!"
+		echo "failed: $APP_NAME is already running!"
 		return 1
 	fi
 
@@ -70,7 +70,7 @@ function stop {
 	printf "Stopping $APP_NAME Jetty"
 
 	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
-		printf "\nfailed: $APP_NAME Jetty is not running or PID file $PID_FILE is missing or empty!"
+		printf "\nfailed: $APP_NAME is not running or PID file $PID_FILE is missing or empty!"
 		return 1
 	fi
 
@@ -109,10 +109,10 @@ function restart {
 
 function status {
 	PID=$(cat $PID_FILE) &> /dev/null
-	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]
-		echo "$APP_NAME Jetty is running with PID $PID"
+	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
+		echo "$APP_NAME running with PID $PID"
 	else
-		echo "$APP_NAME Jetty is not running (or $PID_FILE is missing)"
+		echo "$APP_NAME not running (or $PID_FILE is missing)"
 	fi
 }
 
