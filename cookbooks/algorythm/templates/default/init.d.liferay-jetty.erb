@@ -82,6 +82,7 @@ function start {
 	fi
 
 	rm -rf "$JETTY_HOME/temp/*"
+	echo "=== STARTING ===" >> '$LOG_FILE'
 	su $USER -c  "cd '$JETTY_HOME/bin'; '$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar &>> '$LOG_FILE' & echo \$! > $PID_FILE"
 }
 
@@ -116,6 +117,7 @@ function stop {
 			printf "\nKilling process after a timeout of $SHUTDOWN_TIMEOUT seconds"
 			kill -SIGKILL $PID
 			sleep 1
+			echo "=== SENT SIGKILL ===" >> '$LOG_FILE'
 		fi
 	done
 	
