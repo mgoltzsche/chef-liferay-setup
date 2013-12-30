@@ -45,6 +45,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	ldapPassword = instance['ldap']['password']
 	ldapPasswordHashed = ldapPassword(ldapPassword)
 	ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
+	defaultThemeWar = instance['default_theme_war']
 	defaultThemeId = 'classic'
 
 	# --- Create Liferay system user ---
@@ -106,7 +107,7 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		not_if {File.exist?(liferayDir)}
 	end
 	
-	# --- Set logos & add contact form portlet ---
+	# --- Add logos, default theme & contact form portlet ---
 	cookbook_file "#{liferayRootWebappDir}/WEB-INF/classes/de/algorythm/logo.png" do
 		owner usr
 		group usr
@@ -131,6 +132,18 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		group usr
 		backup false
 		not_if {File.exist?("#{liferayDir}/webapps/contact-form")}
+	end
+	
+	if defaultThemeWar
+		warName = File.basename(URI.parse(defaultThemeWar).path).gsub!(/(.*).war$/, '\1')
+		defaultThemeIdPart = warName.gsub!(/-_ /, '')
+		defaultThemeId = "#{defaultThemeIdPart}_WAR_#{defaultThemeIdPart}"
+		execute "Deploy default theme in #{name} Liferay instance" do
+			user usr
+			group usr
+			command "cp '#{defaultThemeWar}' '#{homeDir}/deploy'"
+			not_if {File.exist?("#{liferayDir}/webapps/#{warName}")}
+		end
 	end
 	
 	# --- Write configuration ---
@@ -172,7 +185,7 @@ include-and-override=#{homeDir}/portal-ext.properties
 			:ldapUser => ldapUser,
 			:ldapPassword => ldapPassword
 		})
-#		notifies :restart, 'service[liferay]'
+		notifies :restart, "service[instanceId]"
 	end
 	
 	# --- Create postgres user & DB ---
@@ -241,10 +254,10 @@ userPassword:: #{ldapPasswordHashed}
 	end
 	
 	# --- (Re)start Liferay ---
-#	service instanceId do
-#		supports :restart => true
-#		action :enable
-#	end
+	service instanceId do
+		supports :restart => true
+		action :enable
+	end
 end
 
 # --- Restart nginx ---

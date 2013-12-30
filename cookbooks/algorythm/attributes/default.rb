@@ -61,6 +61,7 @@ default['liferay-jetty']['instances']['default'] = {
 	'company_name' => nil,
 	'system_mail_prefix' => 'system',
 	'user' => nil,
+	'default_theme_war' => nil,
 	'pg' => {
 		'port' => 5432,
 		'database' => nil,
