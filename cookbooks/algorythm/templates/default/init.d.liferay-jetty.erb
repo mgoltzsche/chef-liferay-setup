@@ -59,17 +59,17 @@ function start {
 	RUN_CMD="$RUN_CMD export JETTY_HOME='$JETTY_HOME';"
 	RUN_CMD="$RUN_CMD export JAVA_OPTS='$JAVA_OPTS';"
 	RUN_CMD="$RUN_CMD"' cd $JETTY_HOME/bin &&'
-	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar'
+	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar &;'
+	RUN_CMD="$RUN_CMD echo \$! > $PID_FILE"
 	
-	su $USER -c  "$RUN_CMD" &
-	echo $! > "$PID_FILE"
+	su $USER -c  "$RUN_CMD"
 }
 
 function stop {
 	printf "Stopping $APP_NAME Jetty"
 
 	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
-		printf "\nfailed: not running or incalid PID file $PID_FILE!\n"
+		printf "\nfailed: not running or invalid PID file $PID_FILE\n"
 		return 1
 	fi
 
