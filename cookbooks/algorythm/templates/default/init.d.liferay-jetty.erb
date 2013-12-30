@@ -82,8 +82,10 @@ function start {
 	fi
 
 	rm -rf "$JETTY_HOME/temp/*"
-	echo "=== STARTING ===" >> '$LOG_FILE'
-	su $USER -c  "cd '$JETTY_HOME/bin'; '$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar &>> '$LOG_FILE' & echo \$! > $PID_FILE"
+	echo "=== STARTING ===" >> "$LOG_FILE"
+	su $USER -c  "cd '$JETTY_HOME/bin'; '$JAVA_HOME/bin/java' " \
+		"$JAVA_OPTS -jar ../start.jar &>> '$LOG_FILE' & " \
+		'echo $! > '$PID_FILE
 }
 
 function stop {
@@ -99,7 +101,7 @@ function stop {
 	PID=$(cat $PID_FILE)
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
-		printf "\nInvalid PID. Process does not exist. Cleaning PID file\n"
+		printf "\nInvalid PID. Removing PID file\n"
 		rm -f $PID_FILE
 		return 1
 	fi
@@ -114,10 +116,10 @@ function stop {
 		WAITED=$(expr $WAITED_TIME + $SHUTDOWN_CHECK_INTERVAL);
 
 		if [ $WAITED_TIME -ge $SHUTDOWN_TIMEOUT ]; then
-			printf "\nKilling process after a timeout of $SHUTDOWN_TIMEOUT seconds"
+			printf "\nSending SIGKILL after $SHUTDOWN_TIMEOUTs timeout"
 			kill -SIGKILL $PID
 			sleep 1
-			echo "=== SENT SIGKILL ===" >> '$LOG_FILE'
+			echo "=== SENT SIGKILL ===" >> "$LOG_FILE"
 		fi
 	done
 	
