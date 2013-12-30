@@ -31,7 +31,7 @@ node['liferay-jetty']['instances'].each do |name, instance|
 	companyName = instance['company_name'] || hostname
 	nginxVhostFileName = name == 'default' ? 'default' : hostname
 	systemMailPrefix = instance['system_mail_prefix'] || 'system'
-    systemEmail = "#{systemMailPrefix}@#{hostname}"
+	systemEmail = "#{systemMailPrefix}@#{hostname}"
 	adminPassword = instance['admin_password'] || node['ldap']['instances']['default']['admin_password'] || 'password'
 	pgPort = instance['pg']['port'] || 5432
 	pgDB = instance['pg']['database'] || instanceId
@@ -213,15 +213,15 @@ userPassword:: #{ldapPasswordHashed}
 	end
 
 	# --- Register Liferay as service ---
-#	template "/etc/init.d/#{instanceId}" do
-#		source 'init.d.liferay.erb'
-#		mode 0755
-#		variables({
-#			:name => name,
-#			:liferayDir => liferayDir,
-#			:user => usr
-#		})
-#	end
+	template "/etc/init.d/#{instanceId}" do
+		source 'init.d.liferay-jetty.erb'
+		mode 0755
+		variables({
+			:name => name,
+			:installDir => liferayDir,
+			:user => usr
+		})
+	end
 
     # --- Configure nginx vhost ---
 	template "/etc/nginx/sites-available/#{nginxVhostFileName}" do

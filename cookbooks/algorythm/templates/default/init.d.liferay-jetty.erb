@@ -1,0 +1,135 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides: liferay
+# Short-Description: Liferay portal daemon.
+# Description: Starts the Liferay portal.
+### END INIT INFO
+
+if [ $(id -u) != '0' ]; then
+	echo 'You need root privileges to run this script!'
+	exit 1
+fi
+
+APP_NAME='<%=@name%>'
+USER=<%=@user%>
+export JETTY_HOME='<%=@installDir%>'
+export JAVA_HOME='/usr/lib/jvm/java-6-openjdk-amd64'
+export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx768m -XX:MaxPermSize=256m'
+PID_FILE="/var/run/$APP_NAME.pid"
+SHUTDOWN_TIMEOUT=45
+SHUTDOWN_CHECK_INTERVAL=1
+
+#verify that the user that will run the daemon exists
+id $USER > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+	echo "User '$USER' does not exist!"
+	exit 2
+fi
+
+if [ ! -x "$JAVA_HOME/bin/java" ]; then
+	echo "Java not installed in '$JAVA_HOME'!"
+	exit 2
+fi
+
+if [ ! -f "$JETTY_HOME/start.jar" ]; then
+	echo "Jetty not installed in '$JETTY_HOME'!"
+	exit 2
+fi
+
+touch $PID_FILE 2> /dev/null &&
+chmod ugo=rw "$PID_FILE"
+PID_FILE_TOUCH_STATUS=$?
+
+if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
+	echo "failed: Cannot write pid file '$PID_FILE'!"
+	exit 2
+fi
+
+function start {
+	echo "Starting $APP_NAME Jetty"
+
+	PID=$(cat $PID_FILE) &> /dev/null
+	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
+		echo "failed: $APP_NAME Jetty is already running!"
+		return 1
+	fi
+
+	rm -rf "$JETTY_HOME/temp/*"
+
+	RUN_CMD="export JAVA_HOME='$JAVA_HOME';"
+	RUN_CMD="$RUN_CMD export JETTY_HOME='$JETTY_HOME';"
+	RUN_CMD="$RUN_CMD export JAVA_OPTS='$JAVA_OPTS';"
+	RUN_CMD="$RUN_CMD"' cd $JETTY_HOME/bin &&'
+	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar'
+	
+	su $USER -c  "$RUN_CMD" &
+	echo $! > "$PID_FILE"
+}
+
+function stop {
+	printf "Stopping $APP_NAME Jetty"
+
+	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
+		printf "\nfailed: $APP_NAME Jetty is not running or PID file $PID_FILE is missing or empty!"
+		return 1
+	fi
+
+	PID=$(cat $PID_FILE)
+
+	if [ $(ps -p $pid | grep -c $pid) -eq 0 ]; then
+		printf "\nInvalid PID. Process does not exist. Removing PID"
+		rm -f $PID_FILE
+		return 1
+	fi
+
+	kill -SIGTERM $PID
+
+	WAITED_TIME=0
+	until [ $(ps -p $PID | grep -c $PID) -eq 0 ]; do
+		printf '.'
+		sleep $SHUTDOWN_CHECK_INTERVAL
+		WAITED=$(expr $WAITED_TIME + $SHUTDOWN_CHECK_INTERVAL);
+
+		if [ $WAITED_TIME -ge $SHUTDOWN_TIMEOUT ]; then
+			printf "\nKilling process after a timeout of $SHUTDOWN_TIMEOUT seconds"
+			kill -SIGKILL $PID
+			sleep 1
+		fi
+	done
+	
+	printf "\n"
+
+	rm -f $PID_FILE
+}
+
+function restart {
+	stop
+	start
+}
+
+function status {
+	PID=$(cat $PID_FILE) &> /dev/null
+	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]
+		echo "$APP_NAME Jetty is running with PID $PID"
+	else
+		echo "$APP_NAME Jetty is not running (or $PID_FILE is missing)"
+	fi
+}
+
+function showUsageAndExit {
+	echo "Usage: service $APP_NAME {start|stop|restart|status}"
+	exit 1
+}
+
+if [ ! -z "$2" ]; then
+	showUsageAndExit
+fi
+
+case "$1" in
+    start|stop|restart|status)
+        $1
+    ;;
+    *)
+        showUsageAndExit
+    ;;
+esac

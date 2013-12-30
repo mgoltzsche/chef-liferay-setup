@@ -27,7 +27,7 @@ SHUTDOWN_CHECK_INTERVAL=5
 #verify that the user that will run the daemon exists
 id "$USER" > /dev/null 2>&1
 if [ $? != '0' ]; then
-	echo "User $USER does not exist!" 2>&1
+	echo "User '$USER' does not exist!" 2>&1
 	exit 1
 fi
 
@@ -43,9 +43,7 @@ function start {
 	su $USER -c "$CATALINA_HOME/bin/catalina.sh start" >> /dev/null
 	status=$?
 
-	if [ $status = 0 ]; then
-		echo 'done'
-	else
+	if [ $status -ne 0 ]; then
 		echo 'failed' 2>&1
 	fi
 
@@ -56,7 +54,7 @@ function stop {
 	echo "Stopping $APP_NAME..."
 
 	if [ ! -f $CATALINA_PID ] || [ ! -s $CATALINA_PID ]; then
-		echo "  failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
+		echo "failed: $APP_NAME is not running or pid file $CATALINA_PID is missing or empty!" 2>&1
 		return 1
 	fi
 
@@ -85,8 +83,6 @@ function stop {
 	fi
 
 	rm -f "$CATALINA_PID"
-
-	echo 'done'
 }
 
 function restart {
