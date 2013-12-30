@@ -105,7 +105,7 @@ function stop {
 	echo "### $PID    -> $?"
 
 	WAITED_TIME=0
-	until [ $(ps -p $PID | grep -c $PID) -eq 0 ]; do
+	until [ $(ps -p $PID | grep -c $PID) = '0' ]; do
 		printf '.'
 		sleep $SHUTDOWN_CHECK_INTERVAL
 		WAITED=$(expr $WAITED_TIME + $SHUTDOWN_CHECK_INTERVAL);
