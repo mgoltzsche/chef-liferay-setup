@@ -185,7 +185,7 @@ include-and-override=#{homeDir}/portal-ext.properties
 			:ldapUser => ldapUser,
 			:ldapPassword => ldapPassword
 		})
-		notifies :restart, "service[instanceId]"
+		notifies :restart, "service[#{instanceId}]"
 	end
 	
 	# --- Create postgres user & DB ---
