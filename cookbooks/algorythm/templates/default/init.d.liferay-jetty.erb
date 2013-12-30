@@ -102,6 +102,7 @@ function stop {
 	fi
 
 	kill -SIGTERM $PID
+	echo "### $PID    -> $?"
 
 	WAITED_TIME=0
 	until [ $(ps -p $PID | grep -c $PID) -eq 0 ]; do
