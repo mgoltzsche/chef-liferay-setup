@@ -15,7 +15,7 @@ USER=<%=@user%>
 export JETTY_HOME='<%=@installDir%>'
 export JAVA_HOME='/usr/lib/jvm/java-6-openjdk-amd64'
 export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx768m -XX:MaxPermSize=256m'
-PID_FILE="/var/run/$APP_NAME.pid"
+PID_FILE="/var/run/jetty-$APP_NAME.pid"
 SHUTDOWN_TIMEOUT=45
 SHUTDOWN_CHECK_INTERVAL=1
 
@@ -69,14 +69,14 @@ function stop {
 	printf "Stopping $APP_NAME Jetty"
 
 	if [ ! -f $PID_FILE ] || [ ! -s $PID_FILE ]; then
-		printf "\nfailed: $APP_NAME is not running or PID file $PID_FILE is missing or empty!"
+		printf "\nfailed: not running or incalid PID file $PID_FILE!\n"
 		return 1
 	fi
 
 	PID=$(cat $PID_FILE)
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
-		printf "\nInvalid PID. Process does not exist. Removing PID"
+		printf "\nInvalid PID. Process does not exist. Removing PID file\n"
 		rm -f $PID_FILE
 		return 1
 	fi
@@ -109,9 +109,9 @@ function restart {
 function status {
 	PID=$(cat $PID_FILE) &> /dev/null
 	if [ ! -z $PID ] && [ $(ps -p $PID | grep -c $PID) -ne 0 ]; then
-		echo "$APP_NAME running with PID $PID"
+		echo "$APP_NAME Jetty running with PID $PID"
 	else
-		echo "$APP_NAME not running (or $PID_FILE is missing)"
+		echo "$APP_NAME Jetty not running (or $PID_FILE is missing)"
 	fi
 }
 
