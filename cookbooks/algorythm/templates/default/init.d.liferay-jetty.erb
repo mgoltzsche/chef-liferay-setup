@@ -82,7 +82,9 @@ function start {
 	RUN_CMD="$RUN_CMD"
 	
 	su $USER -c  "$RUN_CMD" &>> "$LOG_FILE" &
-	echo $! > $PID_FILE
+	PID=$!
+	echo "PID: $PID"
+	echo $PID > $PID_FILE
 }
 
 function stop {
