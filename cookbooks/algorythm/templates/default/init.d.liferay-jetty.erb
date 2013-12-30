@@ -19,7 +19,6 @@ PID_FILE="/var/run/$APP_NAME.pid"
 SHUTDOWN_TIMEOUT=45
 SHUTDOWN_CHECK_INTERVAL=1
 
-#verify that the user that will run the daemon exists
 id $USER > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "User '$USER' does not exist!"
@@ -76,7 +75,7 @@ function stop {
 
 	PID=$(cat $PID_FILE)
 
-	if [ $(ps -p $pid | grep -c $pid) -eq 0 ]; then
+	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
 		printf "\nInvalid PID. Process does not exist. Removing PID"
 		rm -f $PID_FILE
 		return 1
