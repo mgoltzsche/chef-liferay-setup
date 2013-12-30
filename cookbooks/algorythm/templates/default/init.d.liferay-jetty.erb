@@ -45,8 +45,9 @@ if [ $LOG_DIR_CREATION_STATUS -ne 0 ]; then
 	exit 2
 fi
 
-touch $LOG_FILE 2> /dev/null &&
-chmod 644 $LOG_FILE
+touch $LOG_FILE &&
+chown root:$USER $LOG_FILE &&
+chmod 664 $LOG_FILE
 LOG_FILE_TOUCH_STATUS=$?
 
 if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
@@ -54,8 +55,9 @@ if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
 	exit 2
 fi
 
-touch $PID_FILE 2> /dev/null &&
-chmod 644 $PID_FILE
+touch $PID_FILE &&
+chown root:$USER $PID_FILE &&
+chmod 664 $PID_FILE
 PID_FILE_TOUCH_STATUS=$?
 
 if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
@@ -77,8 +79,8 @@ function start {
 	RUN_CMD="export JAVA_HOME='$JAVA_HOME';"
 	RUN_CMD="$RUN_CMD export JETTY_HOME='$JETTY_HOME';"
 	RUN_CMD="$RUN_CMD export JAVA_OPTS='$JAVA_OPTS';"
-	RUN_CMD="$RUN_CMD"' (cd $JETTY_HOME/bin &&'
-	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar &>> '"'$LOG_FILE') &"
+	RUN_CMD="$RUN_CMD"' cd $JETTY_HOME/bin &&'
+	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar &>>'"$LOG_FILE &"
 	RUN_CMD="$RUN_CMD echo \$! > $PID_FILE"
 	
 	su $USER -c  "$RUN_CMD"
@@ -95,8 +97,8 @@ function stop {
 	PID=$(cat $PID_FILE)
 
 	if [ $(ps -p $PID | grep -c $PID) -eq 0 ]; then
-		printf "\nInvalid PID. Process does not exist. Removing PID file\n"
-		rm -f $PID_FILE
+		printf "\nInvalid PID. Process does not exist. Cleaning PID file\n"
+		printf '' > $PID_FILE
 		return 1
 	fi
 
@@ -117,8 +119,7 @@ function stop {
 	done
 	
 	printf "\n"
-
-	rm -f $PID_FILE
+	printf '' > $PID_FILE
 }
 
 function restart {
