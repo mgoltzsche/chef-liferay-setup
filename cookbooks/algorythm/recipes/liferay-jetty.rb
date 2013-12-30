@@ -15,7 +15,7 @@ country = node['liferay-jetty']['country']
 language = node['liferay-jetty']['language']
 
 node['liferay-jetty']['instances'].each do |name, instance|
-	instanceId = "lfy_#{name}"
+	instanceId = "liferay_#{name}"
 	javaServer = instance['java_server'] || 'jetty'
 	rootWebappName = javaServer == 'jetty' ? 'root' : 'ROOT'
 	liferayDownloadUrl = instance['download_url'] || node['liferay-jetty']['instances']['default']['download_url']
