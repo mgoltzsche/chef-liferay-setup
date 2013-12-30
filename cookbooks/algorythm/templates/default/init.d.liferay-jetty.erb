@@ -86,7 +86,7 @@ function start {
 }
 
 function stop {
-	printf "Stopping $APP_NAME Jetty"
+	printf "Stopping $APP_NAME Jetty "
 
 	preparePidFile
 
@@ -104,8 +104,9 @@ function stop {
 	fi
 
 	kill -SIGTERM $PID
-
-	WAITED_TIME=0
+	sleep $SHUTDOWN_CHECK_INTERVAL
+	
+	WAITED_TIME=$SHUTDOWN_CHECK_INTERVAL
 	until [ $(ps -p $PID | grep -c $PID) = '0' ]; do
 		printf '.'
 		sleep $SHUTDOWN_CHECK_INTERVAL
@@ -118,7 +119,7 @@ function stop {
 		fi
 	done
 	
-	printf "\n"
+	printf '\n'
 	rm -f $PID_FILE
 }
 
