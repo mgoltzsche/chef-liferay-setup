@@ -46,8 +46,7 @@ if [ $LOG_DIR_CREATION_STATUS -ne 0 ]; then
 fi
 
 touch $LOG_FILE &&
-chown root:$USER $LOG_FILE &&
-chmod 664 $LOG_FILE
+chmod 644 $LOG_FILE
 LOG_FILE_TOUCH_STATUS=$?
 
 if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
@@ -56,8 +55,7 @@ if [ $LOG_FILE_TOUCH_STATUS -ne 0 ]; then
 fi
 
 touch $PID_FILE &&
-chown root:$USER $PID_FILE &&
-chmod 664 $PID_FILE
+chmod 644 $PID_FILE
 PID_FILE_TOUCH_STATUS=$?
 
 if [ $PID_FILE_TOUCH_STATUS -ne 0 ]; then
@@ -82,7 +80,7 @@ function start {
 	RUN_CMD="$RUN_CMD"' cd $JETTY_HOME/bin &&'
 	RUN_CMD="$RUN_CMD"' "$JAVA_HOME/bin/java" "$JAVA_OPTS" -jar ../start.jar'
 	
-	su $USER -c  "$RUN_CMD" &
+	su $USER -c  "$RUN_CMD" &>> "$LOG_FILE" &
 	PID=$!
 	echo "### $PID"
 	echo $PID > $PID_FILE
