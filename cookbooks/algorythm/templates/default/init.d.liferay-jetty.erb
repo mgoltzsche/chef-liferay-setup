@@ -90,7 +90,7 @@ function start {
 	
 	su $USER -c  "echo '=== STARTING ===' >> '$LOG_FILE'; \
 		cd '$JETTY_HOME'; \
-		'$JAVA_HOME/bin/java' $JAVA_OPTS -Dehcache.disk.store.dir='/tmp/ehcache-$APP_NAME' -jar start.jar --ini=bin/start.ini  \
+		'$JAVA_HOME/bin/java' $JAVA_OPTS -Djava.io.tmpdir='/tmp/$APP_NAME' -jar start.jar --ini=bin/start.ini  \
 		&>> '$LOG_FILE' & echo \$! > '$PID_FILE'"
 }
 
