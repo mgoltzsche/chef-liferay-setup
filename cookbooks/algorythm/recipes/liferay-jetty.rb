@@ -39,8 +39,8 @@ node['liferay']['instances'].each do |name, instance|
 	pgUser = instance['pg']['user'] || usr
 	pgPassword = instance['pg']['password']
 	ldapHost = instance['ldap']['hostname'] || node['ldap']['hostname']
-	ldapPort = instance['ldap']['port'] || node['ldap']['instances'][name]['port'] || node['ldap']['instances']['default']['port']
-	ldapSuffix = ldapSuffix(instance['ldap']['domain'] || node['ldap']['instances'][name]['domain'] || node['ldap']['instances']['default']['domain'])
+	ldapPort = instance['ldap']['port'] || node['ldap']['instances']['default']['port']
+	ldapSuffix = ldapSuffix(instance['ldap']['domain'] || node['ldap']['instances']['default']['domain'])
 	ldapUser = instance['ldap']['user'] || usr
 	ldapUserDN="cn=#{ldapUser},ou=Special Users,#{ldapSuffix}"
 	ldapPassword = instance['ldap']['password']
