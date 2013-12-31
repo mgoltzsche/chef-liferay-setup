@@ -150,7 +150,7 @@ template "#{jettyVhostDir}/#{hostname}.xml" do
 		:war => nexusDir,
 		:hostname => hostname
 	})
-	notifies :restart, "service[#{instanceId}]"
+	notifies :restart, 'service[liferay_default]'
 end
 
 # --- Register Nexus LDAP user ---
