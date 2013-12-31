@@ -186,7 +186,6 @@ template '/etc/dovecot/dovecot.conf' do
 	group 'root'
 	mode 0600
 	variables({
-		:vmailDirectory => "#{vmailDirectory}/#{instanceId}",
 		:vmailUser => usr,
 		:ldapInstances => ldapInstances
 	})
@@ -214,7 +213,7 @@ node['ldap']['instances'].each do |instanceId, instance|
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:vmailDirectory => vmailDirectory
+			:vmailDirectory => "#{vmailDirectory}/#{instanceId}"
 		})
 		notifies :restart, 'service[dovecot]'
 	end
