@@ -4,21 +4,21 @@ package 'imagemagick'
 package 'unzip'
 
 downloadDir = '/Downloads'
-installDir = node['liferay-jetty']['install_directory']
-mailServerHost = node['liferay-jetty']['mail_server_hostname'] || node['mail_server']['hostname']
-adminScreenName = node['liferay-jetty']['admin']['screen_name'] || node['ldap']['instances']['default']['admin_cn'] || 'admin'
-adminFullName = node['liferay-jetty']['admin']['full_name'] || "#{node['ldap']['instances']['default']['admin_givenName']} #{node['ldap']['instances']['default']['admin_sn']}"
-adminEmail = node['liferay-jetty']['admin']['email'] || "#{node['ldap']['instances']['default']['admin_cn']}@#{node['ldap']['instances']['default']['domain']}"
-adminPassword = node['liferay-jetty']['admin']['password'] || node['ldap']['instances']['default']['admin_password']
-timezone = node['liferay-jetty']['timezone']
-country = node['liferay-jetty']['country']
-language = node['liferay-jetty']['language']
+installDir = node['liferay']['install_directory']
+mailServerHost = node['liferay']['mail_server_hostname'] || node['mail_server']['hostname']
+adminScreenName = node['liferay']['admin']['screen_name'] || node['ldap']['instances']['default']['admin_cn'] || 'admin'
+adminFullName = node['liferay']['admin']['full_name'] || "#{node['ldap']['instances']['default']['admin_givenName']} #{node['ldap']['instances']['default']['admin_sn']}"
+adminEmail = node['liferay']['admin']['email'] || "#{node['ldap']['instances']['default']['admin_cn']}@#{node['ldap']['instances']['default']['domain']}"
+adminPassword = node['liferay']['admin']['password'] || node['ldap']['instances']['default']['admin_password']
+timezone = node['liferay']['timezone']
+country = node['liferay']['country']
+language = node['liferay']['language']
 
-node['liferay-jetty']['instances'].each do |name, instance|
+node['liferay']['instances'].each do |name, instance|
 	instanceId = "liferay_#{name}"
 	javaServer = instance['java_server'] || 'jetty'
 	rootWebappName = javaServer == 'jetty' ? 'root' : 'ROOT'
-	liferayDownloadUrl = instance['download_url'] || node['liferay-jetty']['instances']['default']['download_url']
+	liferayDownloadUrl = instance['download_url'] || node['liferay']['instances']['default']['download_url']
 	liferayZipFile = File.basename(URI.parse(liferayDownloadUrl).path)
 	liferayFullName = liferayZipFile.gsub(/liferay-portal-[\w]+-(([\d]+\.?)+-[\w]+(-[\w]+)?)-[\d]+.zip/, 'liferay-portal-\1')
 	extractionDir = "/tmp/#{javaServer}-installation/#{liferayFullName}"
@@ -86,7 +86,7 @@ mkdir -p '/tmp/#{javaServer}-installation' &&
 unzip -qd '/tmp/#{javaServer}-installation' '#{liferayZipFile}' &&
 TMP_SERVER_DIR='#{extractionDir}/'$(ls '#{extractionDir}' | grep '#{javaServer}-') &&
 cd "$TMP_SERVER_DIR/etc" &&
-rm -f jdbcRealm.properties jetty-plus.xml jetty-ajp.xml jetty-bio.xml jetty-requestlog.xml jetty-overlay.xml jetty-xinetd.xml jetty-jmx.xml jetty-ipaccess.xml jetty-bio-ssl.xml jetty-ssl.xml jetty-spdy.xml jetty-spdy-proxy.xml jetty-proxy.xml jetty-rewrite.xml jetty-testrealm.xml realm.properties README.spnego spnego.conf spnego.properties krb5.ini keystore jetty-fileserver.xml &&
+rm -f jdbcRealm.properties jetty-plus.xml jetty-ajp.xml jetty-bio.xml jetty-requestlog.xml jetty-overlay.xml jetty-xinetd.xml jetty-jmx.xml jetty-annotations.xml jetty-ipaccess.xml jetty-bio-ssl.xml jetty-ssl.xml jetty-spdy.xml jetty-spdy-proxy.xml jetty-proxy.xml jetty-rewrite.xml jetty-testrealm.xml realm.properties README.spnego spnego.conf spnego.properties krb5.ini keystore jetty-fileserver.xml &&
 cd "$TMP_SERVER_DIR/bin" &&
 ls | grep '\\.bat$' | xargs rm &&
 cd "$TMP_SERVER_DIR/webapps" &&
@@ -241,7 +241,7 @@ userPassword:: #{ldapPasswordHashed}
 
 	# --- Register Liferay as service ---
 	template "/etc/init.d/#{instanceId}" do
-		source 'init.d.liferay-jetty.erb'
+		source 'init.d.liferay.erb'
 		mode 0755
 		variables({
 			:name => instanceId,

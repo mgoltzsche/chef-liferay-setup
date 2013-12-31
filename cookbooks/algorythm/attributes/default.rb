@@ -21,7 +21,7 @@ default['ldap']['instances']['default'] = {
 	'admin_cn' => 'admin',
 	'admin_sn' => 'Goltzsche',
 	'admin_givenName' => 'Max',
-	'admin_password' => 'password'
+	'admin_password' => 'ldap123'
 }
 
 # Mail Server configuration
@@ -31,7 +31,7 @@ default['mail_server'] = {
 	'vmail_directory' => '/var/vmail',
 	'ldap' => {
 		'user' => 'vmail',
-		'password' => 'password'
+		'password' => 'mail123'
 	}
 }
 
@@ -43,38 +43,6 @@ default['postgresql'] = {
 }
 
 # Liferay installation
-default['liferay-jetty']['install_directory'] = '/opt'
-default['liferay-jetty']['timezone'] = 'Europe/Berlin'
-default['liferay-jetty']['country'] = 'DE'
-default['liferay-jetty']['language'] = 'de'
-default['liferay-jetty']['mail_server_hostname'] = nil
-default['liferay-jetty']['admin'] = {
-	'screen_name' => nil,
-	'full_name' => nil,
-	'email' => nil,
-	'password' => 'password'
-}
-default['liferay-jetty']['instances']['default'] = {
-	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
-	'java_server' => 'jetty',
-	'hostname' => default['ldap']['instances']['default']['domain'],
-	'port' => 7080,
-	'company_name' => nil,
-	'system_mail_prefix' => 'system',
-	'user' => nil,
-	'default_theme_war' => nil,
-	'pg' => {
-		'port' => 5432,
-		'database' => nil,
-		'password' => 'password'
-	},
-	'ldap' => {
-		'hostname' => nil,
-		'port' => nil,
-		'user' => nil,
-		'password' => 'password'
-	}
-}
 default['liferay'] = {
 	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr',
 	'native_connectors_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz',
@@ -110,6 +78,39 @@ default['liferay'] = {
 				'password' => 'password'
 			}
 		}
+	}
+}
+
+default['liferay']['install_directory'] = '/opt'
+default['liferay']['timezone'] = 'Europe/Berlin'
+default['liferay']['country'] = 'DE'
+default['liferay']['language'] = 'de'
+default['liferay']['mail_server_hostname'] = nil
+default['liferay']['admin'] = {
+	'screen_name' => nil,
+	'full_name' => nil,
+	'email' => nil,
+	'password' => 'admin123'
+}
+default['liferay']['instances']['default'] = {
+	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
+	'java_server' => 'jetty',
+	'hostname' => default['ldap']['instances']['default']['domain'],
+	'port' => 7080,
+	'company_name' => nil,
+	'system_mail_prefix' => 'system',
+	'user' => nil,
+	'default_theme_war' => nil,
+	'pg' => {
+		'port' => 5432,
+		'database' => nil,
+		'password' => 'admin123'
+	},
+	'ldap' => {
+		'hostname' => nil,
+		'port' => nil,
+		'user' => nil,
+		'password' => 'admin123'
 	}
 }
 
