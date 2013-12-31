@@ -132,10 +132,9 @@ end
 end
 
 execute "Deploy Sonatype Nexus" do
-  user usr
-  group usr
   command <<-EOH
-cp -r #{nexusExtractDir} #{nexusDir}
+cp -r #{nexusExtractDir} '#{nexusDir}' &&
+chown -R #{usr}:#{usr} '#{nexusDir}'
   EOH
   not_if {File.exist?(nexusDir)}
   notifies :restart, 'service[liferay_default]'
