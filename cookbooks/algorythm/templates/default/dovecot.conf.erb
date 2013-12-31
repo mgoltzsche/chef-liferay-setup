@@ -7,9 +7,9 @@ base_dir = /var/run/dovecot/
 info_log_path = /var/log/dovecot.info
 log_path = /var/log/dovecot
 log_timestamp = "%Y-%m-%d %H:%M:%S "
-mail_location = maildir:<%=@vmail_directory%>/%d/%n/
-mail_uid=<%=@vmail_user%>
-mail_gid=<%=@vmail_user%>
+#mail_location = maildir:<%=@vmailDirectory%>/%d/%n/
+mail_uid=<%=@vmailUser%>
+mail_gid=<%=@vmailUser%>
 protocols = imap pop3
 ssl = required
 ssl_cert = </etc/ssl/certs/server.crt
