@@ -3,7 +3,7 @@ downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
-nexusDir = "#{node['nexus']['install_directory']}"
+nexusDir = "#{node['nexus']['install_directory']}/nexus"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
@@ -140,7 +140,7 @@ chown -R #{usr}:#{usr} '#{nexusDir}'
   notifies :restart, 'service[liferay_default]'
 end
 
-template "#{jettyVhostDir}/#{hostname}.xml" do
+template "#{jettyVhostDir}/nexus.xml" do
 	owner 'root'
 	group usr
 	source 'nexus.jetty.vhost.erb'
