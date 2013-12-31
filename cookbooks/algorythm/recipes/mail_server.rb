@@ -133,7 +133,7 @@ userPassword:: #{ldapPasswordHashed}
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:resultAttribute => "mail\nresult_format = %d/%u/"
+			:resultAttribute => "mail\nresult_format = #{instanceId}/%d/%u/"
 		})
 		notifies :restart, 'service[postfix]'
 	end
@@ -186,7 +186,7 @@ template '/etc/dovecot/dovecot.conf' do
 	group 'root'
 	mode 0600
 	variables({
-		:vmailDirectory => vmailDirectory,
+		:vmailDirectory => "#{vmailDirectory}/#{instanceId}",
 		:vmailUser => usr,
 		:ldapInstances => ldapInstances
 	})

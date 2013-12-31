@@ -59,7 +59,7 @@ passdb {
 userdb {
   driver = prefetch
 }
-userdb { # Only used by LDA
+userdb { # Used by LDA only
   driver = ldap
   args = /etc/dovecot/dovecot-ldap-<%=id%>-userdb.conf.ext
 }
