@@ -1,9 +1,9 @@
-usr = node['liferay']['user']
+usr = node['liferay']['instances']['default']['user']
 downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
-nexusDir = "#{node['nexus']['deploy_directory']}/ROOT"
+nexusDir = "#{node['nexus']['install_directory']}/nexus"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
@@ -107,7 +107,7 @@ template "#{nexusHome}/conf/ldap.xml" do
     :user => ldapUser,
     :password => ldapPassword
   })
-  notifies :restart, 'service[liferay]'
+  notifies :restart, 'service[liferay_default]'
 end
 
 execute "Extract Sonatype Nexus" do
@@ -136,7 +136,7 @@ execute "Deploy Sonatype Nexus" do
 cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
-  notifies :restart, 'service[liferay]'
+  notifies :restart, 'service[liferay_default]'
 end
 
 # --- Register Nexus LDAP user ---
@@ -202,14 +202,15 @@ end
 
 # --- Configure nginx ---
 template "/etc/nginx/sites-available/#{hostname}" do
-  source 'nexus.nginx.vhost.erb'
-  mode 00700
-  variables({
-    :hostname => hostname,
-    :httpPort => node['liferay']['http_port'],
-    :httpsPort => node['liferay']['https_port']
-  })
-  notifies :restart, 'service[nginx]'
+	source 'liferay.nginx.vhost.erb'
+	owner 'root'
+	group 'www-data'
+	mode 0740
+	variables({
+		:hostname => hostname,
+		:port => node['liferay']['instances']['default']['port']
+	})
+	notifies :restart, 'service[nginx]'
 end
 
 link "/etc/nginx/sites-enabled/#{hostname}" do
@@ -224,7 +225,7 @@ service 'nginx' do
 end
 
 # --- (Re)start Liferay ---
-service 'liferay' do
+service 'liferay_default' do
   supports :restart => true
   action :nothing
 end

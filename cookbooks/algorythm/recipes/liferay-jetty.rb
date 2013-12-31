@@ -254,7 +254,9 @@ userPassword:: #{ldapPasswordHashed}
     # --- Configure nginx vhost ---
 	template "/etc/nginx/sites-available/#{nginxVhostFileName}" do
 		source 'liferay.nginx.vhost.erb'
-		mode 0744
+		owner 'root'
+		group 'www-data'
+		mode 0740
 		variables({
 			:hostname => hostname,
 			:port => port
