@@ -246,7 +246,8 @@ userPassword:: #{ldapPasswordHashed}
 		variables({
 			:name => instanceId,
 			:installDir => liferayDir,
-			:user => usr
+			:user => usr,
+			:maxOpenFiles => node['max_open_files']
 		})
 	end
 

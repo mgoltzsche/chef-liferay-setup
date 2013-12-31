@@ -12,9 +12,10 @@ fi
 
 APP_NAME='<%=@name%>'
 USER=<%=@user%>
+MAX_OPEN_FILES=<%=@maxOpenFiles%>
 export JETTY_HOME='<%=@installDir%>'
 export JAVA_HOME='/usr/lib/jvm/java-6-openjdk-amd64'
-export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx768m -XX:MaxPermSize=256m'
+export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx512m -XX:MaxPermSize=128m'
 LOG_DIR=/var/log/jetty
 LOG_FILE="$LOG_DIR/$APP_NAME.log"
 PID_FILE="/var/run/$APP_NAME.pid"
@@ -83,10 +84,13 @@ function start {
 	fi
 
 	rm -rf "$JETTY_HOME/temp/*"
+	
+	ulimit -Hn $MAX_OPEN_FILES
+	ulimit -Sn $MAX_OPEN_FILES
+	
 	su $USER -c  "echo '=== STARTING ===' >> '$LOG_FILE'; \
-		ulimit -n 100000; \
-		cd '$JETTY_HOME/bin'; \
-		'$JAVA_HOME/bin/java' $JAVA_OPTS -jar ../start.jar \
+		cd '$JETTY_HOME'; \
+		'$JAVA_HOME/bin/java' $JAVA_OPTS -jar start.jar \
 		&>> '$LOG_FILE' & echo \$! > '$PID_FILE'"
 }
 
