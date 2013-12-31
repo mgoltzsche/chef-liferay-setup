@@ -241,7 +241,7 @@ userPassword:: #{ldapPasswordHashed}
 
 	# --- Register Liferay as service ---
 	template "/etc/init.d/#{instanceId}" do
-		source 'init.d.liferay.erb'
+		source 'init.d.liferay-jetty.erb'
 		mode 0755
 		variables({
 			:name => instanceId,
