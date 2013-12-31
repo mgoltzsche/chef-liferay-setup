@@ -88,10 +88,9 @@ function start {
 	ulimit -Hn $MAX_OPEN_FILES
 	ulimit -Sn $MAX_OPEN_FILES
 	
-	VHOSTS=$(ls "$JETTY_HOME/etc/vhosts" | grep -P '\.xml$')
 	su $USER -c  "echo '=== STARTING ===' >> '$LOG_FILE'; \
 		cd '$JETTY_HOME'; \
-		'$JAVA_HOME/bin/java' $JAVA_OPTS -Djava.io.tmpdir='/tmp/$APP_NAME' -jar start.jar --ini=bin/start.ini $VHOSTS \
+		'$JAVA_HOME/bin/java' $JAVA_OPTS -Djava.io.tmpdir='/tmp/$APP_NAME' -jar start.jar --ini=bin/start.ini $(find etc/vhosts -name \*.xml) \
 		&>> '$LOG_FILE' & echo \$! > '$PID_FILE'"
 }
 
