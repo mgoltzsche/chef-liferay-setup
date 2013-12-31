@@ -1,4 +1,4 @@
-usr = node['liferay']['instances']['default']['user']
+usr = node['liferay']['instances']['default']['user'] || 'liferay_default'
 downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
