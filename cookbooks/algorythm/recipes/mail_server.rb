@@ -217,6 +217,10 @@ node['ldap']['instances'].each do |instanceId, instance|
 		})
 		notifies :restart, 'service[dovecot]'
 	end
+	
+	link "/etc/dovecot/dovecot-ldap-#{instanceId}-userdb.conf.ext" do
+		to "/etc/dovecot/dovecot-ldap-#{instanceId}.conf.ext"
+	end
 end
 
 # --- Configure backup ---
