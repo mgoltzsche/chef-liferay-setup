@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
 	exit 2
 fi
 
-if [ ! -x "$JAVA_HOME/bin/java" ]; then
+if [ ! -x "$JAVA_BINARY" ]; then
 	echo "Java not installed in $JAVA_HOME!" >&2
 	exit 2
 fi
