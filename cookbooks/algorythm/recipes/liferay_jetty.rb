@@ -69,12 +69,6 @@ node['liferay']['instances'].each do |name, instance|
 		mode 00755
 	end
 	
-	directory "#{homeDir}/etc/vhosts" do
-		owner 'root'
-		group usr
-		mode 0755
-	end
-	
 	# --- Download & install Liferay ---
 	directory downloadDir do
 		mode 0755
@@ -114,6 +108,12 @@ mkdir -p #{liferayRootWebappDir}/WEB-INF/classes/de/algorythm &&
 chown -R #{usr}:#{usr} '#{liferayDir}'
 		EOH
 		not_if {File.exist?(liferayDir)}
+	end
+	
+	directory "#{liferayDir}/etc/vhosts" do
+		owner 'root'
+		group usr
+		mode 0755
 	end
 	
 	# --- Add logos, default theme & contact form portlet ---
