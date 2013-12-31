@@ -6,7 +6,7 @@ machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']
 vmailDirectory = node['mail_server']['vmail_directory']
 ldapHost = node['ldap']['hostname']
-ldapInstances = node['ldap'].keys
+ldapInstances = node['ldap']['instances'].keys
 
 # --- Create virtual mail user ---
 user usr do
