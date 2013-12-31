@@ -14,8 +14,8 @@ APP_NAME='<%=@name%>'
 USER=<%=@user%>
 MAX_OPEN_FILES=<%=@maxOpenFiles%>
 export JETTY_HOME='<%=@installDir%>'
+export JAVA_HOME='/usr/lib/jvm/java-7-openjdk-amd64'
 export JAVA_OPTS='-Dapp.server.jetty.version=8.1.10 -Dapp.server.jetty.version.date=20130312 -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true  -Duser.timezone=Europe/Berlin -Xmx768m -XX:MaxPermSize=256m'
-JAVA_BINARY='/usr/lib/jvm/java-6-openjdk-amd64/bin/java'
 LOG_DIR=/var/log/jetty
 LOG_FILE="$LOG_DIR/$APP_NAME.log"
 PID_FILE="/var/run/$APP_NAME.pid"
@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
 	exit 2
 fi
 
-if [ ! -x "$JAVA_BINARY" ]; then
+if [ ! -x "$JAVA_HOME/bin/java" ]; then
 	echo "Java not installed in $JAVA_HOME!" >&2
 	exit 2
 fi
@@ -90,7 +90,7 @@ function start {
 	
 	su $USER -c  "echo '=== STARTING ===' >> '$LOG_FILE'; \
 		cd '$JETTY_HOME'; \
-		'$JAVA_BINARY' $JAVA_OPTS -Djava.io.tmpdir='/tmp/$APP_NAME' -jar start.jar --ini=bin/start.ini  \
+		'$JAVA_HOME/bin/java' $JAVA_OPTS -Djava.io.tmpdir='/tmp/$APP_NAME' -jar start.jar --ini=bin/start.ini  \
 		&>> '$LOG_FILE' & echo \$! > '$PID_FILE'"
 }
 

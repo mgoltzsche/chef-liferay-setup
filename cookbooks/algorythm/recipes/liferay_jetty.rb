@@ -1,4 +1,4 @@
-package 'openjdk-6-jdk'
+package 'openjdk-7-jdk'
 package 'libssl-dev'
 package 'imagemagick'
 package 'unzip'
