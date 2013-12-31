@@ -133,7 +133,7 @@ userPassword:: #{ldapPasswordHashed}
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:resultAttribute => "cn\nresult_format = %s/"
+			:resultAttribute => 'mail\nresult_format = %d/%u/'
 		})
 		notifies :restart, 'service[postfix]'
 	end
@@ -149,7 +149,7 @@ userPassword:: #{ldapPasswordHashed}
 			:suffix => ldapSuffix,
 			:user => ldapUser,
 			:password => ldapPassword,
-			:resultAttribute => 'cn'
+			:resultAttribute => 'mail'
 		})
 		notifies :restart, 'service[postfix]'
 	end
