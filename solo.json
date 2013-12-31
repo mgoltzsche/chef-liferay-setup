@@ -5,8 +5,6 @@
 		"recipe[algorythm::certificate]",
 		"recipe[algorythm::nginx]",
 		"recipe[algorythm::directory_server]",
-		"recipe[algorythm::mail_server]",
-		"recipe[algorythm::postgresql]",
-		"recipe[algorythm::liferay-jetty]"
+		"recipe[algorythm::mail_server]"
 	]
 }
