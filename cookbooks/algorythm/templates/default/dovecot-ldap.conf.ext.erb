@@ -5,8 +5,8 @@ tls = no
 auth_bind = yes
 base = <%=@suffix%>
 user_attrs = 
-user_filter = (&(objectClass=mailRecipient)(cn=%u))
+user_filter = (&(objectClass=mailRecipient)(mail=%u))
 pass_attrs = 
-pass_filter = (&(objectClass=mailRecipient)(cn=%u))
+pass_filter = (&(objectClass=mailRecipient)(mail=%u))
 scope = subtree
 ldap_version = 3
