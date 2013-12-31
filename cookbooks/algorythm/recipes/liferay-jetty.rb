@@ -249,6 +249,7 @@ userPassword:: #{ldapPasswordHashed}
 			:user => usr,
 			:maxOpenFiles => node['max_open_files']
 		})
+		notifies :restart, "service[#{instanceId}]"
 	end
 
     # --- Configure nginx vhost ---

@@ -62,6 +62,7 @@ end
 execute "Configure baseUrl" do
   command "sed -i 's/<baseUrl>.*?<\\/baseUrl>/<baseUrl>https:\\/\\/#{hostname}\\/<\\/baseUrl>/g' #{nexusCfg}"
   not_if "cat #{nexusCfg} | grep '<baseUrl>https://#{hostname}/</baseUrl>'"
+  notifies :restart, 'service[liferay_default]'
 end
 
 template "#{nexusHome}/conf/security-configuration.xml" do
