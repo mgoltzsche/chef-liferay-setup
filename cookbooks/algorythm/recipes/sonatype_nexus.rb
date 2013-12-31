@@ -3,10 +3,11 @@ downloadDir = "/Downloads"
 version = node['nexus']['version']
 nexusWarFile = "#{downloadDir}/nexus-#{version}.war"
 nexusExtractDir = "/tmp/nexus-#{version}"
-nexusDir = "#{node['nexus']['install_directory']}/nexus"
+nexusDir = "#{node['nexus']['install_directory']}"
 nexusHome = node['nexus']['home']
 nexusHomeEscaped = nexusHome.dup.gsub!('/', '\\/')
 nexusCfg = "#{nexusHome}/conf/nexus.xml"
+jettyVhostDir = node['nexus']['jetty_vhost_directory']
 hostname = node['nexus']['hostname']
 ldapHost = node['ldap']['hostname']
 ldapPort = node['ldap']['instances']['default']['port']
@@ -138,6 +139,18 @@ cp -r #{nexusExtractDir} #{nexusDir}
   EOH
   not_if {File.exist?(nexusDir)}
   notifies :restart, 'service[liferay_default]'
+end
+
+template "#{jettyVhostDir}/#{hostname}.xml" do
+	owner 'root'
+	group usr
+	source 'nexus.jetty.vhost.erb'
+	mode 0644
+	variables({
+		:war => nexusDir,
+		:hostname => hostname
+	})
+	notifies :restart, "service[#{instanceId}]"
 end
 
 # --- Register Nexus LDAP user ---

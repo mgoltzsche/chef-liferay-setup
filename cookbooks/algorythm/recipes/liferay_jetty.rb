@@ -69,6 +69,12 @@ node['liferay']['instances'].each do |name, instance|
 		mode 00755
 	end
 	
+	directory "#{homeDir}/etc/vhosts" do
+		owner 'root'
+		group usr
+		mode 0755
+	end
+	
 	# --- Download & install Liferay ---
 	directory downloadDir do
 		mode 0755
