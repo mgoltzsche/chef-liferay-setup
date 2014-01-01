@@ -145,7 +145,7 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 	
 	if defaultThemeWar
 		warName = File.basename(URI.parse(defaultThemeWar).path).gsub!(/(.*).war$/, '\1')
-		defaultThemeIdPart = warName.gsub!(/-_ /, '')
+		defaultThemeIdPart = warName.delete! '-_'
 		defaultThemeId = "#{defaultThemeIdPart}_WAR_#{defaultThemeIdPart}"
 		execute "Deploy default theme in #{name} Liferay instance" do
 			user usr
