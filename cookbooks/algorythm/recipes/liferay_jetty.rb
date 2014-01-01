@@ -130,7 +130,7 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		backup false
 	end
 	
-	cookbook_file "#{liferayRootWebappDir}/html/themes/control_panel/classic/favicon.ico" do
+	cookbook_file "#{liferayRootWebappDir}/html/themes/classic/images/favicon.ico" do
 		owner usr
 		group usr
 		backup false
