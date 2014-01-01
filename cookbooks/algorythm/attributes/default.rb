@@ -43,44 +43,6 @@ default['postgresql'] = {
 }
 
 # Liferay installation
-default['liferay'] = {
-	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-tomcat-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1383419991&use_mirror=garr',
-	'native_connectors_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-connectors/native/1.1.29/source/tomcat-native-1.1.29-src.tar.gz',
-	'apr_download_url' => 'ftp://ftp.fu-berlin.de/unix/www/apache/apr/apr-1.5.0.tar.bz2',
-	'install_directory' => '/opt',
-	'home' => '/var/opt/liferay',
-	'user' => 'liferay',
-	'catalina_opts' => '-server -Xms128m -Xmx1024m -XX:MaxPermSize=512m',
-	'http_port' => 7080,
-	'https_port' => 7443,
-
-	'system_mail_prefix' => 'system',
-	'admin' => {'name' => 'Max Goltzsche'},
-	'timezone' => 'Europe/Berlin',
-	'country' => 'DE',
-	'language' => 'de',
-	'tomcat_virtual_hosts' => {
-		'nexus' => "repository.#{default['ldap']['instances']['default']['domain']}"
-	},
-	'instances' => {
-		'default' => {
-			'hostname' => default['ldap']['instances']['default']['domain'],
-			'company_default_name' => default['ldap']['instances']['default']['domain'],
-			'system_mail_prefix' => 'system',
-            'admin_password' => nil,
-			'pg' => {
-				'port' => 5432,
-				'database' => 'liferay',
-				'password' => 'password'
-			},
-			'ldap' => {
-				'user' => 'liferay',
-				'password' => 'password'
-			}
-		}
-	}
-}
-
 default['liferay']['install_directory'] = '/opt'
 default['liferay']['timezone'] = 'Europe/Berlin'
 default['liferay']['country'] = 'DE'

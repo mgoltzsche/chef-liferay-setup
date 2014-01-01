@@ -110,12 +110,6 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		not_if {File.exist?(liferayDir)}
 	end
 	
-	directory "#{liferayDir}/etc/vhosts" do
-		owner 'root'
-		group usr
-		mode 0755
-	end
-	
 	# --- Add logos, default theme & contact form portlet ---
 	cookbook_file "#{liferayRootWebappDir}/WEB-INF/classes/de/algorythm/logo.png" do
 		owner usr
