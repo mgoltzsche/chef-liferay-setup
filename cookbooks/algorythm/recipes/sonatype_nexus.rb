@@ -217,8 +217,8 @@ end
 template "/etc/nginx/sites-available/#{hostname}" do
 	source 'liferay.nginx.vhost.erb'
 	owner 'root'
-	group 'www-data'
-	mode 0740
+	group 'root'
+	mode 0600
 	variables({
 		:hostname => hostname,
 		:port => node['liferay']['instances']['default']['port']
