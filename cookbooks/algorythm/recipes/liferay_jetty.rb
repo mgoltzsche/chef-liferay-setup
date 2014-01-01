@@ -135,6 +135,12 @@ chown -R #{usr}:#{usr} '#{liferayDir}'
 		group usr
 		backup false
 	end
+	
+	cookbook_file "#{liferayRootWebappDir}/html/themes/control_panel/classic/favicon.ico" do
+		owner usr
+		group usr
+		backup false
+	end
 
 	cookbook_file "#{deployDir}/contact-form.war" do
 		owner usr
