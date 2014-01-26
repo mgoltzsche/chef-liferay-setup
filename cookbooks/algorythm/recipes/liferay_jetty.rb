@@ -265,7 +265,7 @@ userPassword:: #{ldapPasswordHashed}
 		group 'root'
 		mode 0744
 		variables({
-			:home => liferayHomeDir,
+			:home => homeDir,
 			:user => usr
 		})
 	end
