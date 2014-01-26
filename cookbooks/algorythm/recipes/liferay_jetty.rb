@@ -266,7 +266,8 @@ userPassword:: #{ldapPasswordHashed}
 		mode 0744
 		variables({
 			:home => homeDir,
-			:user => usr
+			:user => usr,
+			:service => instanceId
 		})
 	end
 

@@ -5,6 +5,9 @@ fi
 if [ -z "$LIFERAY_USER" ]; then
 	LIFERAY_USER='<%=@user%>'
 fi
+if [ -z "$LIFERAY_SERVICE" ]; then
+	LIFERAY_SERVICE='<%=@service%>'
+fi
 CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
 DB_NAME=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.url=.*/).*?')
 DB_USER=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.username=).*')
@@ -22,9 +25,9 @@ case "$ACTION" in
 		liferayBackup
 	;;
 	restore)
-		serviceWrapper liferay stop
+		serviceWrapper '$LIFERAY_SERVICE' stop
 		liferayBackup &&
-		serviceWrapper liferay start
+		serviceWrapper '$LIFERAY_SERVICE' start
 	;;
 	*)
 		echo "Usage: $0 {dump|restore} DIRECTORY"
