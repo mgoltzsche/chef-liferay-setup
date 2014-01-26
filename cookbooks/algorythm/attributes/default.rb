@@ -78,7 +78,7 @@ default['liferay']['instances']['default'] = {
 
 # Sonatype Nexus installation
 default['nexus'] = {
-	'version' => '2.7.0-06',
+	'version' => '2.7.1-01',
 	'hostname' => "repository.#{default['ldap']['instances']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'install_directory' => "#{default['liferay']['install_directory']}/liferay_default/webapps",
