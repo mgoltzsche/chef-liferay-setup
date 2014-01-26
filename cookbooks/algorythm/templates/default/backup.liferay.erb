@@ -6,31 +6,12 @@ if [ -z "$LIFERAY_USER" ]; then
 	LIFERAY_USER='<%=@user%>'
 fi
 CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
-
-function backupLiferayDBs {
-	for SHARD in $(cat $CFG_FILE | grep -P '^jdbc\.[^\.]+\.url='); do
-		SHARD_NAME=$(echo $SHARD | grep -Po '(?<=^jdbc\.)[^\.]+')
-		SHARD_DB=$(echo $SHARD | grep -Po '[^/]+$')
-		SHARD_DB_USER=$(cat $CFG_FILE | grep -Po "(?<=^jdbc\.$SHARD_NAME\.username=).*")
-
-		if [ -z "$SHARD_NAME" ] || [ -z "$SHARD_DB" ] || [ -z "$SHARD_DB_USER" ]; then
-			echo "! Invalid shard configuration at shard '$SHARD'. Check $CFG_FILE"
-			return 1
-		fi
-
-		backupPostgreDB "$SHARD_DB" "$SHARD_DB_USER"
-
-		STATUS=$?
-
-		if [ $STATUS != '0' ]; then
-			return 1
-		fi
-	done
-}
+DB_NAME=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.url=.*/).*?')
+DB_USER=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.username=).*')
 
 function liferayBackup {
 	serviceWrapper liferay stop
-	backupLiferayDBs &&
+	backupPostgreDB "$DB_NAME" "$DB_USER" &&
 	backupDirectory "$LIFERAY_HOME/data" 'data'                  "$LIFERAY_USER:$LIFERAY_USER" &&
 	backupFile      "$CFG_FILE"          'portal-ext.properties' "$LIFERAY_USER:$LIFERAY_USER" &&
 	serviceWrapper liferay start

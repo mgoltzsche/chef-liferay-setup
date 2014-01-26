@@ -83,6 +83,7 @@ default['nexus'] = {
 	'system_mail_prefix' => 'system',
 	'install_directory' => "#{default['liferay']['install_directory']}/liferay_default/webapps",
 	'jetty_vhost_directory' => "#{default['liferay']['install_directory']}/liferay_default/contexts",
+	'service' => 'liferay_default',
 	'home' => '/var/opt/nexus',
 	'ldap' => {
 		'user' => 'nexus',

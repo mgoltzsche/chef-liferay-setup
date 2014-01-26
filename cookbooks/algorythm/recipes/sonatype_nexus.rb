@@ -24,6 +24,7 @@ mailServerHost = node['mail_server']['hostname']
 systemEmailAddress = "#{systemMailPrefix}@#{hostname}"
 anonymousEmailAddress = "anonymous@#{hostname}"
 ldapModifyParams = "-x -h #{ldapHost} -p #{ldapPort} -D cn='#{node['ldap']['dirmanager']}' -w '#{node['ldap']['dirmanager_password']}'"
+service = node['nexus']['service']
 
 package 'unzip'
 
@@ -209,7 +210,8 @@ template "#{node['backup']['install_directory']}/tasks/nexus" do
   mode 0700
   variables({
     :home => nexusHome,
-    :user => usr
+    :user => usr,
+    :service => service,
   })
 end
 

@@ -258,6 +258,18 @@ userPassword:: #{ldapPasswordHashed}
 		notifies :restart, "service[#{instanceId}]"
 	end
 
+	# --- Configure backup ---
+	template "#{node['backup']['install_directory']}/tasks/#{instanceId}" do
+		source 'backup.liferay.erb'
+		owner 'root'
+		group 'root'
+		mode 0744
+		variables({
+			:home => liferayHomeDir,
+			:user => usr
+		})
+	end
+
     # --- Configure nginx vhost ---
 	template "/etc/nginx/sites-available/#{nginxVhostFileName}" do
 		source 'liferay.nginx.vhost.erb'

@@ -5,6 +5,7 @@ fi
 if [ -z "$NEXUS_SYSTEM_USER" ]; then
 	NEXUS_SYSTEM_USER='<%=@user%>'
 fi
+CONTAINER_SERVICE='<%=@service%>'
 
 function nexusBackup {
 	backupDirectory "$NEXUS_HOME/conf" 'conf' "$NEXUS_SYSTEM_USER:$NEXUS_SYSTEM_USER" &&
@@ -17,9 +18,9 @@ case "$ACTION" in
 		nexusBackup
 	;;
 	restore)
-		serviceWrapper liferay stop
+		serviceWrapper "$CONTAINER_SERVICE" stop
 		nexusBackup &&
-		serviceWrapper liferay start
+		serviceWrapper "$CONTAINER_SERVICE" start
 	;;
 	*)
 		echo "Usage: $0 {dump|restore} DIRECTORY"
