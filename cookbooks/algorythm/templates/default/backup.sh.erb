@@ -49,6 +49,14 @@ function printStatusMessage {
 	printf "%s%s%20s\n" "$MSG" "${SPACER:${#MSG}}" "$STATE"
 }
 
+function indent {
+	$@ | while read -r LINE; do
+		echo "  $LINE"
+	done
+	CMD_EXIT_CODE=$PIPESTATUS
+	return $CMD_EXIT_CODE
+}
+
 function list {
 	BYTE_COUNT=0
 	for FILE in $(ls "$BACKUP_DIR"); do
@@ -99,10 +107,8 @@ function runBackupTask {
 
 		echo '* Decompress backup'
 		cd $TMP_DIR
-		tar xvjf "$BACKUP_ARCHIVE" | while read -r LINE; do
-			echo "  $LINE"
-		done
-		DECOMPRESSION_EXIT_CODE=$PIPESTATUS
+		indent tar xvjf "$BACKUP_ARCHIVE"
+		DECOMPRESSION_EXIT_CODE=$?
 
 		if [ $DECOMPRESSION_EXIT_CODE -ne 0 ]; then
 			echo "failed: Couldn't extract $BACKUP_ARCHIVE in $TMP_DIR"
@@ -117,9 +123,7 @@ function runBackupTask {
 		if [ $ACTION = 'dump' ]; then
 			echo '* Compress backup'
 			cd $TMP_DIR
-			tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID | while read -r LINE; do
-				echo "  $LINE"
-			done
+			indent tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
 			COMPRESSION_EXIT_CODE=$PIPESTATUS
 
 			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
