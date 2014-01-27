@@ -277,8 +277,9 @@ while [ "$1" != '' ]; do
 			DUMP_OR_RESTORE=true
 		;;
 		list) ACTION=$1;;
+		help) ACTION=$1;;
 		-f|--force) FORCE_OVERWRITE=true;;
-		-h|--help)  showUsageAndExit 0;;
+		-h|--help)  ACTION=help;;
 		*)
 			if $DUMP_OR_RESTORE; then
 				if [ ! -f "$INSTALL_DIR/tasks/$1" ]; then
@@ -292,10 +293,6 @@ while [ "$1" != '' ]; do
 	esac
 	shift
 done
-
-if [ -z "$ACTION" ]; then
-	showUsageAndExit >&2
-fi
 
 # Apply action
 case "$ACTION" in
@@ -349,6 +346,8 @@ case "$ACTION" in
 	list)
 		list
 	;;
+	help)
+		showUsageAndExit 0
 	*)
 		showUsageAndExit >&2
 	;;
