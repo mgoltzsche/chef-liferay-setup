@@ -1,9 +1,11 @@
 #!/bin/bash
+
 function ldapBackup {
 	EXIT_CODE=0
 	
-	for INSTANCE in $(ls "$INSTANCE_LOOP_DIR" | grep -P "^slapd-"); do
-		backupDirectory "/etc/dirsrv/$INSTANCE" "$INSTANCE" dirsrv:dirsrv
+	for INSTANCE in $(ls "$LOOP_DIR" | grep -P "^slapd-"); do
+		backupDirectory "/etc/dirsrv/$INSTANCE" "conf/$INSTANCE" dirsrv:dirsrv &&
+		backupDirectory "/var/lib/dirsrv/$INSTANCE" "data/$INSTANCE" dirsrv:dirsrv
 		STATUS=$?
 
 		if [ $STATUS != '0' ]; then
@@ -15,11 +17,11 @@ function ldapBackup {
 
 case "$ACTION" in
 	dump)
-		INSTANCE_LOOP_DIR=/etc/dirsrv
+		LOOP_DIR=/etc/dirsrv
 		ldapBackup
 	;;
 	restore)
-		INSTANCE_LOOP_DIR="$BACKUP_TMP_DIR"
+		LOOP_DIR="$BACKUP_TMP_DIR/conf"
 		serviceWrapper dirsrv stop
 		ldapBackup &&
 		serviceWrapper dirsrv start
