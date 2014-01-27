@@ -50,8 +50,17 @@ function printStatusMessage {
 }
 
 function indent {
-	"$@" 2>&1 | while read -r LINE; do
-		echo "  $LINE"
+	if [ -z "$1" ]; then
+		return
+	fi
+	i=1
+	if [ "$1" -ge 0 &> /dev/null ]; then
+		i=$1
+		shift
+	fi
+	i=$(($i * 2))
+	("$@") 2>&1 | while read -r LINE; do
+		printf "%${i}s$LINE\n"
 	done
 	CMD_EXIT_CODE=$PIPESTATUS
 	return $CMD_EXIT_CODE

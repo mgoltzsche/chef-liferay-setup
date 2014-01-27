@@ -41,7 +41,7 @@ function backupPostgreDB {
 			mkdir -p "$SQL_BACKUP_TMP_DIR" &&
 			chown root:postgres "$SQL_BACKUP_TMP_DIR" &&
 			chmod 770 "$SQL_BACKUP_TMP_DIR" &&
-			indent indent su postgres -c "pg_dump '$DB' > '$SQL_FILE'"
+			indent 2 su postgres -c "pg_dump '$DB' > '$SQL_FILE'"
 		;;
 		restore)
 			if [ -z "$DB_OWNER" ]; then
@@ -53,12 +53,12 @@ function backupPostgreDB {
 			DB_GREP_STATUS=$?
 			if [ $DB_GREP_STATUS -eq 0 ]; then
 				echo '  * Drop'
-				indent indent su postgres -c "dropdb '$DB'"
+				indent 2 su postgres -c "dropdb '$DB'"
 			fi &&
 			echo '  * Create' &&
-			indent indent su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
+			indent 2 su postgres -c "createdb '$DB' -O '$DB_OWNER'" &&
 			echo "  * Run $DB.sql" &&
-			indent indent su postgres -c "psql --set ON_ERROR_STOP= -1 -q -f '$SQL_FILE' '$DB'" > /dev/null
+			indent 2 su postgres -c "psql --set ON_ERROR_STOP= -1 -f '$SQL_FILE' '$DB'" > /dev/null
 		;;
 	esac
 }
