@@ -293,6 +293,7 @@ while [ "$1" != '' ]; do
 			else
 				showUsageAndExit >&2
 			fi
+		;;
 	esac
 	shift
 done
@@ -311,7 +312,8 @@ case "$ACTION" in
 				if $FORCE_OVERWRITE; then
 					echo "WARNING: $BACKUP_FILE already exists and will be overwritten"
 				else
-					printf "ERROR: $BACKUP_FILE already exists. \n       Add -f option to overwrite old backups\n" >&2
+					echo "ERROR: $BACKUP_FILE already exists." >&2
+					echo "       Add -f option to overwrite old backups\n" >&2
 					exit 5
 				fi
 			fi
