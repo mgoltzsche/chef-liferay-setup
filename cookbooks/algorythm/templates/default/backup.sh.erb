@@ -20,7 +20,7 @@ fi
 SCRIPT_NAME="$0"
 ACTION=
 BACKUP_DATE=
-FORCE_OVERWRITE=
+FORCE_OVERWRITE=false
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
 DATE_FORMAT='[\d]{2}-[\d]{2}-[\d]{2}'
 MAX_BACKUPS=5
@@ -192,7 +192,7 @@ function runBackup {
 		TASK_EXIT_CODE=$?
 
 		if [ $TASK_EXIT_CODE -ne 0 ]; then
-			echo "! $BACKUP_TYPE failed"
+			echo "! $BACKUP_TYPE failed" >&2
 		        EXIT_CODE=3
 		fi
 	done
@@ -257,7 +257,7 @@ function runBackup {
 		echo "Finished successfully (see $LOG_FILE)"
 	else
 		echo "Finished with error(s)" >> "$LOG_FILE"
-		printf "\nFinished with error(s) (see $LOG_FILE)\n"
+		printf "\nFinished with error(s) (see $LOG_FILE)\n" >&2
 	fi
 
 	rm -rf $TMP_DIR
@@ -280,7 +280,7 @@ while [ "$1" != '' ]; do
 			DUMP_OR_RESTORE=true
 		;;
 		list) ACTION=$1;;
-		-f|--force) FORCE_OVERWRITE=1;;
+		-f|--force) FORCE_OVERWRITE=true;;
 		-h|--help)  showUsageAndExit 0;;
 		*)
 			if $DUMP_OR_RESTORE; then
@@ -311,7 +311,7 @@ case "$ACTION" in
 			BACKUP_DATE_SEARCH_EXIT_CODE=$?
 
 			if [ $BACKUP_DATE_SEARCH_EXIT_CODE -eq 0 ]; then
-				if [ "$FORCE_OVERWRITE" = '1' ]; then
+				if $FORCE_OVERWRITE; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
 					printf "ERROR: Backup date $BACKUP_DATE already exists. \n       Add -f option to overwrite old backups\n" >&2
