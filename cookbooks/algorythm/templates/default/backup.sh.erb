@@ -326,7 +326,7 @@ case "$ACTION" in
 	;;
 	restore)
 		ACTION_LABEL='Restore'
-		if [ -z "$BACKUP_DATE" ] || [ ! "$BACKUP_DATE" =~ "$DATE_FORMAT" ]; then
+		if [ -z "$BACKUP_DATE" ] || [[ ! "$BACKUP_DATE" =~ "$DATE_FORMAT" ]]; then
 			showUsageAndExit
 		fi
 
