@@ -22,6 +22,7 @@ ACTION=
 BACKUP_DATE=
 FORCE_OVERWRITE=
 INSTALL_DIR=$(dirname $(readlink -f "$SCRIPT_NAME"))
+DATE_FORMAT='[\d]{2}-[\d]{2}-[\d]{2}'
 MAX_BACKUPS=5
 MAX_LOGS=5
 EXIT_CODE=0
@@ -75,7 +76,7 @@ function list {
         M_BYTE_COUNT=$(expr $K_BYTE_COUNT / 1024)
         M_BYTE_COUNT=$(expr $M_BYTE_COUNT + 1)
         printStatusMessage "# Total size:" "~${M_BYTE_COUNT}M"
-	ls "$BACKUP_DIR" | grep -Po '[\d]{2}-[\d]{2}-[\d]{2}' | sort -r | uniq | while read -r ARCHIVE_DATE; do
+	ls "$BACKUP_DIR" | grep -Po "$DATE_FORMAT" | sort -r | uniq | while read -r ARCHIVE_DATE; do
 		echo "$ARCHIVE_DATE"
 		for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "^$ARCHIVE_DATE-.*\.tar\.bz2$"); do
 			ARCHIVE_SIZE=$(ls -lah "$BACKUP_DIR/$ARCHIVE" | awk '{print $5}')
@@ -325,7 +326,7 @@ case "$ACTION" in
 	;;
 	restore)
 		ACTION_LABEL='Restore'
-		if [ -z "$BACKUP_DATE" ]; then
+		if [ -z "$BACKUP_DATE" ] || [ ! "$BACKUP_DATE" =~ "$DATE_FORMAT" ]; then
 			showUsageAndExit
 		fi
 
