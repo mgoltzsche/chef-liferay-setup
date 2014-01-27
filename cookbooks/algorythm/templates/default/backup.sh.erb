@@ -34,7 +34,7 @@ function showUsageAndExit {
 		EXIT_STATUS=1
 	fi
 
-	printf "Usage: backup {list|dump [force]|restore DATE}\nDATE: YY-MM-DD\n"
+	printf "Usage: backup [-h|--help] {list|dump [-f|--force] [TYPE1 [TYPE2..]]|restore DATE [TYPE1 [TYPE2..]]}\nDATE: YY-MM-DD\n"
 	exit $EXIT_STATUS
 }
 
@@ -287,14 +287,14 @@ while [ "$1" != '' ]; do
 				fi
 				BACKUP_TYPES="$BACKUP_TYPES$1 "
 			else
-				ifshowUsageAndExit
+				showUsageAndExit >&2
 			fi
 	esac
 	shift
 done
 
 if [ -z "$ACTION" ]; then
-	showUsageAndExit
+	showUsageAndExit >&2
 fi
 
 # Apply action
@@ -328,7 +328,7 @@ case "$ACTION" in
 	restore)
 		ACTION_LABEL='Restore'
 		if [ -z "$BACKUP_DATE" ]; then
-			showUsageAndExit
+			showUsageAndExit >&2
 		fi
 		if [ -z $(echo "$BACKUP_DATE" | grep -P "^$DATE_FORMAT$") ]; then
 			echo "ERROR: Invalid date format. Given: $BACKUP_DATE. Expecting: YY-MM-DD" >&2
@@ -350,7 +350,7 @@ case "$ACTION" in
 		list
 	;;
 	*)
-		showUsageAndExit
+		showUsageAndExit >&2
 	;;
 esac
 
