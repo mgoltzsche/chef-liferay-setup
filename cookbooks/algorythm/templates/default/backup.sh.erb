@@ -308,6 +308,9 @@ case "$ACTION" in
 		BACKUP_PARAMS_CORRECT=true
 
 		mkdir -p $BACKUP_DIR &&
+		if [ -z "$BACKUP_TYPES" ]; then
+			BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
+		fi &&
 		for BACKUP_TYPE in $BACKUP_TYPES; do
 			BACKUP_FILE=$(toBackupTaskId "$BACKUP_TYPE")'.tar.bz2'
 			if [ -f "$BACKUP_DIR/$BACKUP_FILE" ]; then
@@ -320,10 +323,6 @@ case "$ACTION" in
 				fi
 			fi
 		done &&
-
-		if [ -z "$BACKUP_TYPES" ]; then
-			BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
-		fi &&
 
 		echo "Backup date $BACKUP_DATE:" &&
 
