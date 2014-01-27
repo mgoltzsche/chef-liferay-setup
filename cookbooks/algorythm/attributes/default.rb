@@ -96,7 +96,7 @@ default['redmine'] = {
 	'install_directory' => '/opt',
 	'home' => '/var/opt/redmine',
 	'user' => 'redmine',
-	'version' => '2.3.3',
+	'version' => '2.4.2',
 	'backlogs_version' => 'v1.0.6',
 
 	'hostname' => "redmine.#{default['ldap']['instances']['default']['domain']}",
