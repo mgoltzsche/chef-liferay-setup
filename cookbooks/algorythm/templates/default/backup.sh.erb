@@ -326,8 +326,11 @@ case "$ACTION" in
 	;;
 	restore)
 		ACTION_LABEL='Restore'
-		if [ -z "$BACKUP_DATE" ] || [[ ! "$BACKUP_DATE" =~ "$DATE_FORMAT" ]]; then
+		if [ -z "$BACKUP_DATE" ]; then
 			showUsageAndExit
+		fi
+		if [ -z $(echo "$BACKUP_DATE" | grep -P "^$DATE_FORMAT$") ]; then
+			echo "ERROR: Invalid date format. Expected: YY-MM-DD" >&2
 		fi
 
 		echo "$ACTION_LABEL"
