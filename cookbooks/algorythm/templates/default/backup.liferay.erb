@@ -9,7 +9,8 @@ if [ -z "$LIFERAY_SERVICE" ]; then
 	LIFERAY_SERVICE='<%=@service%>'
 fi
 CFG_FILE="$LIFERAY_HOME/portal-ext.properties"
-DB_NAME=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.url=.*/).*?')
+DB_URL=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.url=).*')
+DB_NAME=$(cat $DB_URL | grep -Po '(?<=/).*?$')
 DB_USER=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.username=).*')
 
 function liferayBackup {
