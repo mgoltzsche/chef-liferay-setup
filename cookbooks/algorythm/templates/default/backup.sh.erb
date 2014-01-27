@@ -9,7 +9,7 @@
 ##################################################
 
 if [ $(id -u) != '0' ]; then
-	echo 'You need root privileges to run this script' 2>&1
+	echo 'You need root privileges to run this script' >&2
 	exit 1
 fi
 
@@ -161,7 +161,7 @@ function runBackup {
 	fi
 
 	if [ -d "$TMP_DIR" ]; then
-		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
+		echo "ERROR: Temp directory $TMP_DIR is in use" >&2
 		exit 4
 	fi
 
@@ -172,7 +172,7 @@ function runBackup {
 	printf '' > "$FINISH_LISTENER_FILE"
 
 	# Run backup tasks parallel
-	for BACKUP_TYPE in BACKUP_TYPES; do
+	for BACKUP_TYPE in $BACKUP_TYPES; do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo "* $BACKUP_TYPE"
@@ -185,7 +185,7 @@ function runBackup {
 	echo ''
 
 	# Wait for tasks to terminate and collect exit codes
-	for BACKUP_TYPE in BACKUP_TYPES; do
+	for BACKUP_TYPE in $BACKUP_TYPES; do
 		PID_VAR="${BACKUP_TYPE}_PID"
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
@@ -198,7 +198,7 @@ function runBackup {
 
 	# Concat task logs and write to single $LOG_FILE
 	printf '' > $LOG_FILE
-	for BACKUP_TYPE in BACKUP_TYPES; do
+	for BACKUP_TYPE in $BACKUP_TYPES; do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
@@ -284,7 +284,7 @@ while [ "$1" != '' ]; do
 		*)
 			if $DUMP_OR_RESTORE; then
 				if [ ! -f "$INSTALL_DIR/tasks/$1" ]; then
-					echo "Unknown backup type: $1" &>&2
+					echo "ERROR: Unknown backup type: $1" >&2
 					exit 1
 				fi
 				BACKUP_TYPES="$BACKUP_TYPES$1 "
@@ -313,7 +313,7 @@ case "$ACTION" in
 				if [ "$FORCE_OVERWRITE" = '1' ]; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
-					printf "failed: Backup date $BACKUP_DATE already exists. \nAdd -f option to overwrite old backups\n" 2>&1
+					printf "ERROR: Backup date $BACKUP_DATE already exists. \n       Add -f option to overwrite old backups\n" >&2
 					exit 5
 				fi
 			fi

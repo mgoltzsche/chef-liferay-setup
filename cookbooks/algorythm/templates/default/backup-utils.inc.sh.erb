@@ -171,7 +171,7 @@ function serviceWrapper {
 	FN_NAME='serviceWrapper'
 
 	if [ -z "$1" ]; then
-		echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
+		echo "Usage: $FN_NAME {stop|start|restart} SERVICE" >&2
 		return 1
 	fi
 
@@ -184,7 +184,7 @@ function serviceWrapper {
 			echo "echo '* Restart $1'; service '$1' restart &> /dev/null" >> "$FINISH_LISTENER_FILE"
 		;;
 		*)
-			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" 2>&1
+			echo "Usage: $FN_NAME {stop|start|restart} SERVICE" >&2
 			return 1
 		;;
 	esac
