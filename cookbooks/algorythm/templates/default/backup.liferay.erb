@@ -14,11 +14,11 @@ DB_NAME=$(basename $DB_URL)
 DB_USER=$(cat $CFG_FILE | grep -Po '(?<=^jdbc\.default\.username=).*')
 
 function liferayBackup {
-	serviceWrapper liferay stop
+	serviceWrapper  "$LIFERAY_SERVICE" stop
 	backupPostgreDB "$DB_NAME" "$DB_USER" &&
 	backupDirectory "$LIFERAY_HOME/data" 'data'                  "$LIFERAY_USER:$LIFERAY_USER" &&
 	backupFile      "$CFG_FILE"          'portal-ext.properties' "$LIFERAY_USER:$LIFERAY_USER" &&
-	serviceWrapper liferay start
+	serviceWrapper  "$LIFERAY_SERVICE" start
 }
 
 case "$ACTION" in
@@ -26,9 +26,7 @@ case "$ACTION" in
 		liferayBackup
 	;;
 	restore)
-		serviceWrapper '$LIFERAY_SERVICE' stop
-		liferayBackup &&
-		serviceWrapper '$LIFERAY_SERVICE' start
+		liferayBackup
 	;;
 	*)
 		echo "Usage: $0 {dump|restore} DIRECTORY"
