@@ -7,6 +7,8 @@
 		"recipe[algorythm::mail_server]",
 		"recipe[algorythm::postgresql]",
 		"recipe[algorythm::nginx]",
-		"recipe[algorythm::liferay_jetty]"
+		"recipe[algorythm::liferay_jetty]",
+		"recipe[algorythm::sonatype_nexus]",
+		"recipe[algorythm::redmine_backlogs]"
 	]
 }
