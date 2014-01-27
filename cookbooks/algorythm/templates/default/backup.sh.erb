@@ -1,12 +1,8 @@
 #!/bin/bash
-##################################################
-# Usage: backup [OPTIONS] {list|dump|restore [DATE]}    #
-# Options:                                       #
-#   -h --help    Usage                           #
-#   -f --force   Force backup overwrite          #
-# DATE: YY-MM-DD                                 #
-# Must be run as root                            #
-##################################################
+#####################################################################
+# Usage: backup [OPT] {help|list|dump [TYPES]|restore DATE [TYPES]} #
+# Must be run as root                                               #
+#####################################################################
 
 if [ $(id -u) != '0' ]; then
 	echo 'You need root privileges to run this script' >&2
@@ -34,7 +30,14 @@ function showUsageAndExit {
 		EXIT_STATUS=1
 	fi
 
-	printf "Usage: backup [-h|--help] {list|dump [-f|--force] [TYPE1 [TYPE2..]]|restore DATE [TYPE1 [TYPE2..]]}\nDATE: YY-MM-DD\n"
+	echo 'Usage: backup [OPTIONS] {help|list|dump [TYPES]|restore DATE [TYPES]}'
+	echo ''
+	echo 'DATE: YY-MM-DD'
+	echo 'TYPES: List of space separated backup type names.'
+	echo '  If empty all available types will be applied'
+	echo 'OPTIONS:"
+	echo '  -f|--force    Force backup overwrite'
+	echo '  -h|--help     Usage'
 	exit $EXIT_STATUS
 }
 
@@ -348,6 +351,7 @@ case "$ACTION" in
 	;;
 	help)
 		showUsageAndExit 0
+	;;
 	*)
 		showUsageAndExit >&2
 	;;
