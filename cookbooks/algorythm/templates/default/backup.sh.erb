@@ -297,10 +297,6 @@ if [ -z "$ACTION" ]; then
 	showUsageAndExit
 fi
 
-if [ -z "$BACKUP_TYPES" ]; then
-	BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
-fi
-
 # Apply action
 case "$ACTION" in
 	dump)
@@ -321,6 +317,10 @@ case "$ACTION" in
 			fi
 		done &&
 
+		if [ -z "$BACKUP_TYPES" ]; then
+			BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
+		fi &&
+
 		echo "Backup date $BACKUP_DATE:" &&
 
 		runBackup
@@ -334,6 +334,13 @@ case "$ACTION" in
 			echo "ERROR: Invalid date format. Given: $BACKUP_DATE. Expecting: YY-MM-DD" >&2
 			exit 1
 		fi
+		if [ -z "$BACKUP_TYPES" ]; then
+			for ARCHIVE in $(ls "$BACKUP_DIR" | grep -P "^$BACKUP_DATE-.*\.tar\.bz2$"); do
+				BACKUP_TYPE=${ARCHIVE%.tar.bz2}
+				BACKUP_TYPE=${BACKUP_TYPE#${BACKUP_DATE}-}
+				BACKUP_TYPES="$BACKUP_TYPES$BACKUP_TYPE "
+			done
+		fi &&
 
 		echo "$ACTION_LABEL"
 
