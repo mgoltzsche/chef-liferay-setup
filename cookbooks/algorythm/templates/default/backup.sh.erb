@@ -155,6 +155,10 @@ function runBackup {
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
 	FINISH_LISTENER_FILE="$TMP_DIR/finish.sh"
+	
+	if [ -z "$BACKUP_TYPES" ]; then
+		BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
+	fi
 
 	if [ -d "$TMP_DIR" ]; then
 		echo "failed: Temp directory $TMP_DIR is in use" 2>&1
@@ -168,7 +172,7 @@ function runBackup {
 	printf '' > "$FINISH_LISTENER_FILE"
 
 	# Run backup tasks parallel
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
+	for BACKUP_TYPE in BACKUP_TYPES; do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo "* $BACKUP_TYPE"
@@ -181,7 +185,7 @@ function runBackup {
 	echo ''
 
 	# Wait for tasks to terminate and collect exit codes
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
+	for BACKUP_TYPE in BACKUP_TYPES; do
 		PID_VAR="${BACKUP_TYPE}_PID"
 		wait ${!PID_VAR}
 		TASK_EXIT_CODE=$?
@@ -194,7 +198,7 @@ function runBackup {
 
 	# Concat task logs and write to single $LOG_FILE
 	printf '' > $LOG_FILE
-	for BACKUP_TYPE in $(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$'); do
+	for BACKUP_TYPE in BACKUP_TYPES; do
 		BACKUP_TASK_ID=$(toBackupTaskId $BACKUP_TYPE)
 		PARTIAL_LOG_FILE="$LOG_DIR/$BACKUP_TASK_ID.log"
 		echo '===============================================================================' >> "$LOG_FILE"
@@ -259,18 +263,31 @@ function runBackup {
 }
 
 
-# Apply parameters
+# Read parameters
+BACKUP_TYPES=''
+DUMP_OR_RESTORE=false
 while [ "$1" != '' ]; do
 	case "$1" in
 		restore)
 			ACTION=$1
 			shift
 			BACKUP_DATE="$1"
+			DUMP_OR_RESTORE=true
 		;;
-		dump|list)  ACTION=$1;;
+		dump) DUMP_OR_RESTORE=true
+		list) ACTION=$1;;
 		-f|--force) FORCE_OVERWRITE=1;;
 		-h|--help)  showUsageAndExit 0;;
-		*)          showUsageAndExit
+		*)
+			if $DUMP_OR_RESTORE; then
+				if [ ! -f "$INSTALL_DIR/tasks/$1" ]; then
+					echo "Unknown backup type: $1" &>&2
+					exit 1
+				fi
+				BACKUP_TYPES="$BACKUP_TYPES$1 "
+			else
+				ifshowUsageAndExit
+			fi
 	esac
 	shift
 done
