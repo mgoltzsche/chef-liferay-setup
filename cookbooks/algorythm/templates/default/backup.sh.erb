@@ -330,7 +330,7 @@ case "$ACTION" in
 			showUsageAndExit
 		fi
 		if [ -z $(echo "$BACKUP_DATE" | grep -P "^$DATE_FORMAT$") ]; then
-			echo "ERROR: Invalid date format. Expecting YY-MM-DD" >&2
+			echo "ERROR: Invalid date format. Given: $BACKUP_DATE. Expecting: YY-MM-DD" >&2
 			exit 1
 		fi
 
