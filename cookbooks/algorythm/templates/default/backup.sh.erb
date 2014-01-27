@@ -274,7 +274,10 @@ while [ "$1" != '' ]; do
 			BACKUP_DATE="$1"
 			DUMP_OR_RESTORE=true
 		;;
-		dump) DUMP_OR_RESTORE=true;
+		dump)
+			ACTION=$1
+			DUMP_OR_RESTORE=true
+		;;
 		list) ACTION=$1;;
 		-f|--force) FORCE_OVERWRITE=1;;
 		-h|--help)  showUsageAndExit 0;;
