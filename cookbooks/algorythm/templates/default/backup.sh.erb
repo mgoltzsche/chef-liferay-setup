@@ -309,11 +309,12 @@ case "$ACTION" in
 
 		mkdir -p $BACKUP_DIR &&
 		for BACKUP_TYPE in $BACKUP_TYPES; do
-			if [ -f "$BACKUP_DIR/${BACKUP_DATE}-${BACKUP_TYPE}.tar.bz2" ]; then
+			BACKUP_FILE=$(toBackupTaskId BACKUP_TYPE)'.tar.bz2'
+			if [ -f "$BACKUP_DIR/$BACKUP_FILE" ]; then
 				if $FORCE_OVERWRITE; then
-					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
+					echo "WARNING: $BACKUP_FILE already exists and will be overwritten"
 				else
-					printf "ERROR: Backup date $BACKUP_DATE already exists. \n       Add -f option to overwrite old backups\n" >&2
+					printf "ERROR: $BACKUP_FILE already exists. \n       Add -f option to overwrite old backups\n" >&2
 					exit 5
 				fi
 			fi
