@@ -116,7 +116,7 @@ function runBackupTask {
 		fi
 
 		echo '* Decompress backup'
-		cd $TMP_DIR
+		cd $TMP_DIR &&
 		indent tar xvjf "$BACKUP_ARCHIVE"
 		DECOMPRESSION_EXIT_CODE=$?
 
@@ -132,9 +132,10 @@ function runBackupTask {
 	if [ $TASK_EXIT_CODE -eq 0 ]; then
 		if [ $ACTION = 'dump' ]; then
 			echo '* Compress backup'
-			cd $TMP_DIR
-			indent tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID
-			COMPRESSION_EXIT_CODE=$PIPESTATUS
+			cd $TMP_DIR &&
+			indent tar cvjf "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2" $BACKUP_TASK_ID &&
+			chmod 600 "$TMP_ARCHIVE_DIR/$BACKUP_TASK_ID.tar.bz2"
+			COMPRESSION_EXIT_CODE=$?
 
 			if [ $COMPRESSION_EXIT_CODE != '0' ]; then
 				echo "failed: Couldn't compress and save backup to $BACKUP_ARCHIVE"
@@ -156,10 +157,6 @@ function runBackup {
 	TMP_DIR="/tmp/backup-$BACKUP_DATE"
 	TMP_ARCHIVE_DIR="$TMP_DIR/backups"
 	FINISH_LISTENER_FILE="$TMP_DIR/finish.sh"
-	
-	if [ -z "$BACKUP_TYPES" ]; then
-		BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
-	fi
 
 	if [ -d "$TMP_DIR" ]; then
 		echo "ERROR: Temp directory $TMP_DIR is in use" >&2
@@ -300,17 +297,19 @@ if [ -z "$ACTION" ]; then
 	showUsageAndExit
 fi
 
+if [ -z "$BACKUP_TYPES" ]; then
+	BACKUP_TYPES=$(ls "$INSTALL_DIR/tasks" | grep -P '^[\w-_]+$')
+fi
+
 # Apply action
 case "$ACTION" in
 	dump)
 		ACTION_LABEL='Backup'
 		BACKUP_DATE=$(date +'%y-%m-%d')
 
-		if [ -d $BACKUP_DIR ]; then
-			ls $BACKUP_DIR | grep -P $BACKUP_DATE'\.tar\.bz2$' > /dev/null
-			BACKUP_DATE_SEARCH_EXIT_CODE=$?
-
-			if [ $BACKUP_DATE_SEARCH_EXIT_CODE -eq 0 ]; then
+		mkdir -p $BACKUP_DIR &&
+		for BACKUP_TYPE in $BACKUP_TYPES; do
+			if [ -f "$BACKUP_DIR/${BACKUP_DATE}-${BACKUP_TYPE}.tar.bz2" ]; then
 				if $FORCE_OVERWRITE; then
 					echo "WARNING: Backup date $BACKUP_DATE already exists and will be overwritten"
 				else
@@ -318,7 +317,7 @@ case "$ACTION" in
 					exit 5
 				fi
 			fi
-		fi
+		done
 
 		echo "Backup date $BACKUP_DATE:"
 
