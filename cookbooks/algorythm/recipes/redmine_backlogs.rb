@@ -268,6 +268,11 @@ execute 'Update admin user' do
 end
 
 # --- Install Redmine backlogs plugin ---
+trackerConfig = if `psql -d #{dbname} -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" | grep -P '^\s*rb_'`
+		''
+	else
+		'story_trackers=Feature task_tracker=Task'
+end
 execute 'Install Redmine Backlogs plugin' do
   user usr
   group usr
@@ -276,12 +281,11 @@ execute 'Install Redmine Backlogs plugin' do
 export RAILS_ENV=production;
 rake tmp:cache:clear &&
 rake tmp:sessions:clear &&
-rake redmine:backlogs:install \
-	story_trackers=feature \
-	task_tracker=task \
+rake redmine:backlogs:install #{trackerConfig} \
 	corruptiontest=true \
 	labels=true
   EOH
+  not_if("psql -d #{dbname} -c \")
 end
 
 # --- Configure backup ---
