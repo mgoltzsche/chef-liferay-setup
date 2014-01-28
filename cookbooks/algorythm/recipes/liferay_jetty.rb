@@ -253,7 +253,7 @@ userPassword:: #{ldapPasswordHashed}
 #			EOH
 #			not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})' | grep -P '^# numEntries: [\\d]+$'"
 #		end
-#	end
+	end
 
 	# --- Register Liferay as service ---
 	template "/etc/init.d/#{instanceId}" do
