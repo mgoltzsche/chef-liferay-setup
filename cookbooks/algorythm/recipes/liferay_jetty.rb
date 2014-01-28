@@ -243,17 +243,17 @@ userPassword:: #{ldapPasswordHashed}
 			EOH
 			not_if "ldapsearch #{ldapModifyParams} -b '#{ldapUserDN}'"
 		end
-		execute 'Grant Directory Administrator privileges to default Liferay LDAP account' do
-			command <<-EOH
-echo "dn: cn=Directory Administrators,#{ldapSuffix}
-changetype: modify
-add: uniqueMember
-uniqueMember: #{ldapUserDN}
-" | ldapmodify #{ldapModifyParams}
-			EOH
-			not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})' | grep -P '^# numEntries: [\\d]+$'"
-		end
-	end
+#		execute 'Grant Directory Administrator privileges to default Liferay LDAP account' do
+#			command <<-EOH
+#echo "dn: cn=Directory Administrators,#{ldapSuffix}
+#changetype: modify
+#add: uniqueMember
+#uniqueMember: #{ldapUserDN}
+#" | ldapmodify #{ldapModifyParams}
+#			EOH
+#			not_if "ldapsearch #{ldapModifyParams} -b 'cn=Directory Administrators,#{ldapSuffix}' '(uniqueMember=#{ldapUserDN})' | grep -P '^# numEntries: [\\d]+$'"
+#		end
+#	end
 
 	# --- Register Liferay as service ---
 	template "/etc/init.d/#{instanceId}" do
