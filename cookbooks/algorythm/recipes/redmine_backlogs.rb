@@ -285,7 +285,6 @@ rake redmine:backlogs:install #{trackerConfig} \
 	corruptiontest=true \
 	labels=true
   EOH
-  not_if("psql -d #{dbname} -c \")
 end
 
 # --- Configure backup ---
