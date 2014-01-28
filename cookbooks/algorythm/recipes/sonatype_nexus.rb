@@ -54,7 +54,7 @@ template nexusCfg do
   variables({
     :hostname => hostname,
     :mailServerHost => mailServerHost,
-    :mailServerUser => ldapUser,
+    :mailServerUser => systemEmailAddress,
     :mailServerPassword => ldapPassword,
     :systemEmailAddress => systemEmailAddress
   })

@@ -183,10 +183,10 @@ end
 
 # --- Configure Redmine database connection ---
 template "#{redmineDir}/config/database.yml" do
-  owner usr
+  owner 'root'
   group usr
   source 'redmine.database.yml.erb'
-  mode 0400
+  mode 0640
   variables({
     :database => dbname,
     :user => node['redmine']['postgresql']['user'],
@@ -196,14 +196,14 @@ end
 
 # --- Configure Redmine home dir & SMPT connection ---
 template "#{redmineDir}/config/configuration.yml" do
-  owner usr
+  owner 'root'
   group usr
   source 'redmine.configuration.yml.erb'
-  mode 0400
+  mode 0640
   variables({
     :homeDir => redmineHomeDir,
     :mailServerHost => mailServerHost,
-    :mailServerUser => ldapUser,
+    :mailServerUser => systemEmail,
     :mailServerPassword => ldapPassword
   })
 end
@@ -227,7 +227,7 @@ end
 settings = {
   'host_name'     => hostname,
   'mail_from'     => systemEmail,
-  'emails_footer' => "You have received this notification because you have either subscribed to it, or are involved in it.\\r\\nTo change your notification preferences, please click here: https://#{hostname}/my/account"
+  'emails_footer' => "You have received this notification because you have either subscribed to it, or are involved in it.\\r\\nTo change your notification preferences please click here: https://#{hostname}/my/account"
 }
 
 settings.keys.each do |key|
