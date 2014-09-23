@@ -7,14 +7,14 @@ if [ -z "$VMAIL_USER" ]; then
 fi
 
 function mailBackup {
-	backupFile      '/etc/postfix/main.cf'                      'etc/postfix/main.cf' &&
-	backupFile      '/etc/postfix/master.cf'                    'etc/postfix/master.cf' &&
-	backupFile      '/etc/postfix/dynamicmaps.cf'               'etc/postfix/dynamicmaps.cf' &&
-	backupDirectory '/etc/postfix/ldap'                         'etc/postfix/ldap' root:postfix &&
-	backupFile      '/etc/dovecot/dovecot.conf'                 'etc/dovecot/dovecot.conf' root:root &&
-	backupFile      '/etc/dovecot/dovecot-ldap.conf.ext'        'etc/dovecot/dovecot-ldap.conf.ext' root:root &&
-	backupFile      '/etc/dovecot/dovecot-ldap-userdb.conf.ext' 'etc/dovecot/dovecot-ldap-userdb.conf.ext' root:root &&
-	backupDirectory "$VMAIL_HOME"                               'vmail' "$VMAIL_USER:$VMAIL_USER"
+	backupFile      '/etc/postfix/main.cf'                       'etc/postfix/main.cf' &&
+	backupFile      '/etc/postfix/master.cf'                     'etc/postfix/master.cf' &&
+	backupFile      '/etc/postfix/dynamicmaps.cf'                'etc/postfix/dynamicmaps.cf' &&
+	backupDirectory '/etc/postfix/ldap'                          'etc/postfix/ldap' root:postfix &&
+	backupFile      '/etc/dovecot/dovecot.conf'                  'etc/dovecot/dovecot.conf' root:root &&
+	backupFile      '/etc/dovecot/dovecot-ldap-default.conf.ext' 'etc/dovecot/dovecot-ldap-default.conf.ext' root:root &&
+	backupFile      '/etc/dovecot/dovecot-ldap-userdb.conf.ext'  'etc/dovecot/dovecot-ldap-userdb.conf.ext' root:root &&
+	backupDirectory "$VMAIL_HOME"                                'vmail' "$VMAIL_USER:$VMAIL_USER"
 }
 
 case "$ACTION" in
