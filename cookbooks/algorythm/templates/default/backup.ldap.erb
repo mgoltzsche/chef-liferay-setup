@@ -1,33 +1,47 @@
 #!/bin/bash
 
-function ldapBackup {
-	EXIT_CODE=0
-	
-	for INSTANCE in $(ls "$LOOP_DIR" | grep -P "^slapd-"); do
-		backupDirectory "/etc/dirsrv/$INSTANCE" "conf/$INSTANCE" dirsrv:dirsrv &&
-		backupDirectory "/var/lib/dirsrv/$INSTANCE" "data/$INSTANCE" dirsrv:dirsrv
-		STATUS=$?
-
-		if [ $STATUS != '0' ]; then
-			EXIT_CODE=2
-		fi
-	done
-	return $EXIT_CODE
-}
-
 case "$ACTION" in
-	dump)
-		LOOP_DIR=/etc/dirsrv
-		ldapBackup
-	;;
-	restore)
-		LOOP_DIR="$BACKUP_TMP_DIR/conf"
-		serviceWrapper dirsrv stop
-		ldapBackup &&
-		serviceWrapper dirsrv start
-	;;
-	*)
-		echo "Usage: $0 {dump|restore} DIRECTORY"
-		exit 1
-	;;
+		dump)
+			ERROR=0
+			chmod -R 770 $BACKUP_TMP_DIR &&
+			chown -R root:dirsrv $BACKUP_TMP_DIR &&
+			for DIR in $(find /etc/dirsrv/ -mindepth 1 -maxdepth 1 -type d -name "slapd-*" | xargs -n 1 basename); do
+				for DB_NAME in $(find /var/lib/dirsrv/$DIR/db/ -mindepth 1 -maxdepth 1 -type d | xargs -n 1 basename); do
+					ns-slapd db2ldif -D /etc/dirsrv/$DIR -n $DB_NAME -a $BACKUP_TMP_DIR/$(echo $DIR | sed -e 's/slapd-//g')-$DB_NAME.ldif >/dev/null
+					STATUS=$?
+
+					if [ $STATUS -ne 0 ]; then
+						ERROR=1
+					fi
+					done
+			done
+
+			if [ $ERROR -ne 0 ]; then
+				exit 1
+			fi
+		;;
+		restore)
+			ERROR=0
+			serviceWrapper dirsrv stop
+			for LDIF in $(ls $BACKUP_TMP_DIR | grep -P '^.*\.ldif$'); do
+				NAMES=$(echo $LDIF | sed -e 's/\.ldif$//g')
+				INSTANCE_NAME=$(echo $NAMES | cut -d - -f 1)
+				DB_NAME=$(echo $NAMES | cut -d - -f 2)
+				ns-slapd ldif2db -D /etc/dirsrv/slapd-$INSTANCE_NAME -n $DB_NAME -i $BACKUP_TMP_DIR/$LDIF
+				STATUS=$?
+
+				if [ $STATUS -ne 0 ]; then
+					ERROR=1
+				fi
+			done
+			serviceWrapper dirsrv start
+
+			if [ $ERROR -ne 0 ]; then
+				exit 1
+			fi
+		;;
+		*)
+			echo "Usage: $0 {dump|restore}"
+			exit 1
+		;;
 esac

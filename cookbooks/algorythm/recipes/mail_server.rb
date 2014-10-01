@@ -1,6 +1,10 @@
-package 'dovecot-postfix'
-package 'postfix-ldap'
+package 'dovecot-core'
 package 'dovecot-ldap'
+package 'dovecot-imapd'
+package 'dovecot-pop3d'
+package 'postfix'
+package 'postfix-ldap'
+package 'mail-stack-delivery'
 
 machineFQN = "#{node['hostname']}.#{node['domainname']}"
 usr = node['mail_server']['vmail_user']

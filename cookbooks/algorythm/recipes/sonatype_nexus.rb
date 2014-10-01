@@ -30,7 +30,7 @@ package 'unzip'
 
 # --- Download & deploy Nexus OSS ---
 remote_file nexusWarFile do
-  source "http://www.sonatype.org/downloads/nexus-#{version}.war"
+  source "http://download.sonatype.com/nexus/oss/nexus-latest.war"
   action :create_if_missing
 end
 
@@ -120,7 +120,7 @@ execute "Extract Sonatype Nexus" do
 end
 
 execute "Configure home directory" do
-  command "sed -i 's/^\\s*nexus-work\\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/plexus.properties"
+  command "sed -i 's/^\\s*nexus-work\\s*=.*/nexus-work=#{nexusHomeEscaped}/' #{nexusExtractDir}/WEB-INF/classes/nexus.properties"
   not_if {File.exist?(nexusDir)}
 end
 

@@ -5,9 +5,13 @@ external_pid_file = '/var/run/postgresql/<%=@version%>-main.pid'
 port = <%=@port%>
 listen_addresses = <%=@address%>
 max_connections = 100
-unix_socket_directory = '/var/run/postgresql'
+unix_socket_directories = '/var/run/postgresql'
 ssl = false
-shared_buffers = 24MB
+shared_buffers = 128MB
 log_line_prefix = '%t '
 datestyle = 'iso, dmy'
-default_text_search_config = 'pg_catalog.english'
+lc_messages = 'de_DE.UTF-8'
+lc_monetary = 'de_DE.UTF-8'
+lc_numeric = 'de_DE.UTF-8'
+lc_time = 'de_DE.UTF-8'
+default_text_search_config = 'pg_catalog.german'

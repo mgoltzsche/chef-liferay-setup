@@ -13,7 +13,7 @@ default['backup'] = {
 # LDAP configuration
 default['ldap']['dirmanager'] = 'dirmanager'
 default['ldap']['dirmanager_password'] = 'password'
-default['ldap']['hostname'] = 'localhost'
+default['ldap']['hostname'] = 'localhost' # For other systems
 default['ldap']['instances']['default'] = {
 	'listenhost' => '127.0.0.1',
 	'port' => 389,
@@ -39,7 +39,7 @@ default['mail_server'] = {
 default['postgresql'] = {
 	'address' => 'localhost',
 	'port' => 5432,
-	'version' => '9.1'
+	'version' => '9.3'
 }
 
 # Liferay installation
@@ -55,7 +55,7 @@ default['liferay']['admin'] = {
 	'password' => 'admin123'
 }
 default['liferay']['instances']['default'] = {
-	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.0%20GA1/liferay-portal-jetty-6.2.0-ce-ga1-20131101192857659.zip?r=&ts=1388349536&use_mirror=garr',
+	'download_url' => 'http://downloads.sourceforge.net/project/lportal/Liferay%20Portal/6.2.1%20GA2/liferay-portal-jetty-6.2-ce-ga2-20140319114139101.zip?r=&ts=1388349536&use_mirror=garr',
 	'java_server' => 'jetty',
 	'hostname' => default['ldap']['instances']['default']['domain'],
 	'port' => 7080,
@@ -78,7 +78,7 @@ default['liferay']['instances']['default'] = {
 
 # Sonatype Nexus installation
 default['nexus'] = {
-	'version' => '2.7.1-01',
+	'version' => '2.9.2',
 	'hostname' => "repository.#{default['ldap']['instances']['default']['domain']}",
 	'system_mail_prefix' => 'system',
 	'install_directory' => "#{default['liferay']['install_directory']}/liferay_default/webapps",

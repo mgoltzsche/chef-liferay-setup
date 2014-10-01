@@ -30,6 +30,7 @@ package 'git'
 package 'imagemagick'
 package 'libpq-dev'
 package 'libmagick-dev'
+package 'libmagickcore-dev'
 package 'libmagickwand-dev'
 
 # --- Create Redmine system user ---
@@ -283,7 +284,9 @@ rake tmp:cache:clear &&
 rake tmp:sessions:clear &&
 rake redmine:backlogs:install #{trackerConfig} \
 	corruptiontest=true \
-	labels=true
+	labels=true \
+	story_trackers=Story \
+	task_tracker=Task
   EOH
 end
 
